@@ -1,0 +1,1681 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:java="http://www.yworks.com/xml/yfiles-common/1.0/java" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0" xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml" xmlns:yed="http://www.yworks.com/xml/yed/3" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
+<key attr.name="Description" attr.type="string" for="graph" id="d0"/>
+<key for="port" id="d1" yfiles.type="portgraphics"/>
+<key for="port" id="d2" yfiles.type="portgeometry"/>
+<key for="port" id="d3" yfiles.type="portuserdata"/>
+<key attr.name="notes" attr.type="string" for="node" id="d4"/>
+<key attr.name="Annotation" attr.type="string" for="node" id="d5"/>
+<key attr.name="Bqmodel_Is" attr.type="string" for="node" id="d6"/>
+<key attr.name="Biol_Is" attr.type="string" for="node" id="d7"/>
+<key attr.name="Clone" attr.type="string" for="node" id="d8"/>
+<key attr.name="URL" attr.type="string" for="node" id="d9"/>
+<key attr.name="Description" attr.type="string" for="node" id="d10"/>
+<key attr.name="Orientation" attr.type="string" for="node" id="d11"/>
+<key for="node" id="d12" yfiles.type="nodegraphics"/>
+<key for="graphml" id="d13" yfiles.type="resources"/>
+<key attr.name="URL" attr.type="string" for="edge" id="d14"/>
+<key attr.name="Description" attr.type="string" for="edge" id="d15"/>
+<key for="edge" id="d16" yfiles.type="edgegraphics"/>
+<graph edgedefault="directed" id="G">
+<data key="d0"/>
+<node id="glyph9">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="170.0" y="40.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="170.0" y="40.0">hexokinase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph0">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="90.0" y="140.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="90.0" y="140.0">glucose<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph6">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="140.0" y="230.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="140.0" y="230.0">ATP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph8">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="220.0" y="160.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph7">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="270.0" y="230.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="270.0" y="230.0">ADP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph12">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="700.0" y="230.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="700.0" y="230.0">ADP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph13">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="570.0" y="230.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="570.0" y="230.0">ATP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph1">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="320.0" y="140.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="320.0" y="140.0">glucose
+6P<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph2">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="520.0" y="140.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="520.0" y="140.0">fructose
+6P<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph15">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="1080.0" y="140.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="1080.0" y="140.0">triose-P
+isomerase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph3">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="730.0" y="140.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="730.0" y="140.0">fructose
+1,6P<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph17">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="380.0" y="40.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="380.0" y="40.0">glucose-6P
+isomerase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph10">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="430.0" y="160.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph19">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="600.0" y="40.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="600.0" y="40.0">phospho
+fructokinase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph11">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="650.0" y="160.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph18">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="820.0" y="40.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="820.0" y="40.0">adolase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph16">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="870.0" y="160.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph22">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="1080.0" y="350.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="1080.0" y="350.0">GAPDH<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph4">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="960.0" y="240.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="960.0" y="240.0">GA-3P<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph23">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="880.0" y="280.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="880.0" y="280.0">Pi<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph24">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="1050.0" y="280.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="1050.0" y="280.0">NAD<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph25">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="1050.0" y="420.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="1050.0" y="420.0">H+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph20">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">vertical</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="980.0" y="370.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph26">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="1050.0" y="490.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="1050.0" y="490.0">NADH<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph35">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="820.0" y="540.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="820.0" y="540.0">PGK1<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph36">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="580.0" y="540.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="580.0" y="540.0">PG mutase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph37">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="350.0" y="540.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="350.0" y="540.0">enolase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph38">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Macromolecule">
+<y:Geometry height="60.0" width="120.0" x="100.0" y="540.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="120.0" x="100.0" y="540.0">pyruvate
+kinase<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.radius" value="10"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph21">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="960.0" y="460.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="960.0" y="460.0">1,3 BPG<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph42">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="910.0" y="390.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="910.0" y="390.0">ADP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph41">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="780.0" y="390.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="780.0" y="390.0">ATP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph31">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="870.0" y="480.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph27">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="720.0" y="460.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="720.0" y="460.0">3 PG<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph32">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="630.0" y="480.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph28">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="490.0" y="460.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="490.0" y="460.0">2 PG<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph43">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="320.0" y="390.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="320.0" y="390.0">H2O<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph33">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="400.0" y="480.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph29">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="270.0" y="460.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="270.0" y="460.0">PEP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph39">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="210.0" y="390.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="210.0" y="390.0">ADP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph40">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="60.0" y="390.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="60.0" y="390.0">ATP<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph34">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="150.0" y="480.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph30">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="30.0" y="460.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="30.0" y="460.0">pyruvate<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph14">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">vertical</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.Process">
+<y:Geometry height="20.0" width="20.0" x="980.0" y="160.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" bottomInset="0" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="0.0" horizontalTextPosition="center" iconTextGap="4" leftInset="0" modelName="custom" rightInset="0" textColor="#000000" topInset="0" verticalTextPosition="center" visible="true" width="0.0">
+<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph5">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d10"/>
+<data key="d9"/>
+<data key="d8"/>
+<data key="d11">horizontal</data>
+<data key="d12">
+<y:GenericNode configuration="com.yworks.sbgn.SimpleChemical">
+<y:Geometry height="60.0" width="60.0" x="960.0" y="40.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="10" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="60.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="960.0" y="40.0">DHA-P<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<edge id="arc0" source="glyph9" target="glyph8">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc1" source="glyph0" target="glyph8">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="210.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc2" source="glyph8" target="glyph1">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="250.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc3" source="glyph6" target="glyph8">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="210.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc4" source="glyph8" target="glyph7">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="250.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc5" source="glyph11" target="glyph12">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="680.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc6" source="glyph13" target="glyph11">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="640.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc7" source="glyph1" target="glyph10">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="420.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc8" source="glyph10" target="glyph2">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="460.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc9" source="glyph2" target="glyph11">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="640.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc10" source="glyph11" target="glyph3">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="680.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc11" source="glyph14" target="glyph4">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="190.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc12" source="glyph15" target="glyph14">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc13" source="glyph3" target="glyph16">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="860.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc14" source="glyph16" target="glyph5">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="900.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc15" source="glyph16" target="glyph4">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="900.0" y="170.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc16" source="glyph17" target="glyph10">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc17" source="glyph19" target="glyph11">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc18" source="glyph18" target="glyph16">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc19" source="glyph22" target="glyph20">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc20" source="glyph4" target="glyph20">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="360.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc21" source="glyph20" target="glyph21">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="400.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc22" source="glyph23" target="glyph20">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="360.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc23" source="glyph24" target="glyph20">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="360.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc24" source="glyph20" target="glyph25">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="400.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc25" source="glyph20" target="glyph26">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="400.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc26" source="glyph35" target="glyph31">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc27" source="glyph36" target="glyph32">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc28" source="glyph37" target="glyph33">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc29" source="glyph38" target="glyph34">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="white_circle"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc30" source="glyph21" target="glyph31">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="900.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc31" source="glyph42" target="glyph31">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="900.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc32" source="glyph31" target="glyph41">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="860.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc33" source="glyph31" target="glyph27">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="860.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc34" source="glyph27" target="glyph32">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="660.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc35" source="glyph32" target="glyph28">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="620.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc36" source="glyph28" target="glyph33">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="430.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc37" source="glyph33" target="glyph43">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="390.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc38" source="glyph33" target="glyph29">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="390.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc39" source="glyph29" target="glyph34">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="180.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc40" source="glyph39" target="glyph34">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="180.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="none"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc41" source="glyph34" target="glyph40">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="140.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc42" source="glyph34" target="glyph30">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="140.0" y="490.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+<edge id="arc43" source="glyph14" target="glyph5">
+<data key="d15"/>
+<data key="d16">
+<y:PolyLineEdge>
+<y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+<y:Point x="990.0" y="150.0"/>
+</y:Path>
+<y:LineStyle color="#000000" type="line" width="1.0"/>
+<y:Arrows source="none" target="delta"/>
+<y:BendStyle smoothed="false"/>
+</y:PolyLineEdge>
+</data>
+</edge>
+</graph>
+<data key="d13">
+<y:Resources/>
+</data>
+</graphml>
