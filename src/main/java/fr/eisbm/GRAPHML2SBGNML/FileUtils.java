@@ -67,6 +67,10 @@ public class FileUtils {
 	public static final String SBGN_STATE_VARIABLE = "state variable";
 	public static final String SBGN_CARDINALITY = "cardinality";
 	
+	public static final String BQMODEL_IS_DESCRIBED_BY = "bqmodel:isDescribedBy";
+	public static final String BQMODEL_IS = "bqmodel:is";
+	public static final String BQBIOL_IS = "bqbiol:is";
+	
 	public static final String Y_SMART_NODE_LABEL_MODEL_PARAMETER = "y:SmartNodeLabelModelParameter";
 	public static final String Y_MODEL_PARAMETER = "y:ModelParameter";
 	public static final String Y_SMART_NODE_LABEL_MODEL = "y:SmartNodeLabelModel";
@@ -98,43 +102,9 @@ public class FileUtils {
 	public static final String Y_STYLE_PROPERTIES = "y:StyleProperties";
 	public static final String Y_SHAPE_NODE = "y:ShapeNode";
 	
-	public static final String IN_SBGN_ED_RECOMMAP_FILE = "reconmap/reconmap.sbgn";
-	public static final String OUT_YED_RECONMAP_FILE = "reconmap/ASTHMAP1.graphml";
-	public static final String OUT_SBGN_ED_RECOMMAP_FILE = "example-files/out_reconMap.sbgn";
-	public static final String OUT_SBGN_ED_RECOMMAP_VANTED_FILE = "example-files/out_reconMap.sbgn";
 	
-	public static final String IN_SBGN_ED_FILE = "files/cam-camk_dependent_signaling_to_the_nucleus.xml";
-	public static final String OUT_YED_FILE = "files/Step3_ReconMap_yEd_from_SBGN.graphml";
-	public static final String OUT_SBGN_ED_FILE = "files/F018-estrogen-SBGNv02.sbgn";
-	public static final String OUT_SBGN_ED_VANTED_FILE = "metabolism-regulation/working/F015-tag-SBGNv02.sbgn";
-
-	public static final String IN_YED_METABOLIC_FILE = "examples-proteins/F003v10/F003v10.graphml";
-	public static final String IN_GLYCOSLYSIS = "files/examples/glycolysis2.sbgn";
-	public static final String OUT_GLYCOSLYSIS = "files/examples/glycolysis.graphml";
-	public static final String IN_MAPK_CASCADE = "files/examples/mapk_cascade.sbgn";
-	public static final String OUT_MAPK_CASCADE = "files/examples/mapk_cascade.graphml";
-	public static final String IN_CENTRAL_PLANT_METABOLISM = "files/examples/central_plant_metabolism.sbgn";
-	public static final String OUT_CENTRAL_PLANT_METABOLISM = "files/examples/central_plant_metabolism.graphml";
-
-	public static final String OUT_SBGN_GLYCOSLYSIS = "files/examples/out_glycolysis2.sbgn";
-	public static final String IN_GRAPHML_GLYCOSLYSIS = "files/examples/glycolysis.graphml";
-	public static final String OUT_SBGN_MAPK_CASCADE = "files/examples/out_mapk_cascade.sbgn";
-	public static final String IN_GRAPHML_MAPK_CASCADE = "files/examples/mapk_cascade.graphml";
-	public static final String OUT_SBGN_CENTRAL_PLANT_METABOLISM = "files/examples/out_central_plant_metabolism.sbgn";
-	public static final String IN_GRAPHML_CENTRAL_PLANT_METABOLISM = "files/examples/central_plant_metabolism.graphml";
-
-	public static final String IN_ACTIVATED_STATALPHA = "files/examples/activated_stat1alpha_induction_of_the_irf1_gene.sbgn";
-	public static final String OUT_ACTIVATED_STATALPHA = "files/examples/activated_stat1alpha_induction_of_the_irf1_gene.graphml";
-	public static final String IN_INSULIN = "files/examples/insulin-like_growth_factor_signaling.sbgn";
-	public static final String OUT_INSULIN = "files/examples/insulin-like_growth_factor_signaling.graphml";
-	public static final String IN_INSULIN_SUBMAP_MAPK_CASCADE = "files/examples/insulin-like_growth_factor_signaling_withSubmap_mapk_cascade.sbgn";
-	public static final String OUT_INSULIN_SUBMAP_MAPK_CASCADE = "files/examples/insulin-like_growth_factor_signaling_withSubmap_mapk_cascade.graphml";
-	public static final String IN_NEURONAL_MUSCLE_SIGNALLING = "files/examples/neuronal_muscle_signalling.sbgn";
-	public static final String OUT_NEURONAL_MUSCLE_SIGNALLING = "files/examples/neuronal_muscle_signalling.graphml";
-	public static final String IN_EPIDERMAL_GROWTH_FACTOR_RECEPTOR_PATHWAY = "files/examples/epidermal_growth_factor_receptor_pathway.sbgn";
-	public static final String OUT_EPIDERMAL_GROWTH_FACTOR_RECEPTOR_PATHWAY = "files/examples/epidermal_growth_factor_receptor_pathway.graphml";
-	public static final String IN_PRINCIPLE_OF_THE_PCR = "files/examples/principle_of_the_pcr.sbgn";
-	public static final String OUT_PRINCIPLE_OF_THE_PCR = "files/examples/principle_of_the_pcr.graphml";
+	public static final String IN_SBGN_FILE = "files/examples/test.sbgn";
+	public static final String IN_YED_FILE = "files/examples/test.graphml";
 	
 	public static final int DEFAULT_FONT_SIZE = 10;
 	

@@ -68,10 +68,6 @@ public class GraphML2SBGNML {
 	private static final String NOTES_TAG = "notes";
 	private static final String CLONE_TAG = "clone";
 	private static final String ORIENTATION_TAG = "orientation";
-	private static final String BQMODEL_IS_GRAPHML_TAG = "bqmodel_is";
-	private static final String BIOL_IS_GRAPHML_TAG = "biol_is";
-	private static final String BQMODEL_IS_TAG = "bqmodel:is";
-	private static final String BQBIOL_IS_TAG = "bqbiol:is";
 	private static final String NODE_TAG = "node";
 	private static final String EDGE_TAG = "edge";
 	private static final String DATA_TAG = "data";
@@ -95,7 +91,7 @@ public class GraphML2SBGNML {
 	Set<String> compartmentSet = new HashSet<String>();
 
 	public static void main(String[] args) {
-		convert(FileUtils.OUT_YED_FILE);
+		convert(FileUtils.IN_YED_FILE);
 		System.out.println("simulation finished");
 	}
 
@@ -126,6 +122,7 @@ public class GraphML2SBGNML {
 			String szNotesTagId = "";
 			String szCloneTagId = "";
 			String szBqmodelIsTagId = "";
+			String szBqmodelIsDescribedByTagId = "";
 			String szBqbiolIsTagId = "";
 			String szAnnotationTagId = "";
 			String szNodeURLTagId = "";
@@ -141,9 +138,11 @@ public class GraphML2SBGNML {
 						szCloneTagId = eElement.getAttribute(ID_ATTR);
 					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(ANNOTATION_TAG)) {
 						szAnnotationTagId = eElement.getAttribute(ID_ATTR);
-					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(BQMODEL_IS_GRAPHML_TAG)) {
+					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(FileUtils.BQMODEL_IS)) {
 						szBqmodelIsTagId = eElement.getAttribute(ID_ATTR);
-					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(BIOL_IS_GRAPHML_TAG)) {
+					} else if (eElement.getAttribute("attr.name").equals(FileUtils.BQMODEL_IS_DESCRIBED_BY)) {
+						szBqmodelIsDescribedByTagId = eElement.getAttribute(ID_ATTR);
+					} else if (eElement.getAttribute("attr.name").equals(FileUtils.BQBIOL_IS)) {
 						szBqbiolIsTagId = eElement.getAttribute(ID_ATTR);
 					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(ORIENTATION_TAG)) {
 						szOrientationTagId = eElement.getAttribute(ID_ATTR);
@@ -251,8 +250,9 @@ public class GraphML2SBGNML {
 											String szCompoundId = eCompoundElement.getAttribute(ID_ATTR);
 
 											Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId,
-													szBqmodelIsTagId, szBqbiolIsTagId, szAnnotationTagId,
-													szNodeURLTagId, szOrientationTagId, eCompoundElement, szCompoundId);
+													szBqmodelIsTagId, szBqmodelIsDescribedByTagId, szBqbiolIsTagId,
+													szAnnotationTagId, szNodeURLTagId, szOrientationTagId,
+													eCompoundElement, szCompoundId);
 
 											_complexGlyph.getGlyph().add(_glyph);
 
@@ -293,8 +293,8 @@ public class GraphML2SBGNML {
 					if ((!compoundComplexMap.containsKey(szGlyphId)) && (!complexSet.contains(szGlyphId))
 							&& (!compartmentSet.contains(szGlyphId))) {
 						Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId, szBqmodelIsTagId,
-								szBqbiolIsTagId, szAnnotationTagId, szNodeURLTagId, szOrientationTagId, eElement,
-								szGlyphId);
+								szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szAnnotationTagId, szNodeURLTagId,
+								szOrientationTagId, eElement, szGlyphId);
 
 						// if the glyph is part of a compartment, the reference to the compartment is
 						// set
@@ -307,7 +307,6 @@ public class GraphML2SBGNML {
 						map.getGlyph().add(_glyph);
 					}
 				}
-
 			}
 
 			// edges/arcs:
@@ -373,43 +372,57 @@ public class GraphML2SBGNML {
 							_arc.setId(szArcId);
 						} else if (tokens[i].contains("source=")) {
 							szArcSource = tokens[i].replaceAll("source=", "");
-							for (Glyph g : map.getGlyph()) {
-								if (g.getId().equals(szArcSource)) {
-									if (bEdgeToBeCorrected) {
-										_arc.setTarget(g);
-									} else {
-										_arc.setSource(g);
-									}
 
-									if (null != g.getBbox()) {
-										fStartX = g.getBbox().getX();
-										fStartY = g.getBbox().getY();
-										fStartH = g.getBbox().getH();
-										fStartW = g.getBbox().getW();
-									}
+							Glyph g = null;
+							for (Glyph _glyph : map.getGlyph()) {
+								g = findGlyph(szArcSource, _glyph);
+								if (null != g) {
 									break;
 								}
 							}
+
+							if (g != null) {
+								if (bEdgeToBeCorrected) {
+									_arc.setTarget(g);
+								} else {
+									_arc.setSource(g);
+								}
+
+								if (null != g.getBbox()) {
+									fStartX = g.getBbox().getX();
+									fStartY = g.getBbox().getY();
+									fStartH = g.getBbox().getH();
+									fStartW = g.getBbox().getW();
+								}
+							}
+
 						} else if (tokens[i].contains("target=")) {
 							szArcTarget = tokens[i].replaceAll("target=", "");
-							for (Glyph g : map.getGlyph()) {
-								if (g.getId().equals(szArcTarget)) {
-									if (bEdgeToBeCorrected) {
-										_arc.setSource(g);
-									} else {
-										_arc.setTarget(g);
-									}
 
-									if (null != g.getBbox()) {
-										fTargetX = g.getBbox().getX();
-										fTargetY = g.getBbox().getY();
-										fTargetH = g.getBbox().getH();
-										fTargetW = g.getBbox().getW();
-									}
+							Glyph g = null;
+							for (Glyph _glyph : map.getGlyph()) {
+								g = findGlyph(szArcTarget, _glyph);
+								if (null != g) {
 									break;
+								}
+							}
+
+							if (g != null) {
+								if (bEdgeToBeCorrected) {
+									_arc.setSource(g);
+								} else {
+									_arc.setTarget(g);
+								}
+
+								if (null != g.getBbox()) {
+									fTargetX = g.getBbox().getX();
+									fTargetY = g.getBbox().getY();
+									fTargetH = g.getBbox().getH();
+									fTargetW = g.getBbox().getW();
 								}
 							}
 						}
+
 					}
 
 					// given the fact that the consumption line could be used also for the
@@ -429,6 +442,10 @@ public class GraphML2SBGNML {
 								|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_SUBMAP)
 								|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_TAG))
 							_arc.setClazz(FileUtils.SBGN_EQUIVALENCE_ARC);
+					} else if (_arc.getSource() == null) {
+						System.out.println("source " + _arc.getId() + " " + bEdgeToBeCorrected);
+					} else if (_arc.getTarget() == null) {
+						System.out.println("target " + _arc.getId());
 					}
 
 					String szPathCoordinates = processNodeList(eElement.getElementsByTagName(FileUtils.Y_PATH));
@@ -616,6 +633,19 @@ public class GraphML2SBGNML {
 		return bConversion;
 	}
 
+	private Glyph findGlyph(String szId, Glyph g) {
+		if (g.getId().equals(szId)) {
+			return g;
+		}
+		List<Glyph> innerGlyphs = g.getGlyph();
+		Glyph res = null;
+		for (int i = 0; res == null && i < innerGlyphs.size(); i++) {
+			res = findGlyph(szId, innerGlyphs.get(i));
+		}
+		return res;
+	}
+	
+
 	private boolean isProcessType(Glyph source) {
 		boolean bIsProcess = false;
 		if (source.getClazz().equals(FileUtils.SBGN_PROCESS)
@@ -678,8 +708,8 @@ public class GraphML2SBGNML {
 	}
 
 	private Glyph parseGlyphInfo(Document doc, String szNotesTagId, String szCloneTagId, String szBqmodelIsTagId,
-			String szBqbiolIsTagId, String szAnnotationTagId, String szNodeURLTagId, String szOrientationTagId,
-			Element eElement, String szGlyphId) {
+			String szBqmodelIsDescribedByTagId, String szBqbiolIsTagId, String szAnnotationTagId, String szNodeURLTagId,
+			String szOrientationTagId, Element eElement, String szGlyphId) {
 		Glyph _glyph = new Glyph();
 		_glyph.setId(szGlyphId);
 
@@ -868,7 +898,7 @@ public class GraphML2SBGNML {
 						String delimsLine = "[\n]";
 						String[] tokens = szText.split(delimsLine);
 						for (int i = 0; i < tokens.length; i++) {
-							Element elBqtModelIs = doc.createElement(BQMODEL_IS_TAG);
+							Element elBqtModelIs = doc.createElement(FileUtils.BQMODEL_IS);
 							// add rdf:Bag
 							Element eltRDFBag = doc.createElement(RDF_BAG_TAG);
 							elBqtModelIs.appendChild(eltRDFBag);
@@ -876,6 +906,27 @@ public class GraphML2SBGNML {
 							eltRDFLi.setAttribute(RDF_RESOURCE_TAG, tokens[i]);
 							eltRDFBag.appendChild(eltRDFLi);
 							rdfDescription.appendChild(elBqtModelIs);
+							System.out.println(rdfDescription.toString());
+						}
+					}
+				}
+
+				// parse bqmodel:isDescribedBy information
+				else if (_element.getAttribute(KEY_TAG).equals(szBqmodelIsDescribedByTagId)) {
+					String szText = _element.getTextContent().trim();
+
+					if (!szText.equals("")) {
+						String delimsLine = "[\n]";
+						String[] tokens = szText.split(delimsLine);
+						for (int i = 0; i < tokens.length; i++) {
+							Element elBqtModelIsDescribedBy = doc.createElement(FileUtils.BQMODEL_IS_DESCRIBED_BY);
+							// add rdf:Bag
+							Element eltRDFBag = doc.createElement(RDF_BAG_TAG);
+							elBqtModelIsDescribedBy.appendChild(eltRDFBag);
+							Element eltRDFLi = doc.createElement(RDF_LI_TAG);
+							eltRDFLi.setAttribute(RDF_RESOURCE_TAG, tokens[i]);
+							eltRDFBag.appendChild(eltRDFLi);
+							rdfDescription.appendChild(elBqtModelIsDescribedBy);
 						}
 					}
 				}
@@ -884,7 +935,7 @@ public class GraphML2SBGNML {
 				else if (_element.getAttribute(KEY_TAG).equals(szBqbiolIsTagId)) {
 					String szText = _element.getTextContent();
 					if (!szText.equals("")) {
-						Element eltBqbiolIs = doc.createElement(BQBIOL_IS_TAG);
+						Element eltBqbiolIs = doc.createElement(FileUtils.BQBIOL_IS);
 						// add rdf:Bag
 						Element eltRDFBag = doc.createElement(RDF_BAG_TAG);
 						eltBqbiolIs.appendChild(eltRDFBag);
@@ -903,7 +954,7 @@ public class GraphML2SBGNML {
 
 			Extension _extension = new Extension();
 			_extension.getAny().add(eltAnnotation);
-			// _glyph.setExtension(_extension);
+			_glyph.setExtension(_extension);
 		}
 		return _glyph;
 	}
@@ -982,28 +1033,6 @@ public class GraphML2SBGNML {
 		ext.getAny().add(eltRenderInfo);
 
 		map.setExtension(ext);
-	}
-
-	private void setPortInfo(Glyph glyph, Port port) {
-		for (Glyph g : map.getGlyph()) {
-			if (g.getId().equals(glyph.getId())) {
-				int iPortNo = glyph.getPort().size();
-				boolean bFoundPort = false;
-				for (int i = 0; i < iPortNo; i++) {
-					if ((glyph.getPort().get(i).getX() == port.getX())
-							&& (glyph.getPort().get(i).getY() == port.getY())) {
-						bFoundPort = true;
-						port.setId(glyph.getPort().get(i).getId());
-						break;
-					}
-				}
-				if (!bFoundPort) {
-					port.setId(glyph.getId() + "." + (iPortNo + 1));
-					glyph.getPort().add(port);
-				}
-				break;
-			}
-		}
 	}
 
 	private String parseYedNodeType(String szType, boolean bIsMultimer) {
@@ -1105,4 +1134,5 @@ public class GraphML2SBGNML {
 		}
 		return szAttributeValues;
 	}
+
 }

@@ -1,5 +1,6 @@
 package fr.eisbm.GRAPHML2SBGNML;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,11 +22,13 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.Port;
+import org.sbgn.bindings.SBGNBase;
 import org.sbgn.bindings.SBGNBase.Extension;
 import org.sbgn.bindings.SBGNBase.Notes;
 import org.sbgn.bindings.Sbgn;
@@ -34,7 +37,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 public class SBGNML2GraphML {
-
 	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
 	private static final String PORTGRAPHICS_ATTR = "d1";
 	private static final String PORTGEOMETRY_ATTR = "d2";
@@ -42,16 +44,17 @@ public class SBGNML2GraphML {
 	private static final String NODE_NOTES_ATTR = "d4";
 	private static final String NODE_ANNOTATIONS_ATTR = "d5";
 	private static final String NODE_BQMODELIS_ATTR = "d6";
-	private static final String NODE_BIOLIS_ATTR = "d7";
-	private static final String NODE_CLONE_ATTR = "d8";
-	private static final String NODE_URL_ATTR = "d9";
-	private static final String NODE_DESCRIPT_ATTR = "d10";
-	private static final String NODE_ORIENTATION_ATTR = "d11";
-	private static final String NODE_GRAPHICS_ATTR = "d12";
-	private static final String RESOURCES = "d13";
-	private static final String EDGE_URL_ATTR = "d14";
-	private static final String EDGE_DESCRIPT_ATTR = "d15";
-	private static final String EDGE_GRAPHICS_ATTR = "d16";
+	private static final String NODE_BQMODEL_IS_DESCRIBED_BY_ATTR = "d7";
+	private static final String NODE_BIOLIS_ATTR = "d8";
+	private static final String NODE_CLONE_ATTR = "d9";
+	private static final String NODE_URL_ATTR = "d10";
+	private static final String NODE_DESCRIPT_ATTR = "d11";
+	private static final String NODE_ORIENTATION_ATTR = "d12";
+	private static final String NODE_GRAPHICS_ATTR = "d13";
+	private static final String RESOURCES = "d14";
+	private static final String EDGE_URL_ATTR = "d16";
+	private static final String EDGE_DESCRIPT_ATTR = "d16";
+	private static final String EDGE_GRAPHICS_ATTR = "d17";
 
 	private org.sbgn.bindings.Map map;
 
@@ -68,7 +71,16 @@ public class SBGNML2GraphML {
 
 	public static void main(String[] args) {
 
-		convert(FileUtils.IN_SBGN_ED_FILE);
+		File inputFile = new File(FileUtils.IN_SBGN_FILE);
+		try {
+			System.out.println(
+					"SBGN file validation: " + (SbgnUtil.isValid(inputFile) ? "validates" : "does not validate"));
+		} catch (JAXBException | SAXException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		convert(FileUtils.IN_SBGN_FILE);
 		System.out.println("simulation finished");
 	}
 
@@ -95,7 +107,7 @@ public class SBGNML2GraphML {
 				w = new FileWriter(szOutGraphMLFileName);
 				graph = new DefaultDirectedGraph<Glyph, Arc>(Arc.class);
 
-				//adding glyphs and children glyphs (inner glyphs)
+				// adding glyphs and children glyphs (inner glyphs)
 				addGlyphs(graph, map.getGlyph());
 
 				// we can get a list of arcs (edges) in this map with getArc()
@@ -271,16 +283,25 @@ public class SBGNML2GraphML {
 
 		// <key> for bqmodel_is attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", "Bqmodel_Is");
+		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQMODEL_IS);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_BQMODELIS_ATTR);
 		handler.startElement("", "", "key", attr);
 		handler.endElement("", "", "key");
 
+		// <key> for bqmodel:isDescribedBy attribute
+		attr.clear();
+		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQMODEL_IS_DESCRIBED_BY);
+		attr.addAttribute("", "", "attr.type", "CDATA", "string");
+		attr.addAttribute("", "", "for", "CDATA", "node");
+		attr.addAttribute("", "", "id", "CDATA", NODE_BQMODEL_IS_DESCRIBED_BY_ATTR);
+		handler.startElement("", "", "key", attr);
+		handler.endElement("", "", "key");
+
 		// <key> for biol_is attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", "Biol_Is");
+		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQBIOL_IS);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_BIOLIS_ATTR);
@@ -762,7 +783,6 @@ public class SBGNML2GraphML {
 
 		handler.endElement("", "", "node");
 		visitedGlyphSet.add(g.getId());
-
 	}
 
 	private void parseSBGNSourceAndSink(TransformerHandler handler, Glyph g) throws SAXException {
@@ -1617,6 +1637,7 @@ public class SBGNML2GraphML {
 		String szRDFUrl = "";
 		String szRDFDescription = "";
 		String szBqmodelIs = "";
+		String szBqmodelIsDescribedBy = "";
 		String szBiolIs = "";
 
 		if (null != extension) {
@@ -1645,8 +1666,8 @@ public class SBGNML2GraphML {
 						szRDFDescription = szRDFDescription.concat(eRDFDEscription.getAttribute("rdf:about") + "\n");
 					}
 
-					for (int i = 0; i < e.getElementsByTagName("bqmodel:is").getLength(); i++) {
-						Element e1 = (Element) e.getElementsByTagName("bqmodel:is").item(i);
+					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQMODEL_IS).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQMODEL_IS).item(i);
 
 						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
 							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
@@ -1656,8 +1677,20 @@ public class SBGNML2GraphML {
 						}
 					}
 
-					for (int i = 0; i < e.getElementsByTagName("bqbiol:is").getLength(); i++) {
-						Element e1 = (Element) e.getElementsByTagName("bqbiol:is").item(i);
+					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQMODEL_IS_DESCRIBED_BY).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQMODEL_IS_DESCRIBED_BY).item(i);
+
+						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
+							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
+							if (null != e2) {
+								szBqmodelIsDescribedBy = szBqmodelIsDescribedBy
+										.concat(e2.getAttribute("rdf:resource") + "\n");
+							}
+						}
+					}
+
+					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQBIOL_IS).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQBIOL_IS).item(i);
 						if (null != e1) {
 
 							for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
@@ -1682,6 +1715,12 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "key", "CDATA", NODE_BQMODELIS_ATTR);
 		handler.startElement("", "", "data", attr);
 		handler.characters(szBqmodelIs.toCharArray(), 0, szBqmodelIs.length());
+		handler.endElement("", "", "data");
+
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQMODEL_IS_DESCRIBED_BY_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szBqmodelIsDescribedBy.toCharArray(), 0, szBqmodelIsDescribedBy.length());
 		handler.endElement("", "", "data");
 
 		attr.clear();
@@ -1711,10 +1750,13 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", "data", attr);
 
 		if (null != notes) {
+			String notesInfo = "";
+
 			for (Element e : notes.getAny()) {
-				String notesInfo = e.getTextContent();
-				handler.characters(notesInfo.toCharArray(), 0, notesInfo.length());
+				notesInfo = notesInfo.concat(" " + e.getTextContent().trim());
 			}
+
+			handler.characters(notesInfo.toCharArray(), 0, notesInfo.length());
 		}
 		handler.endElement("", "", "data");
 	}
