@@ -45,16 +45,17 @@ public class SBGNML2GraphML {
 	private static final String NODE_ANNOTATIONS_ATTR = "d5";
 	private static final String NODE_BQMODELIS_ATTR = "d6";
 	private static final String NODE_BQMODEL_IS_DESCRIBED_BY_ATTR = "d7";
-	private static final String NODE_BIOLIS_ATTR = "d8";
-	private static final String NODE_CLONE_ATTR = "d9";
-	private static final String NODE_URL_ATTR = "d10";
-	private static final String NODE_DESCRIPT_ATTR = "d11";
-	private static final String NODE_ORIENTATION_ATTR = "d12";
-	private static final String NODE_GRAPHICS_ATTR = "d13";
-	private static final String RESOURCES = "d14";
+	private static final String NODE_BQBIOLIS_ATTR = "d8";
+	private static final String NODE_BQBIOL_IS_DESCRIBED_BY_ATTR = "d9";
+	private static final String NODE_CLONE_ATTR = "d10";
+	private static final String NODE_URL_ATTR = "d11";
+	private static final String NODE_DESCRIPT_ATTR = "d12";
+	private static final String NODE_ORIENTATION_ATTR = "d13";
+	private static final String NODE_GRAPHICS_ATTR = "d14";
+	private static final String RESOURCES = "d15";
 	private static final String EDGE_URL_ATTR = "d16";
-	private static final String EDGE_DESCRIPT_ATTR = "d16";
-	private static final String EDGE_GRAPHICS_ATTR = "d17";
+	private static final String EDGE_DESCRIPT_ATTR = "d17";
+	private static final String EDGE_GRAPHICS_ATTR = "d18";
 
 	private org.sbgn.bindings.Map map;
 
@@ -79,7 +80,7 @@ public class SBGNML2GraphML {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		convert(FileUtils.IN_SBGN_FILE);
 		System.out.println("simulation finished");
 	}
@@ -299,12 +300,21 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", "key", attr);
 		handler.endElement("", "", "key");
 
-		// <key> for biol_is attribute
+		// <key> for bqbiol_is attribute
 		attr.clear();
 		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQBIOL_IS);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
-		attr.addAttribute("", "", "id", "CDATA", NODE_BIOLIS_ATTR);
+		attr.addAttribute("", "", "id", "CDATA", NODE_BQBIOLIS_ATTR);
+		handler.startElement("", "", "key", attr);
+		handler.endElement("", "", "key");
+
+		// <key> for bqbiol:isDescribedBy attribute
+		attr.clear();
+		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQBIOL_IS_DESCRIBED_BY);
+		attr.addAttribute("", "", "attr.type", "CDATA", "string");
+		attr.addAttribute("", "", "for", "CDATA", "node");
+		attr.addAttribute("", "", "id", "CDATA", NODE_BQBIOL_IS_DESCRIBED_BY_ATTR);
 		handler.startElement("", "", "key", attr);
 		handler.endElement("", "", "key");
 
@@ -1639,6 +1649,7 @@ public class SBGNML2GraphML {
 		String szBqmodelIs = "";
 		String szBqmodelIsDescribedBy = "";
 		String szBiolIs = "";
+		String szBqbiolIsDescribedBy = "";
 
 		if (null != extension) {
 			for (Element e : extension.getAny()) {
@@ -1701,6 +1712,18 @@ public class SBGNML2GraphML {
 							}
 						}
 					}
+					
+					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQBIOL_IS_DESCRIBED_BY).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQBIOL_IS_DESCRIBED_BY).item(i);
+
+						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
+							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
+							if (null != e2) {
+								szBqbiolIsDescribedBy = szBqbiolIsDescribedBy
+										.concat(e2.getAttribute("rdf:resource") + "\n");
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1724,9 +1747,15 @@ public class SBGNML2GraphML {
 		handler.endElement("", "", "data");
 
 		attr.clear();
-		attr.addAttribute("", "", "key", "CDATA", NODE_BIOLIS_ATTR);
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQBIOLIS_ATTR);
 		handler.startElement("", "", "data", attr);
 		handler.characters(szBiolIs.toCharArray(), 0, szBiolIs.length());
+		handler.endElement("", "", "data");
+		
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQBIOL_IS_DESCRIBED_BY_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szBqbiolIsDescribedBy.toCharArray(), 0, szBqbiolIsDescribedBy.length());
 		handler.endElement("", "", "data");
 
 		attr.clear();

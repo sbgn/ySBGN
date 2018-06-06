@@ -124,6 +124,7 @@ public class GraphML2SBGNML {
 			String szBqmodelIsTagId = "";
 			String szBqmodelIsDescribedByTagId = "";
 			String szBqbiolIsTagId = "";
+			String szBqbiolIsDescribedByTagId = "";
 			String szAnnotationTagId = "";
 			String szNodeURLTagId = "";
 			String szOrientationTagId = "";
@@ -144,7 +145,10 @@ public class GraphML2SBGNML {
 						szBqmodelIsDescribedByTagId = eElement.getAttribute(ID_ATTR);
 					} else if (eElement.getAttribute("attr.name").equals(FileUtils.BQBIOL_IS)) {
 						szBqbiolIsTagId = eElement.getAttribute(ID_ATTR);
-					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(ORIENTATION_TAG)) {
+					}else if (eElement.getAttribute("attr.name").equals(FileUtils.BQBIOL_IS_DESCRIBED_BY)) {
+						szBqbiolIsDescribedByTagId = eElement.getAttribute(ID_ATTR);
+					} 
+					else if (eElement.getAttribute("attr.name").toLowerCase().equals(ORIENTATION_TAG)) {
 						szOrientationTagId = eElement.getAttribute(ID_ATTR);
 					} else if ((eElement.getAttribute("attr.name").toLowerCase().equals(URL_TAG))
 							&& (eElement.getAttribute("for").toLowerCase().equals(NODE_TAG))) {
@@ -250,7 +254,7 @@ public class GraphML2SBGNML {
 											String szCompoundId = eCompoundElement.getAttribute(ID_ATTR);
 
 											Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId,
-													szBqmodelIsTagId, szBqmodelIsDescribedByTagId, szBqbiolIsTagId,
+													szBqmodelIsTagId, szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId,
 													szAnnotationTagId, szNodeURLTagId, szOrientationTagId,
 													eCompoundElement, szCompoundId);
 
@@ -293,7 +297,7 @@ public class GraphML2SBGNML {
 					if ((!compoundComplexMap.containsKey(szGlyphId)) && (!complexSet.contains(szGlyphId))
 							&& (!compartmentSet.contains(szGlyphId))) {
 						Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId, szBqmodelIsTagId,
-								szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szAnnotationTagId, szNodeURLTagId,
+								szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId, szAnnotationTagId, szNodeURLTagId,
 								szOrientationTagId, eElement, szGlyphId);
 
 						// if the glyph is part of a compartment, the reference to the compartment is
@@ -708,7 +712,7 @@ public class GraphML2SBGNML {
 	}
 
 	private Glyph parseGlyphInfo(Document doc, String szNotesTagId, String szCloneTagId, String szBqmodelIsTagId,
-			String szBqmodelIsDescribedByTagId, String szBqbiolIsTagId, String szAnnotationTagId, String szNodeURLTagId,
+			String szBqmodelIsDescribedByTagId, String szBqbiolIsTagId, String szBqbiolIsDescribedByTagId, String szAnnotationTagId, String szNodeURLTagId,
 			String szOrientationTagId, Element eElement, String szGlyphId) {
 		Glyph _glyph = new Glyph();
 		_glyph.setId(szGlyphId);
@@ -948,6 +952,26 @@ public class GraphML2SBGNML {
 							eltRDFBag.appendChild(eltRDFLi);
 						}
 						rdfDescription.appendChild(eltBqbiolIs);
+					}
+				}
+				
+				// parse bqbiol:isDescribedBy information
+				else if (_element.getAttribute(KEY_TAG).equals(szBqbiolIsDescribedByTagId)) {
+					String szText = _element.getTextContent().trim();
+
+					if (!szText.equals("")) {
+						String delimsLine = "[\n]";
+						String[] tokens = szText.split(delimsLine);
+						for (int i = 0; i < tokens.length; i++) {
+							Element elBqbiolIsDescribedBy = doc.createElement(FileUtils.BQBIOL_IS_DESCRIBED_BY);
+							// add rdf:Bag
+							Element eltRDFBag = doc.createElement(RDF_BAG_TAG);
+							elBqbiolIsDescribedBy.appendChild(eltRDFBag);
+							Element eltRDFLi = doc.createElement(RDF_LI_TAG);
+							eltRDFLi.setAttribute(RDF_RESOURCE_TAG, tokens[i]);
+							eltRDFBag.appendChild(eltRDFLi);
+							rdfDescription.appendChild(elBqbiolIsDescribedBy);
+						}
 					}
 				}
 			}

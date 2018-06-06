@@ -67,9 +67,10 @@ public class FileUtils {
 	public static final String SBGN_STATE_VARIABLE = "state variable";
 	public static final String SBGN_CARDINALITY = "cardinality";
 	
-	public static final String BQMODEL_IS_DESCRIBED_BY = "bqmodel:isDescribedBy";
 	public static final String BQMODEL_IS = "bqmodel:is";
+	public static final String BQMODEL_IS_DESCRIBED_BY = "bqmodel:isDescribedBy";
 	public static final String BQBIOL_IS = "bqbiol:is";
+	public static final String BQBIOL_IS_DESCRIBED_BY = "bqbiol:isDescribedBy";
 	
 	public static final String Y_SMART_NODE_LABEL_MODEL_PARAMETER = "y:SmartNodeLabelModelParameter";
 	public static final String Y_MODEL_PARAMETER = "y:ModelParameter";
