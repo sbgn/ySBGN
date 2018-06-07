@@ -145,10 +145,9 @@ public class GraphML2SBGNML {
 						szBqmodelIsDescribedByTagId = eElement.getAttribute(ID_ATTR);
 					} else if (eElement.getAttribute("attr.name").equals(FileUtils.BQBIOL_IS)) {
 						szBqbiolIsTagId = eElement.getAttribute(ID_ATTR);
-					}else if (eElement.getAttribute("attr.name").equals(FileUtils.BQBIOL_IS_DESCRIBED_BY)) {
+					} else if (eElement.getAttribute("attr.name").equals(FileUtils.BQBIOL_IS_DESCRIBED_BY)) {
 						szBqbiolIsDescribedByTagId = eElement.getAttribute(ID_ATTR);
-					} 
-					else if (eElement.getAttribute("attr.name").toLowerCase().equals(ORIENTATION_TAG)) {
+					} else if (eElement.getAttribute("attr.name").toLowerCase().equals(ORIENTATION_TAG)) {
 						szOrientationTagId = eElement.getAttribute(ID_ATTR);
 					} else if ((eElement.getAttribute("attr.name").toLowerCase().equals(URL_TAG))
 							&& (eElement.getAttribute("for").toLowerCase().equals(NODE_TAG))) {
@@ -223,28 +222,53 @@ public class GraphML2SBGNML {
 								String szYEDNodeType = ((Element) _nlConfigList.item(0)).getAttribute("configuration");
 								if (szYEDNodeType.equals(FileUtils.COM_YWORKS_SBGN_COMPLEX)) {
 									String szComplexId = eElement.getAttribute(ID_ATTR);
-									Glyph _complexGlyph = new Glyph();
-									_complexGlyph.setId(szComplexId);
-									String szGlyphClass = parseYedNodeType(szYEDNodeType, false);
-									_complexGlyph.setClazz(szGlyphClass);
+									Glyph _complexGlyph = null;
 
-									NodeList _nlNodeLabelList = eElement.getElementsByTagName(FileUtils.Y_NODE_LABEL);
-									String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
+									if (!compoundComplexMap.containsKey(szComplexId)) {
+										_complexGlyph = new Glyph();
+										_complexGlyph.setId(szComplexId);
+										String szGlyphClass = parseYedNodeType(szYEDNodeType, false);
+										_complexGlyph.setClazz(szGlyphClass);
 
-									if (!szTextContent.equals("")) {
-										// setting the label of the complex e.g. cytosolic proteasome..
-										Label _label = new Label();
-										_label.setText(szTextContent);
-										_complexGlyph.setLabel(_label);
+										NodeList _nlNodeLabelList = eElement
+												.getElementsByTagName(FileUtils.Y_NODE_LABEL);
+										String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
+
+										if (!szTextContent.equals("")) {
+											// setting the label of the complex e.g. cytosolic proteasome..
+											Label _label = new Label();
+											_label.setText(szTextContent);
+											_complexGlyph.setLabel(_label);
+										}
+
+										// setting the bbox info
+										setBbox(_complexGlyph, eElement.getElementsByTagName(FileUtils.Y_GEOMETRY));
+
+										// setting style info
+										setStyle(eElement, szComplexId);
+
+										complexSet.add(szComplexId);
+
+										// if the complex is part of a compartment, the reference to the compartment is
+										// set
+										if (compoundCompartmentMap.containsKey(szComplexId)) {
+											String szCompartmentId = compoundCompartmentMap.get(szComplexId);
+											setCompartmentRefToGlyph(szCompartmentId, _complexGlyph, map.getGlyph());
+										}
+
+										// add the glyph to the map
+										map.getGlyph().add(_complexGlyph);
+									} else {
+
+										for (Glyph _glyph : map.getGlyph()) {
+											_complexGlyph = findGlyph(szComplexId, _glyph);
+											if (null != _complexGlyph) {
+												break;
+											}
+										}
 									}
 
 									NodeList nCompoundList = eElement.getElementsByTagName(NODE_TAG);
-									// setting the bbox info
-									setBbox(_complexGlyph, eElement.getElementsByTagName(FileUtils.Y_GEOMETRY));
-
-									// setting style info
-									setStyle(eElement, szComplexId);
-
 									for (int tempCompound = 0; tempCompound < nCompoundList
 											.getLength(); tempCompound++) {
 										Node nCompoundNode = nCompoundList.item(tempCompound);
@@ -253,28 +277,22 @@ public class GraphML2SBGNML {
 											Element eCompoundElement = (Element) nCompoundNode;
 											String szCompoundId = eCompoundElement.getAttribute(ID_ATTR);
 
-											Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId,
-													szBqmodelIsTagId, szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId,
-													szAnnotationTagId, szNodeURLTagId, szOrientationTagId,
-													eCompoundElement, szCompoundId);
+											Element nParentElement = (Element) (nCompoundNode.getParentNode());
+											String szParentID = nParentElement.getAttribute(ID_ATTR).substring(0,
+													nParentElement.getAttribute(ID_ATTR).length() - 1);
+											if (_complexGlyph.getId().equals(szParentID)) {
 
-											_complexGlyph.getGlyph().add(_glyph);
+												Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId,
+														szBqmodelIsTagId, szBqmodelIsDescribedByTagId, szBqbiolIsTagId,
+														szBqbiolIsDescribedByTagId, szAnnotationTagId, szNodeURLTagId,
+														szOrientationTagId, eCompoundElement, szCompoundId);
 
-											compoundComplexMap.put(szCompoundId, szComplexId);
+												_complexGlyph.getGlyph().add(_glyph);
+												compoundComplexMap.put(szCompoundId, szComplexId);
+											}
 										}
 									}
 
-									complexSet.add(szComplexId);
-
-									// if the complex is part of a compartment, the reference to the compartment is
-									// set
-									if (compoundCompartmentMap.containsKey(szComplexId)) {
-										String szCompartmentId = compoundCompartmentMap.get(szComplexId);
-										setCompartmentRefToGlyph(szCompartmentId, _complexGlyph, map.getGlyph());
-									}
-
-									// add the glyph to the map
-									map.getGlyph().add(_complexGlyph);
 								}
 							}
 						}
@@ -297,8 +315,8 @@ public class GraphML2SBGNML {
 					if ((!compoundComplexMap.containsKey(szGlyphId)) && (!complexSet.contains(szGlyphId))
 							&& (!compartmentSet.contains(szGlyphId))) {
 						Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId, szBqmodelIsTagId,
-								szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId, szAnnotationTagId, szNodeURLTagId,
-								szOrientationTagId, eElement, szGlyphId);
+								szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId,
+								szAnnotationTagId, szNodeURLTagId, szOrientationTagId, eElement, szGlyphId);
 
 						// if the glyph is part of a compartment, the reference to the compartment is
 						// set
@@ -432,24 +450,26 @@ public class GraphML2SBGNML {
 					// given the fact that the consumption line could be used also for the
 					// representation of the logic or equivalence arcs, this has to be checked and
 					// decoded accordingly
-					if ((_arc.getSource() != null) && (_arc.getTarget() != null)) {
+					if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
+						if ((_arc.getSource() != null) && (_arc.getTarget() != null)) {
 
-						if (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("OR")
-								|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("OR")
-								|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("AND")
-										|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("AND"))
-								|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("NOT")
-										|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("NOT"))) {
-							_arc.setClazz(FileUtils.SBGN_LOGIC_ARC);
-						} else if ((((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_SUBMAP))
-								|| ((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_TAG)
-								|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_SUBMAP)
-								|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_TAG))
-							_arc.setClazz(FileUtils.SBGN_EQUIVALENCE_ARC);
-					} else if (_arc.getSource() == null) {
-						System.out.println("source " + _arc.getId() + " " + bEdgeToBeCorrected);
-					} else if (_arc.getTarget() == null) {
-						System.out.println("target " + _arc.getId());
+							if (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("OR")
+									|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("OR")
+									|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("AND")
+											|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("AND"))
+									|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("NOT")
+											|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("NOT"))) {
+								_arc.setClazz(FileUtils.SBGN_LOGIC_ARC);
+							} else if ((((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_SUBMAP))
+									|| ((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_TAG)
+									|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_SUBMAP)
+									|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_TAG))
+								_arc.setClazz(FileUtils.SBGN_EQUIVALENCE_ARC);
+						} else if (_arc.getSource() == null) {
+							System.out.println("source " + _arc.getId() + " " + bEdgeToBeCorrected);
+						} else if (_arc.getTarget() == null) {
+							System.out.println("target " + _arc.getId());
+						}
 					}
 
 					String szPathCoordinates = processNodeList(eElement.getElementsByTagName(FileUtils.Y_PATH));
@@ -648,7 +668,6 @@ public class GraphML2SBGNML {
 		}
 		return res;
 	}
-	
 
 	private boolean isProcessType(Glyph source) {
 		boolean bIsProcess = false;
@@ -712,8 +731,9 @@ public class GraphML2SBGNML {
 	}
 
 	private Glyph parseGlyphInfo(Document doc, String szNotesTagId, String szCloneTagId, String szBqmodelIsTagId,
-			String szBqmodelIsDescribedByTagId, String szBqbiolIsTagId, String szBqbiolIsDescribedByTagId, String szAnnotationTagId, String szNodeURLTagId,
-			String szOrientationTagId, Element eElement, String szGlyphId) {
+			String szBqmodelIsDescribedByTagId, String szBqbiolIsTagId, String szBqbiolIsDescribedByTagId,
+			String szAnnotationTagId, String szNodeURLTagId, String szOrientationTagId, Element eElement,
+			String szGlyphId) {
 		Glyph _glyph = new Glyph();
 		_glyph.setId(szGlyphId);
 
@@ -731,7 +751,11 @@ public class GraphML2SBGNML {
 		}
 
 		// setting the glyph class
-		NodeList _nlConfigList = eElement.getElementsByTagName(FileUtils.Y_GENERIC_NODE);
+		NodeList _nlConfigList = eElement.getElementsByTagName(FileUtils.Y_GENERIC_GROUP_NODE);
+
+		if (0 == _nlConfigList.getLength()) {
+			_nlConfigList = eElement.getElementsByTagName(FileUtils.Y_GENERIC_NODE);
+		}
 
 		if (_nlConfigList.getLength() > 0) {
 			String szYEDNodeType = ((Element) _nlConfigList.item(0)).getAttribute("configuration");
@@ -954,7 +978,7 @@ public class GraphML2SBGNML {
 						rdfDescription.appendChild(eltBqbiolIs);
 					}
 				}
-				
+
 				// parse bqbiol:isDescribedBy information
 				else if (_element.getAttribute(KEY_TAG).equals(szBqbiolIsDescribedByTagId)) {
 					String szText = _element.getTextContent().trim();
