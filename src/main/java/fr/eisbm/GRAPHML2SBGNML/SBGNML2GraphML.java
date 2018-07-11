@@ -570,9 +570,17 @@ public class SBGNML2GraphML {
 			// bend points for ports representation
 			if (a.getSource() instanceof Port) {
 				Port p = (Port) a.getSource();
+				float p_x = p.getX();
+				float p_y = p.getY();
+				Glyph g = portToGlyphMap.get(p.getId());
+
+				if (g.getOrientation().equals("horizontal")) {
+					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
+				}
+
 				attr.clear();
-				attr.addAttribute("", "", "x", "CDATA", Float.toString(p.getX()));
-				attr.addAttribute("", "", "y", "CDATA", Float.toString(p.getY()));
+				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
+				attr.addAttribute("", "", "y", "CDATA", Float.toString(p_y));
 				handler.startElement("", "", FileUtils.Y_POINT, attr);
 				handler.endElement("", "", FileUtils.Y_POINT);
 			}
@@ -590,9 +598,17 @@ public class SBGNML2GraphML {
 			// bend points for ports representation
 			if (a.getTarget() instanceof Port) {
 				Port p = (Port) a.getTarget();
+				float p_x = p.getX();
+				float p_y = p.getY();
+				Glyph g = portToGlyphMap.get(p.getId());
+
+				if (g.getOrientation().equals("horizontal")) {
+					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
+				}
+
 				attr.clear();
-				attr.addAttribute("", "", "x", "CDATA", Float.toString(p.getX()));
-				attr.addAttribute("", "", "y", "CDATA", Float.toString(p.getY()));
+				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
+				attr.addAttribute("", "", "y", "CDATA", Float.toString(p_y));
 				handler.startElement("", "", FileUtils.Y_POINT, attr);
 				handler.endElement("", "", FileUtils.Y_POINT);
 			}
@@ -1632,10 +1648,19 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", "data", attr);
 
 		if (null != clone) {
+			// Sometimes, label text within in the clone is not specified, but it is usually
+			// equal to an empty space. Thus, the condition if from below would be false and
+			// the clone would not be set. The FlieUtils.CloneIsSet was introduced in order
+			// to show that the glyph has a clone that has to be set, even if the label text
+			// is an empty string. At the decoding step, this additional information must be
+			// removed.
+			String cloneInfo = FileUtils.CloneIsSet;
 			if (null != clone.getLabel()) {
-				String cloneInfo = clone.getLabel().getText();
-				handler.characters(cloneInfo.toCharArray(), 0, cloneInfo.length());
+				cloneInfo = clone.getLabel().getText();
 			}
+
+			handler.characters(cloneInfo.toCharArray(), 0, cloneInfo.length());
+
 		}
 		handler.endElement("", "", "data");
 	}
@@ -1712,7 +1737,7 @@ public class SBGNML2GraphML {
 							}
 						}
 					}
-					
+
 					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQBIOL_IS_DESCRIBED_BY).getLength(); i++) {
 						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQBIOL_IS_DESCRIBED_BY).item(i);
 
@@ -1751,7 +1776,7 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", "data", attr);
 		handler.characters(szBiolIs.toCharArray(), 0, szBiolIs.length());
 		handler.endElement("", "", "data");
-		
+
 		attr.clear();
 		attr.addAttribute("", "", "key", "CDATA", NODE_BQBIOL_IS_DESCRIBED_BY_ATTR);
 		handler.startElement("", "", "data", attr);

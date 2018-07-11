@@ -1,6 +1,7 @@
 package fr.eisbm.GRAPHML2SBGNML;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -29,6 +30,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import fr.eisbm.GRAPHML2SBGNML.FileUtils.PortType;
 
 public class GraphML2SBGNML {
 
@@ -79,6 +82,9 @@ public class GraphML2SBGNML {
 	private static final String RDF_ABOUT_TAG = "rdf:about";
 	private static final String RDF_DESCRIPTION_TAG = "rdf:Description";
 
+	private static final int MAX_PORT_NO = 2;
+	private static final double PORT2PROCESS_DISTANCE = 10.8;
+
 	Sbgn sbgn = new Sbgn();
 	Map map = new Map();
 	java.util.Map<Pair<String, String>, ResourceCoordinates> resourceMap = new HashMap<Pair<String, String>, ResourceCoordinates>();
@@ -89,6 +95,7 @@ public class GraphML2SBGNML {
 	java.util.Map<String, String> compoundCompartmentMap = new HashMap<String, String>();
 	Set<String> complexSet = new HashSet<String>();
 	Set<String> compartmentSet = new HashSet<String>();
+	java.util.Map<String, PortArcsRelationship> port_arc_map = new HashMap<String, PortArcsRelationship>();;
 
 	public static void main(String[] args) {
 		convert(FileUtils.IN_YED_FILE);
@@ -302,348 +309,27 @@ public class GraphML2SBGNML {
 
 			// nodes:
 			NodeList nList = doc.getElementsByTagName(NODE_TAG);
+			processNodes(doc, szNotesTagId, szCloneTagId, szBqmodelIsTagId, szBqmodelIsDescribedByTagId,
+					szBqbiolIsTagId, szBqbiolIsDescribedByTagId, szAnnotationTagId, szNodeURLTagId, szOrientationTagId,
+					nList);
 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-				Node nNode = nList.item(temp);
-
-				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nNode;
-
-					// get id of the node/glyph
-					String szGlyphId = eElement.getAttribute(ID_ATTR);
-
-					if ((!compoundComplexMap.containsKey(szGlyphId)) && (!complexSet.contains(szGlyphId))
-							&& (!compartmentSet.contains(szGlyphId))) {
-						Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId, szBqmodelIsTagId,
-								szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId,
-								szAnnotationTagId, szNodeURLTagId, szOrientationTagId, eElement, szGlyphId);
-
-						// if the glyph is part of a compartment, the reference to the compartment is
-						// set
-						if (compoundCompartmentMap.containsKey(szGlyphId)) {
-							String szCompartmentId = compoundCompartmentMap.get(szGlyphId);
-							setCompartmentRefToGlyph(szCompartmentId, _glyph, map.getGlyph());
-						}
-
-						// add the glyph to the map
-						map.getGlyph().add(_glyph);
-					}
-				}
-			}
+			// for the process glyphs, ports will be created by default
+			createPorts(map.getGlyph());
 
 			// edges/arcs:
 			NodeList nEdgeList = doc.getElementsByTagName(EDGE_TAG);
-
-			for (int temp = 0; temp < nEdgeList.getLength(); temp++) {
-				Node nEdge = nEdgeList.item(temp);
-				Arc _arc = new Arc();
-
-				if (nEdge.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nEdge;
-					String szArrowDirection = processNodeList(eElement.getElementsByTagName(FileUtils.Y_ARROWS));
-					String szArcType = FileUtils.SBGN_CONSUMPTION;
-					boolean bEdgeToBeCorrected = false;
-
-					if (szArrowDirection.contains("white_delta_bar")) {
-						szArcType = FileUtils.SBGN_NECESSARY_STIMULATION;
-						if (szArrowDirection.contains("source=\"white_delta_bar\"")) {
-							bEdgeToBeCorrected = true;
-						}
-					} else if (szArrowDirection.contains("white_diamond")) {
-						szArcType = FileUtils.SBGN_MODULATION;
-						if (szArrowDirection.contains("source=\"white_diamond\"")) {
-							bEdgeToBeCorrected = true;
-						}
-					} else if (szArrowDirection.contains("t_shape")) {
-						szArcType = FileUtils.SBGN_INHIBITION;
-						if (szArrowDirection.contains("source=\"t_shape\"")) {
-							bEdgeToBeCorrected = true;
-						}
-					} else if (szArrowDirection.contains("white_delta")) {
-						szArcType = FileUtils.SBGN_STIMULATION;
-						if (szArrowDirection.contains("source=\"white_circle\"")) {
-							bEdgeToBeCorrected = true;
-						}
-					} else if (szArrowDirection.contains("delta")) {
-						szArcType = FileUtils.SBGN_PRODUCTION;
-						if (szArrowDirection.contains("source=\"delta\"")) {
-							bEdgeToBeCorrected = true;
-						}
-					} else if (szArrowDirection.contains("white_circle")) {
-						szArcType = FileUtils.SBGN_CATALYSIS;
-						if (szArrowDirection.contains("source=\"white_circle\"")) {
-							bEdgeToBeCorrected = true;
-						}
-					}
-
-					_arc.setClazz(szArcType);
-
-					// get id of the edge/arc
-					String szArcAttributes = getElementAttributes(eElement).trim();
-
-					String delims = "[\t]";
-					String szArcId = "", szArcSource = "", szArcTarget = "";
-					szArcAttributes = szArcAttributes.replaceAll("\"", "");
-					String[] tokens = szArcAttributes.split(delims);
-					float fStartX = 0, fStartY = 0, fStartH = 0, fStartW = 0;
-					float fTargetX = 0, fTargetY = 0, fTargetH = 0, fTargetW = 0;
-
-					for (int i = 0; i < tokens.length; i++) {
-						if (tokens[i].contains("id=")) {
-							szArcId = tokens[i].replaceAll("id=", "");
-							_arc.setId(szArcId);
-						} else if (tokens[i].contains("source=")) {
-							szArcSource = tokens[i].replaceAll("source=", "");
-
-							Glyph g = null;
-							for (Glyph _glyph : map.getGlyph()) {
-								g = findGlyph(szArcSource, _glyph);
-								if (null != g) {
-									break;
-								}
-							}
-
-							if (g != null) {
-								if (bEdgeToBeCorrected) {
-									_arc.setTarget(g);
-								} else {
-									_arc.setSource(g);
-								}
-
-								if (null != g.getBbox()) {
-									fStartX = g.getBbox().getX();
-									fStartY = g.getBbox().getY();
-									fStartH = g.getBbox().getH();
-									fStartW = g.getBbox().getW();
-								}
-							}
-
-						} else if (tokens[i].contains("target=")) {
-							szArcTarget = tokens[i].replaceAll("target=", "");
-
-							Glyph g = null;
-							for (Glyph _glyph : map.getGlyph()) {
-								g = findGlyph(szArcTarget, _glyph);
-								if (null != g) {
-									break;
-								}
-							}
-
-							if (g != null) {
-								if (bEdgeToBeCorrected) {
-									_arc.setSource(g);
-								} else {
-									_arc.setTarget(g);
-								}
-
-								if (null != g.getBbox()) {
-									fTargetX = g.getBbox().getX();
-									fTargetY = g.getBbox().getY();
-									fTargetH = g.getBbox().getH();
-									fTargetW = g.getBbox().getW();
-								}
-							}
-						}
-
-					}
-
-					// given the fact that the consumption line could be used also for the
-					// representation of the logic or equivalence arcs, this has to be checked and
-					// decoded accordingly
-					if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
-						if ((_arc.getSource() != null) && (_arc.getTarget() != null)) {
-
-							if (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("OR")
-									|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("OR")
-									|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("AND")
-											|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("AND"))
-									|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("NOT")
-											|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("NOT"))) {
-								_arc.setClazz(FileUtils.SBGN_LOGIC_ARC);
-							} else if ((((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_SUBMAP))
-									|| ((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_TAG)
-									|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_SUBMAP)
-									|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_TAG))
-								_arc.setClazz(FileUtils.SBGN_EQUIVALENCE_ARC);
-						} else if (_arc.getSource() == null) {
-							System.out.println("source " + _arc.getId() + " " + bEdgeToBeCorrected);
-						} else if (_arc.getTarget() == null) {
-							System.out.println("target " + _arc.getId());
-						}
-					}
-
-					String szPathCoordinates = processNodeList(eElement.getElementsByTagName(FileUtils.Y_PATH));
-					String delimsCoord = "[\t]";
-					szPathCoordinates = szPathCoordinates.replaceAll("\"", "");
-					String[] tokensCoordinates = szPathCoordinates.split(delimsCoord);
-					if (tokensCoordinates.length == 4) {
-						Start _start = new Start();
-						String szSX = tokensCoordinates[0].replaceAll("sx=", "");
-						_start.setX(Float.parseFloat(szSX) + fStartX + fStartW / 2);
-						// _start.setX(Float.parseFloat(szSX));
-
-						// System.out.println(szSX+"\t"+fStartX+"\t"+_start.getX());
-						String szSY = tokensCoordinates[1].replaceAll("sy=", "");
-						_start.setY(Float.parseFloat(szSY) + fStartY + fStartH / 2);
-						// _start.setY(Float.parseFloat(szSY) );
-
-						_arc.setStart(_start);
-
-						End _end = new End();
-						String szTX = tokensCoordinates[2].replaceAll("tx=", "");
-						_end.setX(Float.parseFloat(szTX) + fTargetX + fTargetW / 2);
-						// _end.setX(Float.parseFloat(szTX));
-						String szTY = tokensCoordinates[3].replaceAll("ty=", "");
-						_end.setY(Float.parseFloat(szTY) + fTargetY + fTargetH / 2);
-						// _end.setY(Float.parseFloat(szTY));
-						_arc.setEnd(_end);
-					}
-
-					String szPointInfo = processNodeList(eElement.getElementsByTagName(FileUtils.Y_POINT));
-					if (!szPointInfo.isEmpty()) {
-						float fXCoord = 0, fYCoord = 0;
-						szPointInfo = szPointInfo.replaceAll("\"", "");
-						String[] tokensPort = szPointInfo.split(delims);
-
-						for (int i = 0; i < tokensPort.length - 1; i += 2) {
-							if (tokensPort[i].contains("x=")) {
-								fXCoord = Float.parseFloat(tokensPort[i].replaceAll("x=", ""));
-							}
-							if (tokensPort[i + 1].contains("y=")) {
-								fYCoord = Float.parseFloat(tokensPort[i + 1].replaceAll("y=", ""));
-							}
-
-							Next _next = new Next();
-							_next.setX(fXCoord);
-							_next.setY(fYCoord);
-							_arc.getNext().add(_next);
-						}
-					}
-
-					NodeList nlLineStyle = eElement.getElementsByTagName(FileUtils.Y_LINE_STYLE);
-					// getting the border color info
-					String szStrokeColorId = ((Element) (nlLineStyle.item(0))).getAttribute(COLOR_ATTR);
-					colorSet.add(szStrokeColorId);
-
-					// getting the stroke width info
-					float fStrokeWidth = Float.parseFloat(((Element) (nlLineStyle.item(0))).getAttribute(WIDTH_ATTR));
-
-					String szStyleId = STYLE_PREFIX + fStrokeWidth + szStrokeColorId.replaceFirst("#", "");
-
-					if (!styleMap.containsKey(szStyleId)) {
-						styleMap.put(szStyleId, new SBGNMLStyle(szStyleId, szStrokeColorId, fStrokeWidth));
-					}
-					styleMap.get(szStyleId).addElementIdToSet(eElement.getAttribute(ID_ATTR));
-
-					NodeList nlCardinalityList = eElement.getElementsByTagName(FileUtils.Y_EDGE_LABEL);
-					if (nlCardinalityList.getLength() > 0) {
-						String szCardinality = nlCardinalityList.item(0).getTextContent().trim();
-						if (!szCardinality.equals("")) {
-
-							Glyph cardGlyph = new Glyph();
-							cardGlyph.setClazz(FileUtils.SBGN_CARDINALITY);
-							cardGlyph.setId(FileUtils.SBGN_CARDINALITY + "_" + szCardinality);
-							Label _label = new Label();
-							_label.setText(szCardinality);
-							cardGlyph.setLabel(_label);
-							Bbox cardBbox = new Bbox();
-							cardBbox.setH(0);
-							cardBbox.setW(0);
-							cardBbox.setX(0);
-							cardBbox.setY(0);
-							cardGlyph.setBbox(cardBbox);
-							_arc.getGlyph().add(cardGlyph);
-						}
-					}
-				}
-
-				// add the arc to the map
-				map.getArc().add(_arc);
-			}
+			processArcs(nEdgeList);
+			assignArcsToPorts();
 
 			// resources:
 			NodeList nResourceList = doc.getElementsByTagName(FileUtils.Y_RESOURCE);
-
-			for (int temp = 0; temp < nResourceList.getLength(); temp++) {
-				Node nResource = nResourceList.item(temp);
-
-				if (nResource.getNodeType() == Node.ELEMENT_NODE) {
-					Element eElement = (Element) nResource;
-					Glyph _glyph = new Glyph();
-
-					// get id of the resources
-					String szResourceId = eElement.getAttribute(ID_ATTR);
-					_glyph.setId(szResourceId);
-
-					NodeList _nlGenericNodeList = eElement.getElementsByTagName(FileUtils.Y_GENERIC_NODE);
-					NodeList _nlShapeNodeList = eElement.getElementsByTagName(FileUtils.Y_SHAPE_NODE);
-
-					if (_nlGenericNodeList.getLength() > 0) {
-						String szYEDNodeType = ((Element) _nlGenericNodeList.item(0)).getAttribute("configuration");
-						String szGlyphClass = parseYedNodeType(szYEDNodeType, false);
-						_glyph.setClazz(szGlyphClass);
-					} else if (_nlShapeNodeList.getLength() > 0) {
-						_glyph.setClazz(FileUtils.SBGN_UNIT_OF_INFORMATION);
-					}
-
-					NodeList _nlNodeLabelList = eElement.getElementsByTagName(FileUtils.Y_NODE_LABEL);
-					if (_nlNodeLabelList.getLength() > 0) {
-						String szNodeText = _nlNodeLabelList.item(0).getTextContent().trim();
-
-						if (!szNodeText.equals("")) {
-
-							if (_glyph.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
-								// setting the label of the glyph e.g. P, 2P..
-								Glyph.State _state = new Glyph.State();
-								int iDelimPos = szNodeText.indexOf("@");
-								String szValue = "";
-								String szVariable = "";
-
-								if (iDelimPos < 0) {
-									szValue = szNodeText;
-								} else if (0 == iDelimPos) {
-									szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
-								} else if (iDelimPos > 0) {
-									szValue = szNodeText.substring(0, iDelimPos);
-									szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
-								}
-
-								_state.setValue(szValue);
-								_state.setVariable(szVariable);
-								_glyph.setState(_state);
-							} else if (_glyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
-								Label _label = new Label();
-								_label.setText(szNodeText);
-								_glyph.setLabel(_label);
-							}
-						}
-					}
-
-					// add the state variable to the corresponding glyph
-					for (Entry<Pair<String, String>, ResourceCoordinates> _resource : resourceMap.entrySet()) {
-						if (_resource.getKey().first.equals(szResourceId)) {
-							NodeList nlGeometry = eElement.getElementsByTagName(FileUtils.Y_GEOMETRY);
-							String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(HEIGHT_ATTR);
-							String szWidth = ((Element) (nlGeometry.item(0))).getAttribute(WIDTH_ATTR);
-
-							Bbox bbox = new Bbox();
-							bbox.setH(Float.parseFloat(szHeight));
-							bbox.setW(Float.parseFloat(szWidth));
-							if (_resource.getValue() != null) {
-								bbox.setX(_resource.getValue().getXCoord());
-								bbox.setY(_resource.getValue().getYCoord());
-							}
-
-							_glyph.setBbox(bbox);
-
-							String szParentGlyphId = _resource.getKey().second;
-							addGlyphToList(szParentGlyphId, _glyph, map.getGlyph());
-						}
-					}
-				}
-			}
+			processResources(nResourceList);
 
 			addExtension(doc);
+
+			moveNetworkToTopLeft();
+			correctPortOrientationAndConnectedArcs();
+		//	setClonedGlyphs();
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
@@ -655,6 +341,678 @@ public class GraphML2SBGNML {
 			e.printStackTrace();
 		}
 		return bConversion;
+	}
+
+	private void setClonedGlyphs() {
+
+		List<Glyph> allGlyphList = new ArrayList<Glyph>();
+		getAllGlyphs(map.getGlyph(), allGlyphList);
+
+		for (Glyph g : allGlyphList) {
+			if (g.getLabel() != null) {
+				Clone clone = new Clone();
+				for (Glyph g1 : map.getGlyph()) {
+					if (g != g1) {
+
+						if (!sameReaction(g, g1)) {
+							boolean bCloned = true;
+							if (g.getLabel() != null) {
+								if (g1.getLabel() != null) {
+									if (!g.getLabel().getText().equals(g1.getLabel().getText())) {
+										bCloned = false;
+
+									}
+								} else {
+									bCloned = false;
+								}
+							} else {
+								if (g1.getLabel() != null) {
+									bCloned = false;
+								}
+							}
+
+							boolean bState1 = existElements(g, FileUtils.SBGN_STATE_VARIABLE);
+							boolean bState2 = existElements(g1, FileUtils.SBGN_STATE_VARIABLE);
+
+							if (bState1) {
+								if (bState2) {
+									java.util.Map<String, String> stateMap1 = new HashMap<String, String>();
+									java.util.Map<String, String> stateMap2 = new HashMap<String, String>();
+									for (Glyph state1 : g.getGlyph()) {
+										if ((state1.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))
+												&& (state1.getState() != null)) {
+
+											stateMap1.put(state1.getState().getValue(),
+													state1.getState().getVariable());
+
+										}
+									}
+									for (Glyph state2 : g1.getGlyph()) {
+										if ((state2.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))
+												&& (state2.getState() != null)) {
+											stateMap2.put(state2.getState().getValue(),
+													state2.getState().getVariable());
+
+										}
+									}
+
+									for (Glyph state : g.getGlyph()) {
+										if ((state.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))
+												&& (state.getState() != null)) {
+											if (!stateMap2.containsKey(state.getState().getValue())) {
+												bCloned = false;
+											} else {
+												if (!stateMap2.get(state.getState().getValue())
+														.equals(state.getState().getVariable())) {
+													bCloned = false;
+												}
+											}
+										}
+									}
+								} else {
+									bCloned = false;
+								}
+							} else {
+								if (bState1) {
+									bCloned = false;
+								}
+							}
+
+							boolean bUnits1 = existElements(g, FileUtils.SBGN_UNIT_OF_INFORMATION);
+							boolean bUnits2 = existElements(g1, FileUtils.SBGN_UNIT_OF_INFORMATION);
+
+							if (bUnits1) {
+								if (bUnits2) {
+									for (Glyph unitInfo : g.getGlyph()) {
+										if (unitInfo.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
+											for (Glyph unitInfo1 : g1.getGlyph()) {
+												if ((unitInfo1.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION))
+														&& (!unitInfo.getLabel().getText()
+																.equals(unitInfo1.getLabel().getText()))) {
+													bCloned = false;
+													break;
+												}
+											}
+										}
+									}
+								} else {
+									bCloned = false;
+								}
+							} else {
+								if (bUnits2) {
+									bCloned = false;
+								}
+							}
+
+							if (bCloned) {
+								g.setClone(clone);
+								g1.setClone(clone);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	private void getAllGlyphs(List<Glyph> inList, List<Glyph> outList) {
+		for (Glyph g : inList) {
+			outList.add(g);
+			getAllGlyphs(g.getGlyph(), outList);
+		}
+	}
+
+	private boolean sameReaction(Glyph g1, Glyph g2) {
+		for (Arc arc : map.getArc()) {
+			if (arc.getSource() == g1) {
+				if (arc.getTarget() instanceof Glyph) {
+					Glyph glyph = (Glyph) arc.getTarget();
+					for (Arc arc2 : map.getArc()) {
+						if ((arc2.getSource() == glyph && arc.getTarget() == g2)
+								|| (arc2.getSource() == g2 && arc.getTarget() == glyph)) {
+							return true;
+						}
+					}
+				} else if (arc.getTarget() instanceof Port) {
+					Port port = (Port) arc.getTarget();
+					for (Arc arc2 : map.getArc()) {
+						if (arc2.getSource() == g2 && arc2.getTarget() == port) {
+							return true;
+						}
+						// find glyph and compare with the other port.
+						else {
+							for (Glyph glyph : map.getGlyph()) {
+								if ((glyph.getPort() != null) && (glyph.getPort().size() == MAX_PORT_NO)) {
+									Port otherPort = null;
+									if (glyph.getPort().get(0).equals(port)) {
+										otherPort = glyph.getPort().get(1);
+									} else if (glyph.getPort().get(1).equals(port)) {
+										otherPort = glyph.getPort().get(0);
+									}
+									if (null != otherPort) {
+										if (arc2.getSource() == otherPort && arc2.getTarget() == g2) {
+											return true;
+										}
+									}
+								}
+							}
+						}
+					}
+
+				}
+			}
+
+		}
+		return false;
+	}
+
+	private boolean existElements(Glyph g, String szElementType) {
+		boolean bFound = false;
+		for (Glyph unitInfo : g.getGlyph()) {
+			if (unitInfo.getClazz().equals(szElementType)) {
+				bFound = true;
+				break;
+			}
+		}
+		return bFound;
+	}
+
+	private void moveNetworkToTopLeft() {
+		float x_min = 0;
+		float y_min = 0;
+
+		for (Glyph g : map.getGlyph()) {
+			if (g.getBbox().getX() < x_min) {
+				x_min = g.getBbox().getX();
+			}
+			if (g.getBbox().getY() < y_min) {
+				y_min = g.getBbox().getY();
+			}
+
+			if (g.getPort().size() > 0) {
+				for (Port p : g.getPort()) {
+					if (p.getX() < x_min) {
+						x_min = p.getX();
+					}
+
+					if (p.getY() < y_min) {
+						y_min = p.getY();
+					}
+				}
+			}
+		}
+
+		for (Arc a : map.getArc()) {
+			if (a.getStart().getX() < x_min) {
+				x_min = a.getStart().getX();
+			}
+			if (a.getEnd().getX() < x_min) {
+				x_min = a.getEnd().getX();
+			}
+			if (a.getStart().getY() < y_min) {
+				y_min = a.getStart().getY();
+			}
+			if (a.getEnd().getY() < y_min) {
+				y_min = a.getEnd().getY();
+			}
+		}
+
+		if (x_min < 0) {
+			moveGlyphs(map.getGlyph(), Math.abs(x_min), 0);
+			moveArcs(map.getArc(), Math.abs(x_min), 0);
+		}
+
+		if (y_min < 0) {
+			moveGlyphs(map.getGlyph(), 0, Math.abs(y_min));
+			moveArcs(map.getArc(), 0, Math.abs(y_min));
+		}
+	}
+
+	private void moveGlyphs(List<Glyph> glyphList, float x_val, float y_val) {
+		for (Glyph g : glyphList) {
+			float newX = g.getBbox().getX() + x_val;
+			float newY = g.getBbox().getY() + y_val;
+			g.getBbox().setX(newX);
+			g.getBbox().setY(newY);
+
+			if (g.getPort().size() > 0) {
+				for (Port p : g.getPort()) {
+					newX = p.getX() + x_val;
+					newY = p.getY() + y_val;
+					p.setX(newX);
+					p.setY(newY);
+				}
+			}
+
+			if (g.getGlyph().size() > 0) {
+				moveGlyphs(g.getGlyph(), x_val, y_val);
+			}
+		}
+	}
+
+	private void moveArcs(List<Arc> arcList, float x_val, float y_val) {
+		for (Arc a : arcList) {
+			float newX = a.getStart().getX() + x_val;
+			float newY = a.getStart().getY() + y_val;
+			a.getStart().setX(newX);
+			a.getStart().setY(newY);
+
+			newX = a.getEnd().getX() + x_val;
+			newY = a.getEnd().getY() + y_val;
+			a.getEnd().setX(newX);
+			a.getEnd().setY(newY);
+
+			if (a.getNext().size() > 0) {
+				for (Next n : a.getNext()) {
+					newX = n.getX() + x_val;
+					newY = n.getY() + y_val;
+					n.setX(newX);
+					n.setY(newY);
+				}
+			}
+		}
+	}
+
+	private void processNodes(Document doc, String szNotesTagId, String szCloneTagId, String szBqmodelIsTagId,
+			String szBqmodelIsDescribedByTagId, String szBqbiolIsTagId, String szBqbiolIsDescribedByTagId,
+			String szAnnotationTagId, String szNodeURLTagId, String szOrientationTagId, NodeList nList) {
+		for (int temp = 0; temp < nList.getLength(); temp++) {
+			Node nNode = nList.item(temp);
+
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+
+				// get id of the node/glyph
+				String szGlyphId = eElement.getAttribute(ID_ATTR);
+
+				if ((!compoundComplexMap.containsKey(szGlyphId)) && (!complexSet.contains(szGlyphId))
+						&& (!compartmentSet.contains(szGlyphId))) {
+					Glyph _glyph = parseGlyphInfo(doc, szNotesTagId, szCloneTagId, szBqmodelIsTagId,
+							szBqmodelIsDescribedByTagId, szBqbiolIsTagId, szBqbiolIsDescribedByTagId, szAnnotationTagId,
+							szNodeURLTagId, szOrientationTagId, eElement, szGlyphId);
+
+					// if the glyph is part of a compartment, the reference to the compartment is
+					// set
+					if (compoundCompartmentMap.containsKey(szGlyphId)) {
+						String szCompartmentId = compoundCompartmentMap.get(szGlyphId);
+						setCompartmentRefToGlyph(szCompartmentId, _glyph, map.getGlyph());
+					}
+
+					// add the glyph to the map
+					map.getGlyph().add(_glyph);
+				}
+			}
+		}
+	}
+
+	private void processResources(NodeList nResourceList) {
+		for (int temp = 0; temp < nResourceList.getLength(); temp++) {
+			Node nResource = nResourceList.item(temp);
+
+			if (nResource.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nResource;
+				Glyph _glyph = new Glyph();
+
+				// get id of the resources
+				String szResourceId = eElement.getAttribute(ID_ATTR);
+				_glyph.setId(szResourceId);
+
+				NodeList _nlGenericNodeList = eElement.getElementsByTagName(FileUtils.Y_GENERIC_NODE);
+				NodeList _nlShapeNodeList = eElement.getElementsByTagName(FileUtils.Y_SHAPE_NODE);
+
+				if (_nlGenericNodeList.getLength() > 0) {
+					String szYEDNodeType = ((Element) _nlGenericNodeList.item(0)).getAttribute("configuration");
+					String szGlyphClass = parseYedNodeType(szYEDNodeType, false);
+					_glyph.setClazz(szGlyphClass);
+				} else if (_nlShapeNodeList.getLength() > 0) {
+					_glyph.setClazz(FileUtils.SBGN_UNIT_OF_INFORMATION);
+				}
+
+				NodeList _nlNodeLabelList = eElement.getElementsByTagName(FileUtils.Y_NODE_LABEL);
+				if (_nlNodeLabelList.getLength() > 0) {
+					String szNodeText = _nlNodeLabelList.item(0).getTextContent().trim();
+
+					if (!szNodeText.equals("")) {
+
+						if (_glyph.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
+							// setting the label of the glyph e.g. P, 2P..
+							Glyph.State _state = new Glyph.State();
+							int iDelimPos = szNodeText.indexOf("@");
+							String szValue = "";
+							String szVariable = "";
+
+							if (iDelimPos < 0) {
+								szValue = szNodeText;
+							} else if (0 == iDelimPos) {
+								szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
+							} else if (iDelimPos > 0) {
+								szValue = szNodeText.substring(0, iDelimPos);
+								szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
+							}
+
+							_state.setValue(szValue);
+							_state.setVariable(szVariable);
+							_glyph.setState(_state);
+						} else if (_glyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
+							Label _label = new Label();
+							_label.setText(szNodeText);
+							_glyph.setLabel(_label);
+						}
+					}
+				}
+
+				// add the state variable to the corresponding glyph
+				for (Entry<Pair<String, String>, ResourceCoordinates> _resource : resourceMap.entrySet()) {
+					if (_resource.getKey().first.equals(szResourceId)) {
+						NodeList nlGeometry = eElement.getElementsByTagName(FileUtils.Y_GEOMETRY);
+						String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(HEIGHT_ATTR);
+						String szWidth = ((Element) (nlGeometry.item(0))).getAttribute(WIDTH_ATTR);
+
+						Bbox bbox = new Bbox();
+						bbox.setH(Float.parseFloat(szHeight));
+						bbox.setW(Float.parseFloat(szWidth));
+						if (_resource.getValue() != null) {
+							bbox.setX(_resource.getValue().getXCoord());
+							bbox.setY(_resource.getValue().getYCoord());
+						}
+
+						_glyph.setBbox(bbox);
+
+						String szParentGlyphId = _resource.getKey().second;
+						addGlyphToList(szParentGlyphId, _glyph, map.getGlyph());
+					}
+				}
+			}
+		}
+	}
+
+	private void processArcs(NodeList nEdgeList) {
+		float fPort2PointDistance = 0;
+		for (Glyph process : map.getGlyph()) {
+			if (isProcessType(process)) {
+				fPort2PointDistance = 2 * process.getBbox().getH();
+				break;
+			}
+		}
+		for (int temp = 0; temp < nEdgeList.getLength(); temp++) {
+			Node nEdge = nEdgeList.item(temp);
+			Arc _arc = new Arc();
+
+			if (nEdge.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nEdge;
+				String szArrowDirection = processNodeList(eElement.getElementsByTagName(FileUtils.Y_ARROWS));
+				boolean bEdgeToBeCorrected = setArcClazz(_arc, szArrowDirection);
+
+				// get id of the edge/arc
+				String szArcAttributes = getElementAttributes(eElement).trim();
+
+				String delims = "[\t]";
+				String szArcId = "", szArcSource = "", szArcTarget = "";
+				szArcAttributes = szArcAttributes.replaceAll("\"", "");
+				String[] tokens = szArcAttributes.split(delims);
+				float fStartX = 0, fStartY = 0, fStartH = 0, fStartW = 0;
+				float fTargetX = 0, fTargetY = 0, fTargetH = 0, fTargetW = 0;
+
+				for (int i = 0; i < tokens.length; i++) {
+					if (tokens[i].contains("id=")) {
+						szArcId = tokens[i].replaceAll("id=", "");
+						_arc.setId(szArcId);
+					} else if (tokens[i].contains("source=")) {
+						szArcSource = tokens[i].replaceAll("source=", "");
+
+						Glyph g = null;
+						for (Glyph _glyph : map.getGlyph()) {
+							g = findGlyph(szArcSource, _glyph);
+							if (null != g) {
+								break;
+							}
+						}
+
+						if (g != null) {
+							if (bEdgeToBeCorrected) {
+								_arc.setTarget(g);
+							} else {
+								_arc.setSource(g);
+							}
+
+							if (null != g.getBbox()) {
+								fStartX = g.getBbox().getX();
+								fStartY = g.getBbox().getY();
+								fStartH = g.getBbox().getH();
+								fStartW = g.getBbox().getW();
+							}
+						}
+
+					} else if (tokens[i].contains("target=")) {
+						szArcTarget = tokens[i].replaceAll("target=", "");
+
+						Glyph g = null;
+						for (Glyph _glyph : map.getGlyph()) {
+							g = findGlyph(szArcTarget, _glyph);
+							if (null != g) {
+								break;
+							}
+						}
+
+						if (g != null) {
+							if (bEdgeToBeCorrected) {
+								_arc.setSource(g);
+							} else {
+								_arc.setTarget(g);
+							}
+
+							if (null != g.getBbox()) {
+								fTargetX = g.getBbox().getX();
+								fTargetY = g.getBbox().getY();
+								fTargetH = g.getBbox().getH();
+								fTargetW = g.getBbox().getW();
+							}
+						}
+					}
+
+				}
+
+				// if the process is a consumption, it is easy to draw from process to entity
+				// and this can not be detected before
+				if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
+
+					Glyph target = (Glyph) _arc.getTarget();
+					if (!isProcessType(target)) {
+						target = (Glyph) _arc.getSource();
+						_arc.setSource(_arc.getTarget());
+						_arc.setTarget(target);
+					}
+				}
+
+				// given the fact that the consumption line could be used also for the
+				// representation of the logic or equivalence arcs, this has to be checked and
+				// decoded accordingly
+				if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
+					if ((_arc.getSource() != null) && (_arc.getTarget() != null)) {
+
+						if (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("OR")
+								|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("OR")
+								|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("AND")
+										|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("AND"))
+								|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("NOT")
+										|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("NOT"))) {
+							_arc.setClazz(FileUtils.SBGN_LOGIC_ARC);
+						} else if ((((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_SUBMAP))
+								|| ((Glyph) _arc.getSource()).getClazz().equals(FileUtils.SBGN_TAG)
+								|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_SUBMAP)
+								|| ((Glyph) _arc.getTarget()).getClazz().equals(FileUtils.SBGN_TAG))
+							_arc.setClazz(FileUtils.SBGN_EQUIVALENCE_ARC);
+					} else if (_arc.getSource() == null) {
+						System.out.println("source " + _arc.getId() + " " + bEdgeToBeCorrected);
+					} else if (_arc.getTarget() == null) {
+						System.out.println("target " + _arc.getId());
+					}
+				}
+
+				String szPathCoordinates = processNodeList(eElement.getElementsByTagName(FileUtils.Y_PATH));
+				String delimsCoord = "[\t]";
+				szPathCoordinates = szPathCoordinates.replaceAll("\"", "");
+				String[] tokensCoordinates = szPathCoordinates.split(delimsCoord);
+				if (tokensCoordinates.length == 4) {
+					Start _start = new Start();
+					String sx = tokensCoordinates[0].replaceAll("sx=", "");
+					_start.setX(Float.parseFloat(sx) + fStartX + fStartW / 2);
+					// _start.setX(Float.parseFloat(szSX));
+
+					String sy = tokensCoordinates[1].replaceAll("sy=", "");
+					_start.setY(Float.parseFloat(sy) + fStartY + fStartH / 2);
+					// _start.setY(Float.parseFloat(szSY));
+
+					_arc.setStart(_start);
+
+					End _end = new End();
+					String tx = tokensCoordinates[2].replaceAll("tx=", "");
+					_end.setX(Float.parseFloat(tx) + fTargetX + fTargetW / 2);
+					// _end.setX(Float.parseFloat(szTX));
+					String ty = tokensCoordinates[3].replaceAll("ty=", "");
+					_end.setY(Float.parseFloat(ty) + fTargetY + fTargetH / 2);
+					// _end.setY(Float.parseFloat(szTY));
+					_arc.setEnd(_end);
+				}
+
+				// for processes, ports must be set for consumption and production arcs
+				// for logic operators, ports must be set for incoming arcs and for outgoing
+				// regulatory arcs (catalysis, stimulation, inhibition, modulation, necessary
+				// stimulation)
+				setPortToArc(_arc);
+
+				String szPointInfo = processNodeList(eElement.getElementsByTagName(FileUtils.Y_POINT));
+				setBendPoints(_arc, szPointInfo, fPort2PointDistance);
+
+				NodeList nlLineStyle = eElement.getElementsByTagName(FileUtils.Y_LINE_STYLE);
+				// getting the border color info
+				String szStrokeColorId = ((Element) (nlLineStyle.item(0))).getAttribute(COLOR_ATTR);
+				colorSet.add(szStrokeColorId);
+
+				// getting the stroke width info
+				float fStrokeWidth = Float.parseFloat(((Element) (nlLineStyle.item(0))).getAttribute(WIDTH_ATTR));
+
+				String szStyleId = STYLE_PREFIX + fStrokeWidth + szStrokeColorId.replaceFirst("#", "");
+
+				if (!styleMap.containsKey(szStyleId)) {
+					styleMap.put(szStyleId, new SBGNMLStyle(szStyleId, szStrokeColorId, fStrokeWidth));
+				}
+				styleMap.get(szStyleId).addElementIdToSet(eElement.getAttribute(ID_ATTR));
+
+				NodeList nlCardinalityList = eElement.getElementsByTagName(FileUtils.Y_EDGE_LABEL);
+				if (nlCardinalityList.getLength() > 0) {
+					String szCardinality = nlCardinalityList.item(0).getTextContent().trim();
+					if (!szCardinality.equals("")) {
+
+						Glyph cardGlyph = new Glyph();
+						cardGlyph.setClazz(FileUtils.SBGN_CARDINALITY);
+						cardGlyph.setId(FileUtils.SBGN_CARDINALITY + "_" + szCardinality);
+						Label _label = new Label();
+						_label.setText(szCardinality);
+						cardGlyph.setLabel(_label);
+						Bbox cardBbox = new Bbox();
+						cardBbox.setH(0);
+						cardBbox.setW(0);
+						cardBbox.setX(0);
+						cardBbox.setY(0);
+						cardGlyph.setBbox(cardBbox);
+						_arc.getGlyph().add(cardGlyph);
+					}
+				}
+			}
+
+			// add the arc to the map
+			map.getArc().add(_arc);
+		}
+	}
+
+	private void setBendPoints(Arc _arc, String szPointInfo, float fPort2PointDistance) {
+
+		if (!szPointInfo.isEmpty()) {
+			String delims = "[\t]";
+			float fXCoord = 0, fYCoord = 0;
+			szPointInfo = szPointInfo.replaceAll("\"", "");
+			String[] tokensBendPoint = szPointInfo.split(delims);
+
+			for (int i = 0; i < tokensBendPoint.length - 1; i += 2) {
+				if (tokensBendPoint[i].contains("x=")) {
+					fXCoord = Float.parseFloat(tokensBendPoint[i].replaceAll("x=", ""));
+				}
+				if (tokensBendPoint[i + 1].contains("y=")) {
+					fYCoord = Float.parseFloat(tokensBendPoint[i + 1].replaceAll("y=", ""));
+				}
+
+				boolean bFoundPort = false;
+				if (_arc.getSource() instanceof Port) {
+					Port p = (Port) _arc.getSource();
+					if (getPointDistance(p.getX(), p.getY(), fXCoord, fYCoord) <= fPort2PointDistance) {
+						bFoundPort = true;
+					}
+				} else if (_arc.getTarget() instanceof Port) {
+					Port p = (Port) _arc.getTarget();
+					if (getPointDistance(p.getX(), p.getY(), fXCoord, fYCoord) <= fPort2PointDistance) {
+						bFoundPort = true;
+					}
+				}
+				if (!bFoundPort) {
+
+					boolean bBendPointFound = false;
+					for (Next n : _arc.getNext()) {
+						if ((n.getX() == fXCoord) && (n.getY() == fYCoord)) {
+							bBendPointFound = true;
+							break;
+						}
+					}
+
+					if (!bBendPointFound) {
+						Next _next = new Next();
+						_next.setX(fXCoord);
+						_next.setY(fYCoord);
+						_arc.getNext().add(_next);
+					}
+				}
+			}
+		}
+	}
+
+	private boolean setArcClazz(Arc _arc, String szArrowDirection) {
+		String szArcType = FileUtils.SBGN_CONSUMPTION;
+		boolean bEdgeToBeCorrected = false;
+
+		if (szArrowDirection.contains("white_delta_bar")) {
+			szArcType = FileUtils.SBGN_NECESSARY_STIMULATION;
+			if (szArrowDirection.contains("source=\"white_delta_bar\"")) {
+				bEdgeToBeCorrected = true;
+			}
+		} else if (szArrowDirection.contains("white_diamond")) {
+			szArcType = FileUtils.SBGN_MODULATION;
+			if (szArrowDirection.contains("source=\"white_diamond\"")) {
+				bEdgeToBeCorrected = true;
+			}
+		} else if (szArrowDirection.contains("t_shape")) {
+			szArcType = FileUtils.SBGN_INHIBITION;
+			if (szArrowDirection.contains("source=\"t_shape\"")) {
+				bEdgeToBeCorrected = true;
+			}
+		} else if (szArrowDirection.contains("white_delta")) {
+			szArcType = FileUtils.SBGN_STIMULATION;
+			if (szArrowDirection.contains("source=\"white_circle\"")) {
+				bEdgeToBeCorrected = true;
+			}
+		} else if (szArrowDirection.contains("delta")) {
+			szArcType = FileUtils.SBGN_PRODUCTION;
+			if (szArrowDirection.contains("source=\"delta\"")) {
+				bEdgeToBeCorrected = true;
+			}
+		} else if (szArrowDirection.contains("white_circle")) {
+			szArcType = FileUtils.SBGN_CATALYSIS;
+			if (szArrowDirection.contains("source=\"white_circle\"")) {
+				bEdgeToBeCorrected = true;
+			}
+		}
+
+		_arc.setClazz(szArcType);
+		return bEdgeToBeCorrected;
 	}
 
 	private Glyph findGlyph(String szId, Glyph g) {
@@ -677,6 +1035,15 @@ public class GraphML2SBGNML {
 			bIsProcess = true;
 		}
 		return bIsProcess;
+	}
+
+	private boolean isOperatorType(Glyph source) {
+		boolean bIsOperator = false;
+		if (source.getClazz().equals(FileUtils.SBGN_AND) || (source.getClazz().equals(FileUtils.SBGN_OR))
+				|| (source.getClazz().equals(FileUtils.SBGN_NOT))) {
+			bIsOperator = true;
+		}
+		return bIsOperator;
 	}
 
 	private void setCompartmentRefToGlyph(String szParentCompartmentId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
@@ -808,7 +1175,9 @@ public class GraphML2SBGNML {
 
 					// the glyph is a multimer (the shape from the yEd SBGN palette was used for
 					// drawing) and the child glyph is an unit of information
-					if (_element.getTextContent().trim().contains("N:")) {
+					if ((_element.getTextContent().trim().contains("N:"))
+							|| (_element.getTextContent().trim().contains("RNA"))
+							|| (_element.getTextContent().trim().toUpperCase().contains("RECEPTOR"))) {
 						Glyph _uofGlyph = new Glyph();
 						_uofGlyph.setClazz(FileUtils.SBGN_UNIT_OF_INFORMATION);
 						_uofGlyph.setId(_glyph.getId() + "_uof_" + i);
@@ -912,7 +1281,18 @@ public class GraphML2SBGNML {
 				else if (_element.getAttribute(KEY_TAG).equals(szCloneTagId)) {
 					if (!_element.getTextContent().equals("")) {
 						Label _label = new Label();
-						_label.setText(_element.getTextContent());
+						String text = "";
+						// This is in concordance with the SBGN to GraphML translation as sometimes,
+						// label text within in the clone is not specified, but it is usually equal to
+						// empty space. Thus, the condition if from above would be false and the clone
+						// would not be set. The FlieUtils.CloneIsSet was introduced in order to show
+						// that the glyph has a clone that has to be set, even if the label text is an
+						// empty string. At the decoding step, this additional information must be
+						// removed.
+						if (!_element.getTextContent().equals(FileUtils.CloneIsSet)) {
+							text = _element.getTextContent();
+						}
+						_label.setText(text);
 						Clone _clone = new Clone();
 						_clone.setLabel(_label);
 						_glyph.setClone(_clone);
@@ -934,7 +1314,6 @@ public class GraphML2SBGNML {
 							eltRDFLi.setAttribute(RDF_RESOURCE_TAG, tokens[i]);
 							eltRDFBag.appendChild(eltRDFLi);
 							rdfDescription.appendChild(elBqtModelIs);
-							System.out.println(rdfDescription.toString());
 						}
 					}
 				}
@@ -1183,4 +1562,430 @@ public class GraphML2SBGNML {
 		return szAttributeValues;
 	}
 
+	private void createPorts(List<Glyph> list) {
+		for (Glyph g : list) {
+
+			if (isOperatorType(g)) {
+				if (g.getPort() != null) {
+					if (g.getPort().size() != MAX_PORT_NO) {
+						for (int i = 0; i < MAX_PORT_NO; i++) {
+							createPort(g, i);
+						}
+					}
+				}
+			}
+
+			if (isProcessType(g)) {
+				if (g.getPort() != null) {
+					if (g.getPort().size() != MAX_PORT_NO) {
+
+						for (int i = 0; i < MAX_PORT_NO; i++) {
+							createPort(g, i);
+						}
+					}
+				}
+			}
+			// create ports also for inner processes/ operators
+			createPorts(g.getGlyph());
+		}
+	}
+
+	private void createPort(Glyph g, int i) {
+		Port _port = new Port();
+		_port.setId(g.getId() + "." + i);
+
+		float x = 0;
+		float y = 0;
+		// the process is oriented horizontally, so the ports will be located left-right
+		if (g.getOrientation().equals("horizontal")) {
+			if (0 == i) {
+				x = g.getBbox().getX() - (float) PORT2PROCESS_DISTANCE;
+			} else {
+				x = g.getBbox().getX() + g.getBbox().getW() + (float) PORT2PROCESS_DISTANCE;
+			}
+			y = g.getBbox().getY();
+		}
+		// the process is oriented vertically, so the ports will be located top/down
+		else {
+			x = g.getBbox().getX();
+
+			if (0 == i) {
+				y = g.getBbox().getY() - (float) PORT2PROCESS_DISTANCE;
+			} else {
+				y = g.getBbox().getY() + g.getBbox().getH() + (float) PORT2PROCESS_DISTANCE;
+			}
+		}
+
+		_port.setX(x);
+		_port.setY(y);
+		g.getPort().add(_port);
+	}
+
+	private void setPortToArc(Arc _arc) {
+
+		// if the port has not been set yet, i.e. the arc source/ target is an instance
+		// of the Glyph class and not of the Port class yet
+		Port currentPort = null;
+		Port alternativePort = null;
+
+		if (_arc.getClazz().equals(FileUtils.SBGN_PRODUCTION)) {
+			if (_arc.getSource() instanceof Glyph) {
+				Glyph g = (Glyph) _arc.getSource();
+				Port port1 = g.getPort().get(0);
+				Port port2 = g.getPort().get(1);
+
+				float point_x = g.getBbox().getX();
+				float point_y = g.getBbox().getY();
+
+				if (_arc.getNext().size() > 0) {
+					Next bendPoint = getClosestBendPoint(g, _arc);
+					point_x = bendPoint.getX();
+					point_y = bendPoint.getY();
+				} else {
+					point_x = _arc.getEnd().getX();
+					point_y = _arc.getEnd().getY();
+				}
+
+				float dist1 = getPointDistance(point_x, point_y, port1.getX(), port1.getY());
+				float dist2 = getPointDistance(point_x, point_y, port2.getX(), port2.getY());
+
+				if (dist1 <= dist2) {
+					currentPort = port1;
+					alternativePort = port2;
+				} else {
+					currentPort = port2;
+					alternativePort = port1;
+				}
+			}
+		} else if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
+			if (_arc.getTarget() instanceof Glyph) {
+
+				Glyph g = (Glyph) _arc.getTarget();
+
+				if (g.getPort() != null) {
+					if (g.getPort().size() == MAX_PORT_NO) {
+						Port port1 = g.getPort().get(0);
+						Port port2 = g.getPort().get(1);
+
+						float point_x = g.getBbox().getX();
+						float point_y = g.getBbox().getY();
+
+						if (_arc.getNext().size() > 0) {
+							Next bendPoint = getClosestBendPoint(g, _arc);
+							point_x = bendPoint.getX();
+							point_y = bendPoint.getY();
+						} else {
+							point_x = _arc.getStart().getX();
+							point_y = _arc.getStart().getY();
+						}
+
+						float dist1 = getPointDistance(point_x, point_y, port1.getX(), port1.getY());
+						float dist2 = getPointDistance(point_x, point_y, port2.getX(), port2.getY());
+
+						if (dist1 <= dist2) {
+							currentPort = port1;
+							alternativePort = port2;
+						} else {
+							currentPort = port2;
+							alternativePort = port1;
+						}
+					}
+				}
+			}
+		}
+
+		else if (_arc.getClazz().equals(FileUtils.SBGN_LOGIC_ARC)) {
+			if (_arc.getTarget() instanceof Glyph) {
+				Glyph g = (Glyph) _arc.getTarget();
+				if (isOperatorType(g)) {
+					Port port1 = g.getPort().get(0);
+					Port port2 = g.getPort().get(1);
+
+					float point_x = g.getBbox().getX();
+					float point_y = g.getBbox().getY();
+
+					if (_arc.getNext().size() > 0) {
+						Next bendPoint = getClosestBendPoint(g, _arc);
+						point_x = bendPoint.getX();
+						point_y = bendPoint.getY();
+					} else {
+						point_x = _arc.getStart().getX();
+						point_y = _arc.getStart().getY();
+					}
+
+					float dist1 = getPointDistance(point_x, point_y, port1.getX(), port1.getY());
+					float dist2 = getPointDistance(point_x, point_y, port2.getX(), port2.getY());
+
+					if (dist1 <= dist2) {
+						currentPort = port1;
+						alternativePort = port2;
+					} else {
+						currentPort = port2;
+						alternativePort = port1;
+					}
+				}
+			}
+		} else if (_arc.getClazz().equals(FileUtils.SBGN_CATALYSIS)
+				|| _arc.getClazz().equals(FileUtils.SBGN_STIMULATION)
+				|| _arc.getClazz().equals(FileUtils.SBGN_INHIBITION)
+				|| _arc.getClazz().equals(FileUtils.SBGN_MODULATION)
+				|| _arc.getClazz().equals(FileUtils.SBGN_NECESSARY_STIMULATION)) {
+			if (_arc.getSource() instanceof Glyph) {
+				Glyph g = (Glyph) _arc.getSource();
+				if (isOperatorType(g)) {
+					Port port1 = g.getPort().get(0);
+					Port port2 = g.getPort().get(1);
+
+					float point_x = g.getBbox().getX();
+					float point_y = g.getBbox().getY();
+
+					if (_arc.getNext().size() > 0) {
+						Next bendPoint = getClosestBendPoint(g, _arc);
+						point_x = bendPoint.getX();
+						point_y = bendPoint.getY();
+					} else {
+						point_x = _arc.getStart().getX();
+						point_y = _arc.getStart().getY();
+					}
+
+					float dist1 = getPointDistance(point_x, point_y, port1.getX(), port1.getY());
+					float dist2 = getPointDistance(point_x, point_y, port2.getX(), port2.getY());
+
+					if (dist1 <= dist2) {
+						currentPort = port1;
+						alternativePort = port2;
+					} else {
+						currentPort = port2;
+						alternativePort = port1;
+					}
+				}
+			}
+		}
+
+		if (currentPort != null) {
+			if (!port_arc_map.containsKey(currentPort.getId())) {
+				port_arc_map.put(currentPort.getId(), new PortArcsRelationship(currentPort));
+				port_arc_map.put(alternativePort.getId(), new PortArcsRelationship(alternativePort));
+				port_arc_map.get(currentPort.getId()).addArcToSet(_arc);
+
+				if (_arc.getClazz().equals(FileUtils.SBGN_PRODUCTION)) {
+					port_arc_map.get(currentPort.getId()).setType(FileUtils.PortType.SourcePort);
+					port_arc_map.get(alternativePort.getId()).setType(FileUtils.PortType.TargetPort);
+				} else if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
+					port_arc_map.get(currentPort.getId()).setType(FileUtils.PortType.TargetPort);
+					port_arc_map.get(alternativePort.getId()).setType(FileUtils.PortType.SourcePort);
+				} else if (_arc.getClazz().equals(FileUtils.SBGN_LOGIC_ARC)) {
+					port_arc_map.get(currentPort.getId()).setType(FileUtils.PortType.TargetPort);
+					port_arc_map.get(alternativePort.getId()).setType(FileUtils.PortType.SourcePort);
+				} else if (_arc.getClazz().equals(FileUtils.SBGN_CATALYSIS)
+						|| _arc.getClazz().equals(FileUtils.SBGN_STIMULATION)
+						|| _arc.getClazz().equals(FileUtils.SBGN_INHIBITION)
+						|| _arc.getClazz().equals(FileUtils.SBGN_MODULATION)
+						|| _arc.getClazz().equals(FileUtils.SBGN_NECESSARY_STIMULATION)) {
+					port_arc_map.get(currentPort.getId()).setType(FileUtils.PortType.SourcePort);
+					port_arc_map.get(alternativePort.getId()).setType(FileUtils.PortType.TargetPort);
+				}
+			}
+			// the port exists already in the map, and it has already some arcs assigned to
+			// it. It must check if the existent arcs have the same clazz; if there are arcs
+			// of different clazz, they must be assigned to the alternative port
+			else {
+
+				if (_arc.getClazz().equals(FileUtils.SBGN_PRODUCTION)) {
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.SourcePort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(_arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(_arc);
+					}
+				} else if (_arc.getClazz().equals(FileUtils.SBGN_CONSUMPTION)) {
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.TargetPort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(_arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(_arc);
+					}
+				} else if (_arc.getClazz().equals(FileUtils.SBGN_LOGIC_ARC)) {
+
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.TargetPort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(_arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(_arc);
+					}
+				} else if (_arc.getClazz().equals(FileUtils.SBGN_CATALYSIS)
+						|| _arc.getClazz().equals(FileUtils.SBGN_STIMULATION)
+						|| _arc.getClazz().equals(FileUtils.SBGN_INHIBITION)
+						|| _arc.getClazz().equals(FileUtils.SBGN_MODULATION)
+						|| _arc.getClazz().equals(FileUtils.SBGN_NECESSARY_STIMULATION)) {
+
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.SourcePort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(_arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(_arc);
+					}
+				}
+			}
+		}
+	}
+
+	private void assignArcsToPorts() {
+
+		for (Entry<String, PortArcsRelationship> entry : port_arc_map.entrySet()) {
+			if (entry.getValue().getPortType() == PortType.SourcePort) {
+				for (Arc a : entry.getValue().getConnectedArcs()) {
+					a.setSource(entry.getValue().getPort());
+				}
+			} else if (entry.getValue().getPortType() == PortType.TargetPort) {
+				for (Arc a : entry.getValue().getConnectedArcs()) {
+					a.setTarget(entry.getValue().getPort());
+				}
+			}
+		}
+	}
+
+	private float getPointDistance(float x1, float y1, float x2, float y2) {
+		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+	}
+
+	private void correctPortOrientationAndConnectedArcs() {
+
+		for (Glyph glyph : map.getGlyph()) {
+			if (isProcessType(glyph)) {
+				int horizontal = 0;
+				int vertical = 0;
+				for (Arc a : map.getArc()) {
+					if (a.getClazz().equals(FileUtils.SBGN_CONSUMPTION)
+							|| a.getClazz().equals(FileUtils.SBGN_PRODUCTION)) {
+						boolean bArcAttachedToProcess = isArcConnectedToProcess(glyph, a);
+
+						if (bArcAttachedToProcess) {
+							float point_x = glyph.getBbox().getX();
+							float point_y = glyph.getBbox().getY();
+
+							if (a.getNext().size() > 0) {
+								Next bendPoint = getClosestBendPoint(glyph, a);
+								point_x = bendPoint.getX();
+								point_y = bendPoint.getY();
+							} else {
+								if (a.getTarget() instanceof Port) {
+									point_x = a.getStart().getX();
+									point_y = a.getStart().getY();
+
+								} else if (a.getSource() instanceof Port) {
+									point_x = a.getEnd().getX();
+									point_y = a.getEnd().getY();
+								}
+
+							}
+							float y_shape = (float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5);
+							float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
+
+							if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
+								horizontal++;
+							} else {
+								vertical++;
+							}
+						}
+
+					}
+				}
+				rearrangePorts(glyph, horizontal, vertical);
+
+			} else if (isOperatorType(glyph)) {
+				int horizontal = 0;
+				int vertical = 0;
+				for (Arc a : map.getArc()) {
+					if (a.getClazz().equals(FileUtils.SBGN_LOGIC_ARC) || a.getClazz().equals(FileUtils.SBGN_CATALYSIS)
+							|| a.getClazz().equals(FileUtils.SBGN_STIMULATION)
+							|| a.getClazz().equals(FileUtils.SBGN_INHIBITION)
+							|| a.getClazz().equals(FileUtils.SBGN_MODULATION)
+							|| a.getClazz().equals(FileUtils.SBGN_NECESSARY_STIMULATION)) {
+						boolean bArcAttachedToProcess = isArcConnectedToProcess(glyph, a);
+
+						if (bArcAttachedToProcess) {
+							float point_x = glyph.getBbox().getX();
+							float point_y = glyph.getBbox().getY();
+
+							if (a.getNext().size() > 0) {
+								Next bendPoint = getClosestBendPoint(glyph, a);
+								point_x = bendPoint.getX();
+								point_y = bendPoint.getY();
+							} else {
+								if (a.getTarget() instanceof Port) {
+									point_x = a.getStart().getX();
+									point_y = a.getStart().getY();
+								} else if (a.getSource() instanceof Port) {
+									point_x = a.getEnd().getX();
+									point_y = a.getEnd().getY();
+								}
+							}
+
+							float y_shape = (float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5);
+							float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
+
+							if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
+								horizontal++;
+							} else {
+								vertical++;
+							}
+						}
+
+					}
+				}
+
+				rearrangePorts(glyph, horizontal, vertical);
+			}
+		}
+	}
+
+	private void rearrangePorts(Glyph glyph, int horizontal, int vertical) {
+		if (horizontal >= vertical) {
+			glyph.getPort().get(0).setX(glyph.getBbox().getX() - (float) PORT2PROCESS_DISTANCE);
+			glyph.getPort().get(1)
+					.setX(glyph.getBbox().getX() + glyph.getBbox().getW() + (float) PORT2PROCESS_DISTANCE);
+
+			glyph.getPort().get(0).setY(glyph.getBbox().getY());
+			glyph.getPort().get(1).setY(glyph.getBbox().getY());
+		} else {
+			glyph.getPort().get(0).setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
+			glyph.getPort().get(1).setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
+
+			glyph.getPort().get(0).setY(glyph.getBbox().getY() + (float) PORT2PROCESS_DISTANCE);
+			glyph.getPort().get(1)
+					.setY(glyph.getBbox().getY() + glyph.getBbox().getH() - (float) PORT2PROCESS_DISTANCE);
+		}
+	}
+
+	private Next getClosestBendPoint(Glyph _glyph, Arc a) {
+		Next closestBendPoint = a.getNext().get(0);
+		float min_dist = getPointDistance(closestBendPoint.getX(), closestBendPoint.getY(), _glyph.getBbox().getX(),
+				_glyph.getBbox().getY());
+
+		for (Next n : a.getNext()) {
+			float dist = getPointDistance(n.getX(), n.getY(), _glyph.getBbox().getX(), _glyph.getBbox().getY());
+			if (dist < min_dist) {
+				min_dist = dist;
+				closestBendPoint = n;
+			}
+		}
+
+		return closestBendPoint;
+	}
+
+	private boolean isArcConnectedToProcess(Glyph process, Arc a) {
+		boolean bArcAttachedToProcess = false;
+
+		if (a.getSource() instanceof Port) {
+			Port p = (Port) a.getSource();
+			if (p.equals(process.getPort().get(0)) || (p.equals(process.getPort().get(1)))) {
+				bArcAttachedToProcess = true;
+			}
+		}
+
+		if (a.getTarget() instanceof Port) {
+			Port p = (Port) a.getTarget();
+			if (p.equals(process.getPort().get(0)) || (p.equals(process.getPort().get(1)))) {
+				bArcAttachedToProcess = true;
+			}
+		}
+		return bArcAttachedToProcess;
+	}
 }

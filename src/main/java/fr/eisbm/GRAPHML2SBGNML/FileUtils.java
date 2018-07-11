@@ -104,11 +104,19 @@ public class FileUtils {
 	public static final String Y_SHAPE_NODE = "y:ShapeNode";
 	
 	
-	public static final String IN_SBGN_FILE = "files/examples/test.sbgn";
-	public static final String IN_YED_FILE = "files/examples/test.graphml";
+	public static final String IN_SBGN_FILE = "test.sbgn";
+	public static final String IN_YED_FILE = "test.graphml";
 	
 	public static final int DEFAULT_FONT_SIZE = 10;
-	
+	public static final float PORT_DISTANCE = 10;
+	public static final int MAX_PORT_NUMBER = 2;
+	public static final String CloneIsSet = "CloneIsSet";
+	 
+	public enum PortType
+	{
+		SourcePort,
+		TargetPort
+	}
 	
 	public static Sbgn readFromFile(String szFileName) throws JAXBException {
 		Sbgn result = null;
