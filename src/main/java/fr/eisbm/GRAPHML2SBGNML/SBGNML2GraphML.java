@@ -76,13 +76,14 @@ public class SBGNML2GraphML {
 		try {
 			System.out.println(
 					"SBGN file validation: " + (SbgnUtil.isValid(inputFile) ? "validates" : "does not validate"));
+			convert(FileUtils.IN_SBGN_FILE);
+			System.out.println("simulation finished");
 		} catch (JAXBException | SAXException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		convert(FileUtils.IN_SBGN_FILE);
-		System.out.println("simulation finished");
+		
 	}
 
 	public static void convert(String szInputFileName) {
@@ -134,7 +135,7 @@ public class SBGNML2GraphML {
 				}
 
 				parseColorsAndStyles();
-
+				
 				try {
 					export(w, graph);
 				} catch (TransformerConfigurationException | SAXException e) {

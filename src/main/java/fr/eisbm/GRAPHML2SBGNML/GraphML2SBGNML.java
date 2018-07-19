@@ -329,7 +329,7 @@ public class GraphML2SBGNML {
 
 			moveNetworkToTopLeft();
 			correctPortOrientationAndConnectedArcs();
-		//	setClonedGlyphs();
+			setClonedGlyphs();
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
@@ -344,115 +344,176 @@ public class GraphML2SBGNML {
 	}
 
 	private void setClonedGlyphs() {
+		for (Glyph g : map.getGlyph()) {
+			if (!(g.getClazz().equals(FileUtils.SBGN_COMPLEX)
+					|| g.getClazz().equals(FileUtils.SBGN_COMPLEX_MULTIMER))) {
+				setCloneSimpleGlyphs(g, map.getGlyph());
+			} else {
+				findCloneComplexGlyph(g, map.getGlyph());
+			}
+		}
+	}
 
-		List<Glyph> allGlyphList = new ArrayList<Glyph>();
-		getAllGlyphs(map.getGlyph(), allGlyphList);
+	private void findCloneComplexGlyph(Glyph g1, List<Glyph> listOfGlyphs) {
+		for (Glyph g2 : listOfGlyphs) {
+			if (!g1.getId().equals(g2.getId()) && (g1.getClazz().equals(g2.getClazz()))) {
+				boolean bClone = findClonedSimilarGlyphs(g1, g2);
 
-		for (Glyph g : allGlyphList) {
-			if (g.getLabel() != null) {
-				Clone clone = new Clone();
-				for (Glyph g1 : map.getGlyph()) {
-					if (g != g1) {
-
-						if (!sameReaction(g, g1)) {
-							boolean bCloned = true;
-							if (g.getLabel() != null) {
-								if (g1.getLabel() != null) {
-									if (!g.getLabel().getText().equals(g1.getLabel().getText())) {
-										bCloned = false;
-
-									}
-								} else {
-									bCloned = false;
+				if (bClone) {
+					if (g1.getGlyph().size() != g2.getGlyph().size()) {
+						bClone = false;
+					}
+				}
+				
+				if (bClone) {
+					for (Glyph g11 : g1.getGlyph()) {
+						// this flag assures that all previous elements have clones; otherwise, if there
+						// is an element from the first map that has not clone in the second map, no
+						// further checking is necessarly as the complexes are not clones
+						if (bClone) {
+							for (Glyph g22 : g2.getGlyph()) {
+								bClone = findClonedSimilarGlyphs(g11, g22);
+								// when finding the clone of the current element, the for loop can move to the
+								// next element
+								if (bClone) {
+									break;
 								}
-							} else {
-								if (g1.getLabel() != null) {
-									bCloned = false;
-								}
-							}
-
-							boolean bState1 = existElements(g, FileUtils.SBGN_STATE_VARIABLE);
-							boolean bState2 = existElements(g1, FileUtils.SBGN_STATE_VARIABLE);
-
-							if (bState1) {
-								if (bState2) {
-									java.util.Map<String, String> stateMap1 = new HashMap<String, String>();
-									java.util.Map<String, String> stateMap2 = new HashMap<String, String>();
-									for (Glyph state1 : g.getGlyph()) {
-										if ((state1.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))
-												&& (state1.getState() != null)) {
-
-											stateMap1.put(state1.getState().getValue(),
-													state1.getState().getVariable());
-
-										}
-									}
-									for (Glyph state2 : g1.getGlyph()) {
-										if ((state2.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))
-												&& (state2.getState() != null)) {
-											stateMap2.put(state2.getState().getValue(),
-													state2.getState().getVariable());
-
-										}
-									}
-
-									for (Glyph state : g.getGlyph()) {
-										if ((state.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))
-												&& (state.getState() != null)) {
-											if (!stateMap2.containsKey(state.getState().getValue())) {
-												bCloned = false;
-											} else {
-												if (!stateMap2.get(state.getState().getValue())
-														.equals(state.getState().getVariable())) {
-													bCloned = false;
-												}
-											}
-										}
-									}
-								} else {
-									bCloned = false;
-								}
-							} else {
-								if (bState1) {
-									bCloned = false;
-								}
-							}
-
-							boolean bUnits1 = existElements(g, FileUtils.SBGN_UNIT_OF_INFORMATION);
-							boolean bUnits2 = existElements(g1, FileUtils.SBGN_UNIT_OF_INFORMATION);
-
-							if (bUnits1) {
-								if (bUnits2) {
-									for (Glyph unitInfo : g.getGlyph()) {
-										if (unitInfo.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
-											for (Glyph unitInfo1 : g1.getGlyph()) {
-												if ((unitInfo1.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION))
-														&& (!unitInfo.getLabel().getText()
-																.equals(unitInfo1.getLabel().getText()))) {
-													bCloned = false;
-													break;
-												}
-											}
-										}
-									}
-								} else {
-									bCloned = false;
-								}
-							} else {
-								if (bUnits2) {
-									bCloned = false;
-								}
-							}
-
-							if (bCloned) {
-								g.setClone(clone);
-								g1.setClone(clone);
 							}
 						}
 					}
 				}
+
+				if (bClone) {
+					Clone clone = new Clone();
+
+					if (g1.getClone() != null) {
+						clone = g1.getClone();
+					} else if (g2.getClone() != null) {
+						clone = g2.getClone();
+					}
+					g1.setClone(clone);
+					g2.setClone(clone);
+				}
 			}
 		}
+
+	}
+
+	private void setCloneSimpleGlyphs(Glyph g1, List<Glyph> listOfGlyphs) {
+
+		for (Glyph g2 : listOfGlyphs) {
+			boolean bClone = findClonedSimilarGlyphs(g1, g2);
+			if (bClone) {
+				Clone clone = new Clone();
+
+				if (g1.getClone() != null) {
+					clone = g1.getClone();
+				} else if (g2.getClone() != null) {
+					clone = g2.getClone();
+				}
+				g1.setClone(clone);
+				g2.setClone(clone);
+			}
+		}
+	}
+
+	private boolean findClonedSimilarGlyphs(Glyph g1, Glyph g2) {
+		boolean bClone = false;
+
+		if (!g1.getId().equals(g2.getId()) && (g1.getClazz().equals(g2.getClazz()))) {
+
+			bClone = haveSameCompartment(g1, g2);
+			if (bClone) {
+				bClone = haveSameTextLabel(g1, g2);
+			}
+			
+			if (bClone) {
+				bClone = haveSameUnitsOfInfo(g1, g2);
+			}
+			
+			if (bClone) {
+				bClone = haveSameStateVariables(g1, g2);
+			}
+		}
+		return bClone;
+	}
+
+	private boolean haveSameStateVariables(Glyph g1, Glyph g2) {
+		boolean bSameStateVariable = true;
+
+		for (Glyph g : g1.getGlyph()) {
+			if (g.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
+				if (!g2.getGlyph().contains(g)) {
+					bSameStateVariable = false;
+				}
+			}
+		}
+
+		for (Glyph g : g2.getGlyph()) {
+			if (g.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
+				if (!g1.getGlyph().contains(g)) {
+					bSameStateVariable = false;
+				}
+			}
+		}
+		return bSameStateVariable;
+	}
+
+	private boolean haveSameUnitsOfInfo(Glyph g1, Glyph g2) {
+		boolean bSameUOI = true;
+
+		for (Glyph g : g1.getGlyph()) {
+			if (g.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
+				if (!g2.getGlyph().contains(g)) {
+					bSameUOI = false;
+				}
+			}
+		}
+
+		for (Glyph g : g2.getGlyph()) {
+			if (g.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
+				if (!g1.getGlyph().contains(g)) {
+					bSameUOI = false;
+				}
+			}
+		}
+		return bSameUOI;
+	}
+
+	private boolean haveSameCompartment(Glyph g1, Glyph g2) {
+		boolean bSameCompartment = false;
+
+		if (g1.getCompartmentRef() != null) {
+			if (g2.getCompartmentRef() != null) {
+				if (g1.getCompartmentRef().equals(g2.getCompartmentRef())) {
+					bSameCompartment = true;
+				}
+			}
+		} else {
+			// if both glyphs have no compartment references
+			if (g2.getCompartmentRef() == null) {
+				bSameCompartment = true;
+			}
+		}
+		return bSameCompartment;
+
+	}
+
+	private boolean haveSameTextLabel(Glyph g1, Glyph g2) {
+		boolean bSameTextLabel = false;
+
+		if (g1.getLabel() != null) {
+			if (g2.getLabel() != null) {
+				if (g1.getLabel().getText().equals(g2.getLabel().getText())) {
+					bSameTextLabel = true;
+				}
+			}
+		} else {
+			if (g2.getLabel() == null) {
+				bSameTextLabel = true;
+			}
+		}
+		return bSameTextLabel;
 	}
 
 	private void getAllGlyphs(List<Glyph> inList, List<Glyph> outList) {
@@ -460,50 +521,6 @@ public class GraphML2SBGNML {
 			outList.add(g);
 			getAllGlyphs(g.getGlyph(), outList);
 		}
-	}
-
-	private boolean sameReaction(Glyph g1, Glyph g2) {
-		for (Arc arc : map.getArc()) {
-			if (arc.getSource() == g1) {
-				if (arc.getTarget() instanceof Glyph) {
-					Glyph glyph = (Glyph) arc.getTarget();
-					for (Arc arc2 : map.getArc()) {
-						if ((arc2.getSource() == glyph && arc.getTarget() == g2)
-								|| (arc2.getSource() == g2 && arc.getTarget() == glyph)) {
-							return true;
-						}
-					}
-				} else if (arc.getTarget() instanceof Port) {
-					Port port = (Port) arc.getTarget();
-					for (Arc arc2 : map.getArc()) {
-						if (arc2.getSource() == g2 && arc2.getTarget() == port) {
-							return true;
-						}
-						// find glyph and compare with the other port.
-						else {
-							for (Glyph glyph : map.getGlyph()) {
-								if ((glyph.getPort() != null) && (glyph.getPort().size() == MAX_PORT_NO)) {
-									Port otherPort = null;
-									if (glyph.getPort().get(0).equals(port)) {
-										otherPort = glyph.getPort().get(1);
-									} else if (glyph.getPort().get(1).equals(port)) {
-										otherPort = glyph.getPort().get(0);
-									}
-									if (null != otherPort) {
-										if (arc2.getSource() == otherPort && arc2.getTarget() == g2) {
-											return true;
-										}
-									}
-								}
-							}
-						}
-					}
-
-				}
-			}
-
-		}
-		return false;
 	}
 
 	private boolean existElements(Glyph g, String szElementType) {
