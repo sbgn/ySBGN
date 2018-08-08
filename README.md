@@ -6,7 +6,7 @@ Compatible formats:
  - SBGN-ML 0.2 (Process Description)
  - yEd 3.17.1
 
-To find more information, please check the [Wiki](https://github.com/sbgn/ySBGN/wiki). The translation mapping rules are briefly described in [Translation mapping](https://github.com/sbgn/ySBGN/wiki/Translation-mapping) page. The full application can be directly donwloaded from [here](https://github.com/sbgn/ySBGN).
+To find more information, please check the [Wiki](https://github.com/sbgn/ySBGN/wiki). The translation mapping rules are briefly described in [Translation mapping](https://github.com/sbgn/ySBGN/wiki/Translation-mapping) page. The latest release including executable application and source files can be directly donwloaded from [here](https://github.com/sbgn/ySBGN/releases).
 
 Known issues are shown in the [Issues](https://github.com/sbgn/ySBGN/issues) section and the limitations of the tool are listed on the [Limitations](https://github.com/sbgn/ySBGN/wiki/Limitations) page.
 
@@ -25,7 +25,7 @@ After cloning the repository and getting into its directory:
 
 A small GUI is also provided as the main class of the package. It can be launched by double clicking on the jar or by directly calling the package with `java -jar`. Be sure to have JavaFX working in your Java distribution.
 
-The executable jar can be directly downloaded from [https://github.com/sbgn/ySBGN/blob/master/ySBGN-1.0-app.jar](https://github.com/sbgn/ySBGN/blob/master/ySBGN-1.0-app.jar).
+The executable jar can be directly downloaded from the [Release page](https://github.com/sbgn/ySBGN/releases).
 
 ## How to contribute
 
