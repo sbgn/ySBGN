@@ -91,6 +91,9 @@ public class SBGNML2GraphML {
 		SBGNML2GraphML sg = new SBGNML2GraphML();
 		String szOutFileName = szInputFileName.substring(0, szInputFileName.indexOf(".")).concat(".graphml");
 		sg.parseSBGNFile(szInputFileName, szOutFileName);
+		
+		String szSBGNv02FileName = szOutFileName.replace(".graphml", "-SBGNv02.sbgn");
+		transformToSBGN02.transformToSBGNv02(szInputFileName, szSBGNv02FileName);
 	}
 
 	public void parseSBGNFile(String szInSBGNFileName, String szOutGraphMLFileName) {
@@ -497,6 +500,9 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "width", "CDATA", Float.toString(resource.getWidth()));
 		attr.addAttribute("", "", "x", "CDATA", Float.toString(resource.getXCoord()));
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(resource.getYCoord()));
+		
+		System.out.println(resource.getText() +"\t "+resource.getXCoord() +"\t "+ resource.getYCoord());
+
 
 		// Content for <y:NodeLabel>
 		handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
@@ -575,9 +581,9 @@ public class SBGNML2GraphML {
 				float p_y = p.getY();
 				Glyph g = portToGlyphMap.get(p.getId());
 
-				if (g.getOrientation().equals("horizontal")) {
+		/*		if (g.getOrientation().equals("horizontal")) {
 					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
-				}
+				}*/
 
 				attr.clear();
 				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
@@ -603,9 +609,9 @@ public class SBGNML2GraphML {
 				float p_y = p.getY();
 				Glyph g = portToGlyphMap.get(p.getId());
 
-				if (g.getOrientation().equals("horizontal")) {
+			/*	if (g.getOrientation().equals("horizontal")) {
 					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
-				}
+				}*/
 
 				attr.clear();
 				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
@@ -1158,17 +1164,17 @@ public class SBGNML2GraphML {
 							addModelParameter(handler, fValueStateVariable);
 							handler.endElement("", "", FileUtils.Y_NODE_LABEL);
 
-							GraphMLResource _resource = new GraphMLResource();
-							_resource.setId(childGlyph.getId());
+							GraphMLResource resource = new GraphMLResource();
+							resource.setId(childGlyph.getId());
 							String szText = "";
 
 							if (childGlyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
-								_resource.setClass(FileUtils.COM_YWORKS_SBGN_UNIT_OF_INFORMATION);
+								resource.setClass(FileUtils.COM_YWORKS_SBGN_UNIT_OF_INFORMATION);
 								if (childGlyph.getLabel() != null) {
 									szText = childGlyph.getLabel().getText();
 								}
 							} else {
-								_resource.setClass(FileUtils.COM_YWORKS_SBGN_STATE_VARIABLE);
+								resource.setClass(FileUtils.COM_YWORKS_SBGN_STATE_VARIABLE);
 								if (childGlyph.getState() != null) {
 
 									if (childGlyph.getState().getValue() != null) {
@@ -1180,13 +1186,13 @@ public class SBGNML2GraphML {
 									}
 								}
 							}
-							_resource.setText(szText);
-							_resource.setHeight(childGlyph.getBbox().getH());
-							_resource.setWidth(childGlyph.getBbox().getW());
-							_resource.setXCoord(childGlyph.getBbox().getX());
-							_resource.setYCoord(childGlyph.getBbox().getY());
-
-							resourceList.add(_resource);
+							resource.setText(szText);
+							resource.setHeight(childGlyph.getBbox().getH());
+							resource.setWidth(childGlyph.getBbox().getW());
+							resource.setXCoord(childGlyph.getBbox().getX());
+							resource.setYCoord(childGlyph.getBbox().getY());
+							
+							resourceList.add(resource);
 						}
 					}
 				}
@@ -1268,7 +1274,7 @@ public class SBGNML2GraphML {
 		handler.endElement("", "", "graph");
 	}
 
-	private void parseCompartment(TransformerHandler handler, Glyph g) throws SAXException {
+	private void parseCompartment(TransformerHandler handler, Glyph glyph) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
 		// <data>
@@ -1288,8 +1294,8 @@ public class SBGNML2GraphML {
 			attr.clear();
 			handler.startElement("", "", FileUtils.Y_GROUP_NODE, attr);
 
-			addGeometry(handler, g);
-			GraphMLStyle _style = getStyle(g.getId());
+			addGeometry(handler, glyph);
+			GraphMLStyle _style = getStyle(glyph.getId());
 			addFillColor(handler, _style);
 			addBorderStyle(handler, _style);
 
@@ -1302,7 +1308,7 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "fontStyle", "CDATA", "plain");
 			attr.addAttribute("", "", "hasBackgroundColor", "CDATA", "false");
 			attr.addAttribute("", "", "hasLineColor", "CDATA", "false");
-			attr.addAttribute("", "", "height", "CDATA", Float.toString(g.getBbox().getH()));
+			attr.addAttribute("", "", "height", "CDATA", Float.toString(glyph.getBbox().getH()));
 			attr.addAttribute("", "", "horizontalTextPosition", "CDATA", "center");
 			attr.addAttribute("", "", "iconTextGap", "CDATA", "4");
 			attr.addAttribute("", "", "modelName", "CDATA", "internal");
@@ -1310,13 +1316,13 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "textColor", "CDATA", "#000000");
 			attr.addAttribute("", "", "verticalTextPosition", "CDATA", "bottom");
 			attr.addAttribute("", "", "visible", "CDATA", "true");
-			attr.addAttribute("", "", "width", "CDATA", Float.toString(g.getBbox().getW()));
-			attr.addAttribute("", "", "x", "CDATA", Float.toString(g.getBbox().getX()));
-			attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
+			attr.addAttribute("", "", "width", "CDATA", Float.toString(glyph.getBbox().getW()));
+			attr.addAttribute("", "", "x", "CDATA", Float.toString(glyph.getBbox().getX()));
+			attr.addAttribute("", "", "y", "CDATA", Float.toString(glyph.getBbox().getY()));
 
 			handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
-			if (null != g.getLabel()) {
-				String vertexLabel = g.getLabel().getText().trim();
+			if (null != glyph.getLabel()) {
+				String vertexLabel = glyph.getLabel().getText().trim();
 				handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			}
 			handler.endElement("", "", FileUtils.Y_NODE_LABEL);
@@ -1368,12 +1374,12 @@ public class SBGNML2GraphML {
 		attr.clear();
 		attr.addAttribute("", "", "edgedefault", "CDATA",
 				(graph instanceof DirectedGraph<?, ?>) ? "directed" : "undirected");
-		attr.addAttribute("", "", "id", "CDATA", g.getId());
+		attr.addAttribute("", "", "id", "CDATA", glyph.getId());
 		handler.startElement("", "", "graph", attr);
 
 		for (Glyph refGlyph : map.getGlyph()) {
 			if (refGlyph.getCompartmentRef() != null) {
-				if ((((Glyph) (refGlyph.getCompartmentRef())).getId().equals(g.getId()))
+				if ((((Glyph) (refGlyph.getCompartmentRef())).getId().equals(glyph.getId()))
 						&& (!visitedGlyphSet.contains(refGlyph.getId()))) {
 					parseGlyph(handler, refGlyph);
 				}
@@ -1383,12 +1389,12 @@ public class SBGNML2GraphML {
 		handler.endElement("", "", "graph");
 	}
 
-	private void parseSBGNElement(TransformerHandler handler, Glyph g, String szConfiguration, boolean bIsMultimer)
+	private void parseSBGNElement(TransformerHandler handler, Glyph glyph, String szConfiguration, boolean bIsMultimer)
 			throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		if (g.getLabel() != null) {
-			String vertexLabel = g.getLabel().getText();
+		if (glyph.getLabel() != null) {
+			String vertexLabel = glyph.getLabel().getText();
 
 			// <data>
 			attr.clear();
@@ -1400,8 +1406,8 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "configuration", "CDATA", szConfiguration);
 			handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
 
-			addGeometry(handler, g);
-			GraphMLStyle style = getStyle(g.getId());
+			addGeometry(handler, glyph);
+			GraphMLStyle style = getStyle(glyph.getId());
 			addFillColor(handler, style);
 			addBorderStyle(handler, style);
 
@@ -1414,16 +1420,16 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "fontStyle", "CDATA", "plain");
 			attr.addAttribute("", "", "hasBackgroundColor", "CDATA", "false");
 			attr.addAttribute("", "", "hasLineColor", "CDATA", "false");
-			attr.addAttribute("", "", "height", "CDATA", Float.toString(g.getBbox().getH()));
+			attr.addAttribute("", "", "height", "CDATA", Float.toString(glyph.getBbox().getH()));
 			attr.addAttribute("", "", "horizontalTextPosition", "CDATA", "center");
 			attr.addAttribute("", "", "iconTextGap", "CDATA", "4");
 			attr.addAttribute("", "", "modelName", "CDATA", "custom");
 			attr.addAttribute("", "", "textColor", "CDATA", "#000000");
 			attr.addAttribute("", "", "verticalTextPosition", "CDATA", "center");
 			attr.addAttribute("", "", "visible", "CDATA", "true");
-			attr.addAttribute("", "", "width", "CDATA", Float.toString(g.getBbox().getW()));
-			attr.addAttribute("", "", "x", "CDATA", Float.toString(g.getBbox().getX()));
-			attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
+			attr.addAttribute("", "", "width", "CDATA", Float.toString(glyph.getBbox().getW()));
+			attr.addAttribute("", "", "x", "CDATA", Float.toString(glyph.getBbox().getX()));
+			attr.addAttribute("", "", "y", "CDATA", Float.toString(glyph.getBbox().getY()));
 
 			// Content for <y:NodeLabel>
 			handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
@@ -1433,9 +1439,9 @@ public class SBGNML2GraphML {
 			addModelParameter(handler, fValue);
 			handler.endElement("", "", FileUtils.Y_NODE_LABEL);
 
-			if (g.getGlyph().size() > 0) {
+			if (glyph.getGlyph().size() > 0) {
 
-				for (Glyph childGlyph : g.getGlyph()) {
+				for (Glyph childGlyph : glyph.getGlyph()) {
 
 					if (childGlyph.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
 						attr.clear();
@@ -1502,7 +1508,7 @@ public class SBGNML2GraphML {
 				}
 			}
 
-			if (g.getClazz().equals(FileUtils.SBGN_MACROMOLECULE)) {
+			if (glyph.getClazz().equals(FileUtils.SBGN_MACROMOLECULE)) {
 				attr.clear();
 				handler.startElement("", "", FileUtils.Y_STYLE_PROPERTIES, attr);
 				attr.clear();
@@ -1523,7 +1529,7 @@ public class SBGNML2GraphML {
 		}
 	}
 
-	private void addUnitOfInformation(TransformerHandler handler, GraphMLStyle _style, Glyph _unitGlyph)
+	private void addUnitOfInformation(TransformerHandler handler, GraphMLStyle style, Glyph _unitGlyph)
 			throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
@@ -1531,7 +1537,7 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "autoSizePolicy", "CDATA", "content");
 		attr.addAttribute("", "", "backgroundColor", "CDATA", "#FFFFFF");
 		attr.addAttribute("", "", "fontFamily", "CDATA", "Dialog");
-		attr.addAttribute("", "", "fontSize", "CDATA", String.valueOf(_style.getFontSize()));
+		attr.addAttribute("", "", "fontSize", "CDATA", String.valueOf(style.getFontSize()));
 		attr.addAttribute("", "", "fontStyle", "CDATA", "plain");
 		attr.addAttribute("", "", "height", "CDATA", Float.toString(_unitGlyph.getBbox().getH()));
 		attr.addAttribute("", "", "width", "CDATA", Float.toString(_unitGlyph.getBbox().getW()));
@@ -1587,23 +1593,23 @@ public class SBGNML2GraphML {
 		handler.endElement("", "", FileUtils.Y_LABEL_MODEL);
 	}
 
-	private void addGeometry(TransformerHandler handler, Glyph g) throws SAXException {
+	private void addGeometry(TransformerHandler handler, Glyph glyph) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		attr.addAttribute("", "", "height", "CDATA", Float.toString(g.getBbox().getH()));
-		attr.addAttribute("", "", "width", "CDATA", Float.toString(g.getBbox().getW()));
-		attr.addAttribute("", "", "x", "CDATA", Float.toString(g.getBbox().getX()));
-		attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
+		attr.addAttribute("", "", "height", "CDATA", Float.toString(glyph.getBbox().getH()));
+		attr.addAttribute("", "", "width", "CDATA", Float.toString(glyph.getBbox().getW()));
+		attr.addAttribute("", "", "x", "CDATA", Float.toString(glyph.getBbox().getX()));
+		attr.addAttribute("", "", "y", "CDATA", Float.toString(glyph.getBbox().getY()));
 		handler.startElement("", "", FileUtils.Y_GEOMETRY, attr);
 		handler.endElement("", "", FileUtils.Y_GEOMETRY);
 	}
 
-	private void addGeometryForStateVariable(TransformerHandler handler, Glyph g, float x, float y)
+	private void addGeometryForStateVariable(TransformerHandler handler, Glyph glyph, float x, float y)
 			throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		attr.addAttribute("", "", "height", "CDATA", Float.toString(g.getBbox().getH()));
-		attr.addAttribute("", "", "width", "CDATA", Float.toString(g.getBbox().getW()));
+		attr.addAttribute("", "", "height", "CDATA", Float.toString(glyph.getBbox().getH()));
+		attr.addAttribute("", "", "width", "CDATA", Float.toString(glyph.getBbox().getW()));
 		attr.addAttribute("", "", "x", "CDATA", Float.toString(x));
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(y));
 		handler.startElement("", "", FileUtils.Y_GEOMETRY, attr);
