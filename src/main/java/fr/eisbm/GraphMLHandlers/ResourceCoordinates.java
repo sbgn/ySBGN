@@ -1,4 +1,4 @@
-package fr.eisbm.GRAPHML2SBGNML;
+package fr.eisbm.GraphMLHandlers;
 
 public class ResourceCoordinates {
 	float m_fXCoord;

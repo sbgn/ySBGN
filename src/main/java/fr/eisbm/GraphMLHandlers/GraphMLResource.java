@@ -1,4 +1,6 @@
-package fr.eisbm.GRAPHML2SBGNML;
+package fr.eisbm.GraphMLHandlers;
+
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 
 public class GraphMLResource {
 	String m_ID;
@@ -23,7 +25,7 @@ public class GraphMLResource {
 	public GraphMLResource() {
 		super();
 		this.m_ID = "";
-		this.m_Class = FileUtils.COM_YWORKS_SBGN_STATE_VARIABLE;
+		this.m_Class = ConverterDefines.COM_YWORKS_SBGN_STATE_VARIABLE;
 		this.m_fHeight = 0;
 		this.m_fWidth = 0;
 		this.m_XCoord = 0;

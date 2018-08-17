@@ -1,18 +1,10 @@
-package fr.eisbm.GRAPHML2SBGNML;
+package fr.eisbm.SBGNHandlers;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 
 import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
@@ -22,9 +14,10 @@ import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
 import org.xml.sax.SAXException;
 
-public class transformToSBGN02 {
-	private static java.util.Map visited = new HashMap<String, Boolean>();
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.FileUtils;
 
+public class transformToSBGN02 {
 	public static void transformToSBGNv02(String szInSBGNFileName, String szOutSBGNv02FileName) {
 		// Now read from "f" and put the result in "sbgn"
 		Sbgn sbgn;
@@ -66,7 +59,7 @@ public class transformToSBGN02 {
 
 				for (int i = 0; i < a.getGlyph().size(); i++) {
 
-					if (a.getGlyph().get(i).getClazz().equals(FileUtils.SBGN_CARDINALITY)
+					if (a.getGlyph().get(i).getClazz().equals(ConverterDefines.SBGN_CARDINALITY)
 							&& a.getGlyph().get(i).getLabel().getText().equals("0")) {
 						a.getGlyph().remove(i);
 					}

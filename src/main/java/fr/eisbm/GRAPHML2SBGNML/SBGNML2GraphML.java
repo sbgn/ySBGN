@@ -28,13 +28,17 @@ import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.Port;
-import org.sbgn.bindings.SBGNBase;
 import org.sbgn.bindings.SBGNBase.Extension;
 import org.sbgn.bindings.SBGNBase.Notes;
 import org.sbgn.bindings.Sbgn;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+
+import fr.eisbm.GraphMLHandlers.CloneHandler;
+import fr.eisbm.GraphMLHandlers.GraphMLResource;
+import fr.eisbm.SBGNHandlers.GraphMLStyle;
+import fr.eisbm.SBGNHandlers.transformToSBGN02;
 
 public class SBGNML2GraphML {
 	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
@@ -288,7 +292,7 @@ public class SBGNML2GraphML {
 
 		// <key> for bqmodel_is attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQMODEL_IS);
+		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.BQMODEL_IS);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_BQMODELIS_ATTR);
@@ -297,7 +301,7 @@ public class SBGNML2GraphML {
 
 		// <key> for bqmodel:isDescribedBy attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQMODEL_IS_DESCRIBED_BY);
+		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.BQMODEL_IS_DESCRIBED_BY);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_BQMODEL_IS_DESCRIBED_BY_ATTR);
@@ -306,7 +310,7 @@ public class SBGNML2GraphML {
 
 		// <key> for bqbiol_is attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQBIOL_IS);
+		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.BQBIOL_IS);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_BQBIOLIS_ATTR);
@@ -315,7 +319,7 @@ public class SBGNML2GraphML {
 
 		// <key> for bqbiol:isDescribedBy attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", FileUtils.BQBIOL_IS_DESCRIBED_BY);
+		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.BQBIOL_IS_DESCRIBED_BY);
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_BQBIOL_IS_DESCRIBED_BY_ATTR);
@@ -451,36 +455,36 @@ public class SBGNML2GraphML {
 	private void parseResource(TransformerHandler handler, GraphMLResource resource) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 		attr.addAttribute("", "", "id", "CDATA", resource.getId());
-		handler.startElement("", "", FileUtils.Y_RESOURCE, attr);
+		handler.startElement("", "", ConverterDefines.Y_RESOURCE, attr);
 
 		attr.clear();
-		handler.startElement("", "", FileUtils.YED_NODE_REALIZER_ICON, attr);
+		handler.startElement("", "", ConverterDefines.YED_NODE_REALIZER_ICON, attr);
 
 		// <y:GenericNode>
 		attr.clear();
 		attr.addAttribute("", "", "configuration", "CDATA", resource.getResourceClass());
-		handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
+		handler.startElement("", "", ConverterDefines.Y_GENERIC_NODE, attr);
 
 		attr.clear();
 		attr.addAttribute("", "", "height", "CDATA", Float.toString(resource.getHeight()));
 		attr.addAttribute("", "", "width", "CDATA", Float.toString(resource.getWidth()));
 		attr.addAttribute("", "", "x", "CDATA", Float.toString(resource.getXCoord()));
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(resource.getYCoord()));
-		handler.startElement("", "", FileUtils.Y_GEOMETRY, attr);
-		handler.endElement("", "", FileUtils.Y_GEOMETRY);
+		handler.startElement("", "", ConverterDefines.Y_GEOMETRY, attr);
+		handler.endElement("", "", ConverterDefines.Y_GEOMETRY);
 
 		attr.clear();
 		attr.addAttribute("", "", "color", "CDATA", "#FFFFFF");
 		attr.addAttribute("", "", "transparent", "CDATA", "false");
-		handler.startElement("", "", FileUtils.Y_FILL, attr);
-		handler.endElement("", "", FileUtils.Y_FILL);
+		handler.startElement("", "", ConverterDefines.Y_FILL, attr);
+		handler.endElement("", "", ConverterDefines.Y_FILL);
 
 		attr.clear();
 		attr.addAttribute("", "", "color", "CDATA", "#000000");
 		attr.addAttribute("", "", "type", "CDATA", "line");
 		attr.addAttribute("", "", "width", "CDATA", "1.0");
-		handler.startElement("", "", FileUtils.Y_BORDER_STYLE, attr);
-		handler.endElement("", "", FileUtils.Y_BORDER_STYLE);
+		handler.startElement("", "", ConverterDefines.Y_BORDER_STYLE, attr);
+		handler.endElement("", "", ConverterDefines.Y_BORDER_STYLE);
 
 		attr.clear();
 		attr.addAttribute("", "", "alignment", "CDATA", "right");
@@ -505,15 +509,15 @@ public class SBGNML2GraphML {
 
 
 		// Content for <y:NodeLabel>
-		handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		if (null != resource.getText()) {
 			handler.characters(resource.getText().toCharArray(), 0, resource.getText().length());
 		}
-		handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
-		handler.endElement("", "", FileUtils.Y_GENERIC_NODE);
-		handler.endElement("", "", FileUtils.YED_NODE_REALIZER_ICON);
-		handler.endElement("", "", FileUtils.Y_RESOURCE);
+		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
+		handler.endElement("", "", ConverterDefines.YED_NODE_REALIZER_ICON);
+		handler.endElement("", "", ConverterDefines.Y_RESOURCE);
 	}
 
 	private void parseArc(TransformerHandler handler, Arc a) throws SAXException {
@@ -536,7 +540,7 @@ public class SBGNML2GraphML {
 
 		if ((null != source) && (null != target)) {
 
-			if ((source.getClazz().equals(FileUtils.SBGN_TAG)) || (target.getClazz().equals(FileUtils.SBGN_TAG))) {
+			if ((source.getClazz().equals(ConverterDefines.SBGN_TAG)) || (target.getClazz().equals(ConverterDefines.SBGN_TAG))) {
 				bTag = true;
 			}
 			// <edge>
@@ -563,7 +567,7 @@ public class SBGNML2GraphML {
 
 			// <y:PolyLineEdge>
 			attr.clear();
-			handler.startElement("", "", FileUtils.Y_POLY_LINE_EDGE, attr);
+			handler.startElement("", "", ConverterDefines.Y_POLY_LINE_EDGE, attr);
 
 			float sx = 0, sy = 0, tx = 0, ty = 0;
 			attr.clear();
@@ -572,24 +576,24 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "tx", "CDATA", Float.toString(tx));
 			attr.addAttribute("", "", "ty", "CDATA", Float.toString(ty));
 
-			handler.startElement("", "", FileUtils.Y_PATH, attr);
+			handler.startElement("", "", ConverterDefines.Y_PATH, attr);
 
 			// bend points for ports representation
 			if (a.getSource() instanceof Port) {
 				Port p = (Port) a.getSource();
 				float p_x = p.getX();
 				float p_y = p.getY();
-				Glyph g = portToGlyphMap.get(p.getId());
+		/*		Glyph g = portToGlyphMap.get(p.getId());
 
-		/*		if (g.getOrientation().equals("horizontal")) {
+				if (g.getOrientation().equals("horizontal")) {
 					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
 				}*/
 
 				attr.clear();
 				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
 				attr.addAttribute("", "", "y", "CDATA", Float.toString(p_y));
-				handler.startElement("", "", FileUtils.Y_POINT, attr);
-				handler.endElement("", "", FileUtils.Y_POINT);
+				handler.startElement("", "", ConverterDefines.Y_POINT, attr);
+				handler.endElement("", "", ConverterDefines.Y_POINT);
 			}
 
 			if (a.getNext() != null) {
@@ -597,8 +601,8 @@ public class SBGNML2GraphML {
 					attr.clear();
 					attr.addAttribute("", "", "x", "CDATA", Float.toString(_next.getX()));
 					attr.addAttribute("", "", "y", "CDATA", Float.toString(_next.getY()));
-					handler.startElement("", "", FileUtils.Y_POINT, attr);
-					handler.endElement("", "", FileUtils.Y_POINT);
+					handler.startElement("", "", ConverterDefines.Y_POINT, attr);
+					handler.endElement("", "", ConverterDefines.Y_POINT);
 				}
 			}
 
@@ -607,66 +611,66 @@ public class SBGNML2GraphML {
 				Port p = (Port) a.getTarget();
 				float p_x = p.getX();
 				float p_y = p.getY();
-				Glyph g = portToGlyphMap.get(p.getId());
+			/*	Glyph g = portToGlyphMap.get(p.getId());
 
-			/*	if (g.getOrientation().equals("horizontal")) {
+				if (g.getOrientation().equals("horizontal")) {
 					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
 				}*/
 
 				attr.clear();
 				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
 				attr.addAttribute("", "", "y", "CDATA", Float.toString(p_y));
-				handler.startElement("", "", FileUtils.Y_POINT, attr);
-				handler.endElement("", "", FileUtils.Y_POINT);
+				handler.startElement("", "", ConverterDefines.Y_POINT, attr);
+				handler.endElement("", "", ConverterDefines.Y_POINT);
 			}
 
-			handler.endElement("", "", FileUtils.Y_PATH);
+			handler.endElement("", "", ConverterDefines.Y_PATH);
 
 			attr.clear();
 			attr.addAttribute("", "", "color", "CDATA", "#000000");
 			attr.addAttribute("", "", "type", "CDATA", "line");
 			attr.addAttribute("", "", "width", "CDATA", "1.0");
-			handler.startElement("", "", FileUtils.Y_LINE_STYLE, attr);
-			handler.endElement("", "", FileUtils.Y_LINE_STYLE);
+			handler.startElement("", "", ConverterDefines.Y_LINE_STYLE, attr);
+			handler.endElement("", "", ConverterDefines.Y_LINE_STYLE);
 
 			attr.clear();
 
-			if (a.getClazz().equals(FileUtils.SBGN_NECESSARY_STIMULATION)) {
+			if (a.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "white_delta_bar");
-			} else if (a.getClazz().equals(FileUtils.SBGN_MODULATION)) {
+			} else if (a.getClazz().equals(ConverterDefines.SBGN_MODULATION)) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "white_diamond");
-			} else if (a.getClazz().equals(FileUtils.SBGN_INHIBITION)) {
+			} else if (a.getClazz().equals(ConverterDefines.SBGN_INHIBITION)) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "t_shape");
-			} else if (a.getClazz().equals(FileUtils.SBGN_STIMULATION)) {
+			} else if (a.getClazz().equals(ConverterDefines.SBGN_STIMULATION)) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "white_delta");
-			} else if (a.getClazz().equals(FileUtils.SBGN_CATALYSIS)) {
+			} else if (a.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "white_circle");
 			} else if (true == bTag) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "none");
-			} else if ((a.getClazz().equals(FileUtils.SBGN_CONSUMPTION))
-					|| (a.getClazz().equals(FileUtils.SBGN_LOGIC_ARC))
-					|| (a.getClazz().equals(FileUtils.SBGN_EQUIVALENCE_ARC))) {
+			} else if ((a.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION))
+					|| (a.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC))
+					|| (a.getClazz().equals(ConverterDefines.SBGN_EQUIVALENCE_ARC))) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "none");
-			} else if (a.getClazz().equals(FileUtils.SBGN_PRODUCTION)) {
+			} else if (a.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
 				attr.addAttribute("", "", "source", "CDATA", "none");
 				attr.addAttribute("", "", "target", "CDATA", "delta");
 			} else {
 				System.out.println(a.getClazz());
 			}
 
-			handler.startElement("", "", FileUtils.Y_ARROWS, attr);
-			handler.endElement("", "", FileUtils.Y_ARROWS);
+			handler.startElement("", "", ConverterDefines.Y_ARROWS, attr);
+			handler.endElement("", "", ConverterDefines.Y_ARROWS);
 
 			if (a.getGlyph().size() > 0) {
 				for (Glyph card : a.getGlyph()) {
-					if (card.getClazz().equals(FileUtils.SBGN_CARDINALITY)) {
+					if (card.getClazz().equals(ConverterDefines.SBGN_CARDINALITY)) {
 						String vertexLabel = card.getLabel().getText();
 						if (!vertexLabel.equals("0")) {
 							attr.clear();
@@ -691,9 +695,9 @@ public class SBGNML2GraphML {
 							attr.addAttribute("", "", "visible", "CDATA", "true");
 							attr.addAttribute("", "", "width", "CDATA", "12");
 
-							handler.startElement("", "", FileUtils.Y_EDGE_LABEL, attr);
+							handler.startElement("", "", ConverterDefines.Y_EDGE_LABEL, attr);
 							handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
-							handler.endElement("", "", FileUtils.Y_EDGE_LABEL);
+							handler.endElement("", "", ConverterDefines.Y_EDGE_LABEL);
 						}
 					}
 				}
@@ -701,10 +705,10 @@ public class SBGNML2GraphML {
 
 			attr.clear();
 			attr.addAttribute("", "", "smoothed", "CDATA", "false");
-			handler.startElement("", "", FileUtils.Y_BEND_STYLE, attr);
-			handler.endElement("", "", FileUtils.Y_BEND_STYLE);
+			handler.startElement("", "", ConverterDefines.Y_BEND_STYLE, attr);
+			handler.endElement("", "", ConverterDefines.Y_BEND_STYLE);
 
-			handler.endElement("", "", FileUtils.Y_POLY_LINE_EDGE);
+			handler.endElement("", "", ConverterDefines.Y_POLY_LINE_EDGE);
 			handler.endElement("", "", "data");
 			handler.endElement("", "", "edge");
 		}
@@ -715,8 +719,8 @@ public class SBGNML2GraphML {
 		AttributesImpl attr = new AttributesImpl();
 		attr.addAttribute("", "", "id", "CDATA", g.getId());
 
-		if (g.getClazz().equals(FileUtils.SBGN_COMPLEX) || (g.getClazz().equals(FileUtils.SBGN_COMPARTMENT))) {
-			attr.addAttribute("", "", FileUtils.YFILES_FOLDERTYPE, "CDATA", "group");
+		if (g.getClazz().equals(ConverterDefines.SBGN_COMPLEX) || (g.getClazz().equals(ConverterDefines.SBGN_COMPARTMENT))) {
+			attr.addAttribute("", "", ConverterDefines.YFILES_FOLDERTYPE, "CDATA", "group");
 		}
 
 		handler.startElement("", "", "node", attr);
@@ -734,81 +738,81 @@ public class SBGNML2GraphML {
 		addOrientation(handler, g.getOrientation());
 
 		// Simple chemical
-		if (g.getClazz().equals(FileUtils.SBGN_SIMPLE_CHEMICAL)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_SIMPLE_CHEMICAL, false);
+		if (g.getClazz().equals(ConverterDefines.SBGN_SIMPLE_CHEMICAL)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_SIMPLE_CHEMICAL, false);
 		}
 		// simple chemical multimer
-		else if (g.getClazz().equals(FileUtils.SBGN_SIMPLE_CHEMICAL_MULTIMER)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_SIMPLE_CHEMICAL, true);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_SIMPLE_CHEMICAL_MULTIMER)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_SIMPLE_CHEMICAL, true);
 		}
 		// Process
-		else if ((g.getClazz().equals(FileUtils.SBGN_PROCESS)) || (g.getClazz().equals(FileUtils.SBGN_ASSOCIATION))
-				|| (g.getClazz().equals(FileUtils.SBGN_DISSOCIATION))) {
+		else if ((g.getClazz().equals(ConverterDefines.SBGN_PROCESS)) || (g.getClazz().equals(ConverterDefines.SBGN_ASSOCIATION))
+				|| (g.getClazz().equals(ConverterDefines.SBGN_DISSOCIATION))) {
 			parseProcess(handler, g, false, false);
-		} else if (g.getClazz().equals(FileUtils.SBGN_UNCERTAIN_PROCESS)) {
+		} else if (g.getClazz().equals(ConverterDefines.SBGN_UNCERTAIN_PROCESS)) {
 			parseProcess(handler, g, true, false);
-		} else if (g.getClazz().equals(FileUtils.SBGN_OMITTED_PROCESS)) {
+		} else if (g.getClazz().equals(ConverterDefines.SBGN_OMITTED_PROCESS)) {
 			parseProcess(handler, g, false, true);
 		}
 		// Unspecified entity
-		else if (g.getClazz().equals(FileUtils.SBGN_UNSPECIFIED_ENTITY)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_UNSPECIFIED_ENTITY, false);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_UNSPECIFIED_ENTITY)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_UNSPECIFIED_ENTITY, false);
 		}
 		// perturbing agent
-		else if (g.getClazz().equals(FileUtils.SBGN_PERTURBING_AGENT)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_PERTURBING_AGENT, false);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_PERTURBING_AGENT)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_PERTURBING_AGENT, false);
 		}
 		// phenotype
-		else if (g.getClazz().equals(FileUtils.SBGN_PHENOTYPE)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_PHENOTYPE, false);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_PHENOTYPE)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_PHENOTYPE, false);
 		}
 		// nucleic acid feature
-		else if (g.getClazz().equals(FileUtils.SBGN_NUCLEIC_ACID_FEATURE)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_NUCLEIC_ACID_FEATURE, false);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_NUCLEIC_ACID_FEATURE)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_NUCLEIC_ACID_FEATURE, false);
 		}
 		// nucleic acid feature multimer
-		else if (g.getClazz().equals(FileUtils.SBGN_NUCLEIC_ACID_FEATURE_MULTIMER)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_NUCLEIC_ACID_FEATURE, true);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_NUCLEIC_ACID_FEATURE_MULTIMER)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_NUCLEIC_ACID_FEATURE, true);
 		}
 
 		// submap
-		else if (g.getClazz().equals(FileUtils.SBGN_SUBMAP)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_SUBMAP, false);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_SUBMAP)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_SUBMAP, false);
 		}
 
 		// Macromolecule
-		else if (g.getClazz().equals(FileUtils.SBGN_MACROMOLECULE)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_MACROMOLECULE, false);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_MACROMOLECULE)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_MACROMOLECULE, false);
 		}
 
 		// Macromolecule multimer
-		else if (g.getClazz().equals(FileUtils.SBGN_MACROMOLECULE_MULTIMER)) {
-			parseSBGNElement(handler, g, FileUtils.COM_YWORKS_SBGN_MACROMOLECULE, true);
+		else if (g.getClazz().equals(ConverterDefines.SBGN_MACROMOLECULE_MULTIMER)) {
+			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_MACROMOLECULE, true);
 		}
 
 		// Complex
-		else if (g.getClazz().equals(FileUtils.SBGN_COMPLEX)) {
+		else if (g.getClazz().equals(ConverterDefines.SBGN_COMPLEX)) {
 			parseComplex(handler, g, false);
-		} else if (g.getClazz().equals(FileUtils.SBGN_COMPLEX_MULTIMER)) {
+		} else if (g.getClazz().equals(ConverterDefines.SBGN_COMPLEX_MULTIMER)) {
 			parseComplex(handler, g, true);
 		}
 
 		// Compartment
-		else if (g.getClazz().equals(FileUtils.SBGN_COMPARTMENT)) {
+		else if (g.getClazz().equals(ConverterDefines.SBGN_COMPARTMENT)) {
 			parseCompartment(handler, g);
 		}
 
 		// OR OPERATOR
-		else if ((g.getClazz().equals(FileUtils.SBGN_OR)) || (g.getClazz().equals(FileUtils.SBGN_AND))
-				|| (g.getClazz().equals(FileUtils.SBGN_NOT))) {
+		else if ((g.getClazz().equals(ConverterDefines.SBGN_OR)) || (g.getClazz().equals(ConverterDefines.SBGN_AND))
+				|| (g.getClazz().equals(ConverterDefines.SBGN_NOT))) {
 			parseSBGNOperator(handler, g);
 		}
 		// Tag
-		else if (g.getClazz().equals(FileUtils.SBGN_TAG)) {
+		else if (g.getClazz().equals(ConverterDefines.SBGN_TAG)) {
 			parseSBGNTag(handler, g);
 		}
 		// source and sink
-		else if (g.getClazz().equals(FileUtils.SBGN_SOURCE_AND_SINK)) {
+		else if (g.getClazz().equals(ConverterDefines.SBGN_SOURCE_AND_SINK)) {
 			parseSBGNSourceAndSink(handler, g);
 		} else {
 			System.out.println(g.getClazz());
@@ -828,8 +832,8 @@ public class SBGNML2GraphML {
 
 		// <y:GenericNode>
 		attr.clear();
-		attr.addAttribute("", "", "configuration", "CDATA", FileUtils.COM_YWORKS_SBGN_SOURCE_AND_SINK);
-		handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
+		attr.addAttribute("", "", "configuration", "CDATA", ConverterDefines.COM_YWORKS_SBGN_SOURCE_AND_SINK);
+		handler.startElement("", "", ConverterDefines.Y_GENERIC_NODE, attr);
 
 		addGeometry(handler, g);
 
@@ -859,13 +863,13 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
 
 		// Content for <y:NodeLabel>
-		handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		addLabelModel(handler);
 		float fValue = 0;
 		addModelParameter(handler, fValue);
-		handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
-		handler.endElement("", "", FileUtils.Y_GENERIC_NODE);
+		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
 		handler.endElement("", "", "data");
 
 	}
@@ -885,13 +889,13 @@ public class SBGNML2GraphML {
 	private void addMultimerStyleProp(TransformerHandler handler) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		handler.startElement("", "", FileUtils.Y_STYLE_PROPERTIES, attr);
+		handler.startElement("", "", ConverterDefines.Y_STYLE_PROPERTIES, attr);
 		attr.addAttribute("", "", "class", "CDATA", "java.lang.Integer");
-		attr.addAttribute("", "", "name", "CDATA", FileUtils.COM_YWORKS_SBGN_STYLE_MCOUNT);
+		attr.addAttribute("", "", "name", "CDATA", ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT);
 		attr.addAttribute("", "", "value", "CDATA", "2");
-		handler.startElement("", "", FileUtils.Y_PROPERTY, attr);
-		handler.endElement("", "", FileUtils.Y_PROPERTY);
-		handler.endElement("", "", FileUtils.Y_STYLE_PROPERTIES);
+		handler.startElement("", "", ConverterDefines.Y_PROPERTY, attr);
+		handler.endElement("", "", ConverterDefines.Y_PROPERTY);
+		handler.endElement("", "", ConverterDefines.Y_STYLE_PROPERTIES);
 	}
 
 	private void parseSBGNOperator(TransformerHandler handler, Glyph g) throws SAXException {
@@ -905,8 +909,8 @@ public class SBGNML2GraphML {
 
 		// <y:GenericNode>
 		attr.clear();
-		attr.addAttribute("", "", "configuration", "CDATA", FileUtils.COM_YWORKS_SBGN_OPERATOR);
-		handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
+		attr.addAttribute("", "", "configuration", "CDATA", ConverterDefines.COM_YWORKS_SBGN_OPERATOR);
+		handler.startElement("", "", ConverterDefines.Y_GENERIC_NODE, attr);
 
 		addGeometry(handler, g);
 		GraphMLStyle style = getStyle(g.getId());
@@ -938,14 +942,14 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
 
 		// Content for <y:NodeLabel>
-		handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 		addLabelModel(handler);
 		float fValue = 0;
 		addModelParameter(handler, fValue);
-		handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
-		handler.endElement("", "", FileUtils.Y_GENERIC_NODE);
+		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
 		handler.endElement("", "", "data");
 
 	}
@@ -963,8 +967,8 @@ public class SBGNML2GraphML {
 
 			// <y:GenericNode>
 			attr.clear();
-			attr.addAttribute("", "", "configuration", "CDATA", FileUtils.COM_YWORKS_SBGN_TAG);
-			handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
+			attr.addAttribute("", "", "configuration", "CDATA", ConverterDefines.COM_YWORKS_SBGN_TAG);
+			handler.startElement("", "", ConverterDefines.Y_GENERIC_NODE, attr);
 
 			addGeometry(handler, g);
 			GraphMLStyle style = getStyle(g.getId());
@@ -981,25 +985,25 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
 
 			// Content for <y:NodeLabel>
-			handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+			handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 			handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			addLabelModel(handler);
 			float fValue = 0;
 			addModelParameter(handler, fValue);
-			handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+			handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 			if (g.getOrientation().equals("right")) {
 				attr.clear();
-				handler.startElement("", "", FileUtils.Y_STYLE_PROPERTIES, attr);
+				handler.startElement("", "", ConverterDefines.Y_STYLE_PROPERTIES, attr);
 				attr.addAttribute("", "", "class", "CDATA", "java.lang.Boolean");
 				attr.addAttribute("", "", "name", "CDATA", "com.yworks.sbgn.style.inverse");
 				attr.addAttribute("", "", "value", "CDATA", "true");
-				handler.startElement("", "", FileUtils.Y_PROPERTY, attr);
-				handler.endElement("", "", FileUtils.Y_PROPERTY);
-				handler.endElement("", "", FileUtils.Y_STYLE_PROPERTIES);
+				handler.startElement("", "", ConverterDefines.Y_PROPERTY, attr);
+				handler.endElement("", "", ConverterDefines.Y_PROPERTY);
+				handler.endElement("", "", ConverterDefines.Y_STYLE_PROPERTIES);
 			}
 
-			handler.endElement("", "", FileUtils.Y_GENERIC_NODE);
+			handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
 			handler.endElement("", "", "data");
 		}
 
@@ -1017,8 +1021,8 @@ public class SBGNML2GraphML {
 
 		// <y:GenericNode>
 		attr.clear();
-		attr.addAttribute("", "", "configuration", "CDATA", FileUtils.COM_YWORKS_SBGN_PROCESS);
-		handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
+		attr.addAttribute("", "", "configuration", "CDATA", ConverterDefines.COM_YWORKS_SBGN_PROCESS);
+		handler.startElement("", "", ConverterDefines.Y_GENERIC_NODE, attr);
 
 		addGeometry(handler, g);
 		GraphMLStyle style = getStyle(g.getId());
@@ -1048,7 +1052,7 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "width", "CDATA", "0.0");
 
 		// Content for <y:NodeLabel>
-		handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		if (bUncertainProcess) {
 			String vertexLabel = "?";
 			handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
@@ -1060,9 +1064,9 @@ public class SBGNML2GraphML {
 		addLabelModel(handler);
 		float fValue = 0;
 		addModelParameter(handler, fValue);
-		handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
-		handler.endElement("", "", FileUtils.Y_GENERIC_NODE);
+		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
 		handler.endElement("", "", "data");
 	}
 
@@ -1075,19 +1079,19 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", "data", attr);
 
 		attr.clear();
-		handler.startElement("", "", FileUtils.Y_PROXY_AUTO_BOUNDS_NODE, attr);
+		handler.startElement("", "", ConverterDefines.Y_PROXY_AUTO_BOUNDS_NODE, attr);
 
 		attr.clear();
 		attr.addAttribute("", "", "active", "CDATA", "0");
-		handler.startElement("", "", FileUtils.Y_REALIZERS, attr);
+		handler.startElement("", "", ConverterDefines.Y_REALIZERS, attr);
 		boolean closed = false;
 		GraphMLStyle style = getStyle(g.getId());
 
 		for (int i = 0; i < 2; i++) {
 
 			attr.clear();
-			attr.addAttribute("", "", "configuration", "CDATA", FileUtils.COM_YWORKS_SBGN_COMPLEX);
-			handler.startElement("", "", FileUtils.Y_GENERIC_GROUP_NODE, attr);
+			attr.addAttribute("", "", "configuration", "CDATA", ConverterDefines.COM_YWORKS_SBGN_COMPLEX);
+			handler.startElement("", "", ConverterDefines.Y_GENERIC_GROUP_NODE, attr);
 
 			addGeometry(handler, g);
 			addFillColor(handler, style);
@@ -1114,20 +1118,20 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "x", "CDATA", Float.toString(g.getBbox().getX()));
 			attr.addAttribute("", "", "y", "CDATA", Float.toString(g.getBbox().getY()));
 
-			handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+			handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 			if (null != g.getLabel()) {
 				String vertexLabel = g.getLabel().getText().trim();
 				handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			}
-			handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+			handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 			// the unit of information for complexes is represented as a resource but its
 			// name label is given immediately after the complex label in yEd
 			if (false == closed) {
 				if (g.getGlyph().size() > 0) {
 					for (Glyph childGlyph : g.getGlyph()) {
-						if ((childGlyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION))
-								|| (childGlyph.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE))) {
+						if ((childGlyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION))
+								|| (childGlyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE))) {
 							attr.clear();
 
 							attr.addAttribute("", "", "alignment", "CDATA", "center");
@@ -1158,23 +1162,23 @@ public class SBGNML2GraphML {
 							attr.addAttribute("", "", "y", "CDATA", Float.toString(childGlyph.getBbox().getY()));
 
 							// Content for <y:NodeLabel>
-							handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+							handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 							addLabelModel(handler);
 							float fValueStateVariable = (float) 0.5;
 							addModelParameter(handler, fValueStateVariable);
-							handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+							handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 							GraphMLResource resource = new GraphMLResource();
 							resource.setId(childGlyph.getId());
 							String szText = "";
 
-							if (childGlyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
-								resource.setClass(FileUtils.COM_YWORKS_SBGN_UNIT_OF_INFORMATION);
+							if (childGlyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
+								resource.setClass(ConverterDefines.COM_YWORKS_SBGN_UNIT_OF_INFORMATION);
 								if (childGlyph.getLabel() != null) {
 									szText = childGlyph.getLabel().getText();
 								}
 							} else {
-								resource.setClass(FileUtils.COM_YWORKS_SBGN_STATE_VARIABLE);
+								resource.setClass(ConverterDefines.COM_YWORKS_SBGN_STATE_VARIABLE);
 								if (childGlyph.getState() != null) {
 
 									if (childGlyph.getState().getValue() != null) {
@@ -1199,25 +1203,25 @@ public class SBGNML2GraphML {
 			}
 
 			attr.clear();
-			handler.startElement("", "", FileUtils.Y_STYLE_PROPERTIES, attr);
+			handler.startElement("", "", ConverterDefines.Y_STYLE_PROPERTIES, attr);
 
 			for (int j = 0; j < 2; j++) {
 				attr.clear();
 				attr.addAttribute("", "", "class", "CDATA", "java.lang.Integer");
 				attr.addAttribute("", "", "name", "CDATA", "com.yworks.sbgn.style.radiusY");
 				attr.addAttribute("", "", "value", "CDATA", Integer.toString(12));
-				handler.startElement("", "", FileUtils.Y_PROPERTY, attr);
-				handler.endElement("", "", FileUtils.Y_PROPERTY);
+				handler.startElement("", "", ConverterDefines.Y_PROPERTY, attr);
+				handler.endElement("", "", ConverterDefines.Y_PROPERTY);
 			}
-			handler.endElement("", "", FileUtils.Y_STYLE_PROPERTIES);
+			handler.endElement("", "", ConverterDefines.Y_STYLE_PROPERTIES);
 
 			attr.clear();
 			attr.addAttribute("", "", "autoResize", "CDATA", "true");
 			attr.addAttribute("", "", "closed", "CDATA", Boolean.toString(closed));
 			attr.addAttribute("", "", "closedHeight", "CDATA", Integer.toString(80));
 			attr.addAttribute("", "", "closedWidth", "CDATA", Integer.toString(80));
-			handler.startElement("", "", FileUtils.Y_STATE, attr);
-			handler.endElement("", "", FileUtils.Y_STATE);
+			handler.startElement("", "", ConverterDefines.Y_STATE, attr);
+			handler.endElement("", "", ConverterDefines.Y_STATE);
 
 			attr.clear();
 			attr.addAttribute("", "", "bottom", "CDATA", "15");
@@ -1228,8 +1232,8 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "rightF", "CDATA", "10.0");
 			attr.addAttribute("", "", "top", "CDATA", "10");
 			attr.addAttribute("", "", "topF", "CDATA", "10.0");
-			handler.startElement("", "", FileUtils.Y_INSETS, attr);
-			handler.endElement("", "", FileUtils.Y_INSETS);
+			handler.startElement("", "", ConverterDefines.Y_INSETS, attr);
+			handler.endElement("", "", ConverterDefines.Y_INSETS);
 
 			attr.clear();
 			attr.addAttribute("", "", "bottom", "CDATA", "0");
@@ -1245,14 +1249,14 @@ public class SBGNML2GraphML {
 				attr.addAttribute("", "", "top", "CDATA", "3");
 				attr.addAttribute("", "", "topF", "CDATA", "3.0");
 			}
-			handler.startElement("", "", FileUtils.Y_BORDER_INSETS, attr);
-			handler.endElement("", "", FileUtils.Y_BORDER_INSETS);
+			handler.startElement("", "", ConverterDefines.Y_BORDER_INSETS, attr);
+			handler.endElement("", "", ConverterDefines.Y_BORDER_INSETS);
 
-			handler.endElement("", "", FileUtils.Y_GENERIC_GROUP_NODE);
+			handler.endElement("", "", ConverterDefines.Y_GENERIC_GROUP_NODE);
 			closed = !closed;
 		}
-		handler.endElement("", "", FileUtils.Y_REALIZERS);
-		handler.endElement("", "", FileUtils.Y_PROXY_AUTO_BOUNDS_NODE);
+		handler.endElement("", "", ConverterDefines.Y_REALIZERS);
+		handler.endElement("", "", ConverterDefines.Y_PROXY_AUTO_BOUNDS_NODE);
 		handler.endElement("", "", "data");
 
 		attr.clear();
@@ -1264,8 +1268,8 @@ public class SBGNML2GraphML {
 		if (g.getGlyph().size() > 0) {
 
 			for (Glyph childGlyph : g.getGlyph()) {
-				if (!childGlyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)
-						&& !childGlyph.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
+				if (!childGlyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)
+						&& !childGlyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
 					parseGlyph(handler, childGlyph);
 				}
 			}
@@ -1283,16 +1287,16 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", "data", attr);
 
 		attr.clear();
-		handler.startElement("", "", FileUtils.Y_PROXY_AUTO_BOUNDS_NODE, attr);
+		handler.startElement("", "", ConverterDefines.Y_PROXY_AUTO_BOUNDS_NODE, attr);
 
 		attr.clear();
 		attr.addAttribute("", "", "active", "CDATA", "0");
-		handler.startElement("", "", FileUtils.Y_REALIZERS, attr);
+		handler.startElement("", "", ConverterDefines.Y_REALIZERS, attr);
 		boolean closed = false;
 		for (int i = 0; i < 2; i++) {
 
 			attr.clear();
-			handler.startElement("", "", FileUtils.Y_GROUP_NODE, attr);
+			handler.startElement("", "", ConverterDefines.Y_GROUP_NODE, attr);
 
 			addGeometry(handler, glyph);
 			GraphMLStyle _style = getStyle(glyph.getId());
@@ -1320,25 +1324,25 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "x", "CDATA", Float.toString(glyph.getBbox().getX()));
 			attr.addAttribute("", "", "y", "CDATA", Float.toString(glyph.getBbox().getY()));
 
-			handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+			handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 			if (null != glyph.getLabel()) {
 				String vertexLabel = glyph.getLabel().getText().trim();
 				handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			}
-			handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+			handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 			attr.clear();
 			attr.addAttribute("", "", "type", "CDATA", "roundrectangle");
-			handler.startElement("", "", FileUtils.Y_SHAPE, attr);
-			handler.endElement("", "", FileUtils.Y_SHAPE);
+			handler.startElement("", "", ConverterDefines.Y_SHAPE, attr);
+			handler.endElement("", "", ConverterDefines.Y_SHAPE);
 
 			attr.clear();
 			attr.addAttribute("", "", "closed", "CDATA", Boolean.toString(closed));
 			attr.addAttribute("", "", "closedHeight", "CDATA", Integer.toString(80));
 			attr.addAttribute("", "", "closedWidth", "CDATA", Integer.toString(80));
 			attr.addAttribute("", "", "innerGraphDisplayEnabled", "CDATA", "false");
-			handler.startElement("", "", FileUtils.Y_STATE, attr);
-			handler.endElement("", "", FileUtils.Y_STATE);
+			handler.startElement("", "", ConverterDefines.Y_STATE, attr);
+			handler.endElement("", "", ConverterDefines.Y_STATE);
 
 			attr.clear();
 			attr.addAttribute("", "", "bottom", "CDATA", "15");
@@ -1349,8 +1353,8 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "rightF", "CDATA", "15.0");
 			attr.addAttribute("", "", "top", "CDATA", "15");
 			attr.addAttribute("", "", "topF", "CDATA", "15.0");
-			handler.startElement("", "", FileUtils.Y_INSETS, attr);
-			handler.endElement("", "", FileUtils.Y_INSETS);
+			handler.startElement("", "", ConverterDefines.Y_INSETS, attr);
+			handler.endElement("", "", ConverterDefines.Y_INSETS);
 
 			attr.clear();
 			attr.addAttribute("", "", "bottom", "CDATA", "0");
@@ -1361,14 +1365,14 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "rightF", "CDATA", "0.0");
 			attr.addAttribute("", "", "top", "CDATA", "0");
 			attr.addAttribute("", "", "topF", "CDATA", "0.0");
-			handler.startElement("", "", FileUtils.Y_BORDER_INSETS, attr);
-			handler.endElement("", "", FileUtils.Y_BORDER_INSETS);
+			handler.startElement("", "", ConverterDefines.Y_BORDER_INSETS, attr);
+			handler.endElement("", "", ConverterDefines.Y_BORDER_INSETS);
 
-			handler.endElement("", "", FileUtils.Y_GROUP_NODE);
+			handler.endElement("", "", ConverterDefines.Y_GROUP_NODE);
 			closed = !closed;
 		}
-		handler.endElement("", "", FileUtils.Y_REALIZERS);
-		handler.endElement("", "", FileUtils.Y_PROXY_AUTO_BOUNDS_NODE);
+		handler.endElement("", "", ConverterDefines.Y_REALIZERS);
+		handler.endElement("", "", ConverterDefines.Y_PROXY_AUTO_BOUNDS_NODE);
 		handler.endElement("", "", "data");
 
 		attr.clear();
@@ -1404,7 +1408,7 @@ public class SBGNML2GraphML {
 			// <y:GenericNode>
 			attr.clear();
 			attr.addAttribute("", "", "configuration", "CDATA", szConfiguration);
-			handler.startElement("", "", FileUtils.Y_GENERIC_NODE, attr);
+			handler.startElement("", "", ConverterDefines.Y_GENERIC_NODE, attr);
 
 			addGeometry(handler, glyph);
 			GraphMLStyle style = getStyle(glyph.getId());
@@ -1432,18 +1436,18 @@ public class SBGNML2GraphML {
 			attr.addAttribute("", "", "y", "CDATA", Float.toString(glyph.getBbox().getY()));
 
 			// Content for <y:NodeLabel>
-			handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+			handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 			handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			addLabelModel(handler);
 			float fValue = 0;
 			addModelParameter(handler, fValue);
-			handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+			handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 			if (glyph.getGlyph().size() > 0) {
 
 				for (Glyph childGlyph : glyph.getGlyph()) {
 
-					if (childGlyph.getClazz().equals(FileUtils.SBGN_STATE_VARIABLE)) {
+					if (childGlyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
 						attr.clear();
 
 						attr.addAttribute("", "", "alignment", "CDATA", "center");
@@ -1474,15 +1478,15 @@ public class SBGNML2GraphML {
 						attr.addAttribute("", "", "y", "CDATA", Float.toString(childGlyph.getBbox().getY()));
 
 						// Content for <y:NodeLabel>
-						handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+						handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 						addLabelModel(handler);
 						float fValueStateVariable = (float) 0.5;
 						addModelParameter(handler, fValueStateVariable);
-						handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+						handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 						GraphMLResource _resource = new GraphMLResource();
 						_resource.setId(childGlyph.getId());
-						_resource.setClass(FileUtils.COM_YWORKS_SBGN_STATE_VARIABLE);
+						_resource.setClass(ConverterDefines.COM_YWORKS_SBGN_STATE_VARIABLE);
 						_resource.setHeight(childGlyph.getBbox().getH());
 						_resource.setWidth(childGlyph.getBbox().getW());
 						_resource.setXCoord(childGlyph.getBbox().getX());
@@ -1502,29 +1506,29 @@ public class SBGNML2GraphML {
 						}
 
 						resourceList.add(_resource);
-					} else if (childGlyph.getClazz().equals(FileUtils.SBGN_UNIT_OF_INFORMATION)) {
+					} else if (childGlyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
 						addUnitOfInformation(handler, style, childGlyph);
 					}
 				}
 			}
 
-			if (glyph.getClazz().equals(FileUtils.SBGN_MACROMOLECULE)) {
+			if (glyph.getClazz().equals(ConverterDefines.SBGN_MACROMOLECULE)) {
 				attr.clear();
-				handler.startElement("", "", FileUtils.Y_STYLE_PROPERTIES, attr);
+				handler.startElement("", "", ConverterDefines.Y_STYLE_PROPERTIES, attr);
 				attr.clear();
 				attr.addAttribute("", "", "class", "CDATA", "java.lang.Integer");
 				attr.addAttribute("", "", "name", "CDATA", "com.yworks.sbgn.style.radius");
 				attr.addAttribute("", "", "value", "CDATA", "10");
-				handler.startElement("", "", FileUtils.Y_PROPERTY, attr);
-				handler.endElement("", "", FileUtils.Y_PROPERTY);
-				handler.endElement("", "", FileUtils.Y_STYLE_PROPERTIES);
+				handler.startElement("", "", ConverterDefines.Y_PROPERTY, attr);
+				handler.endElement("", "", ConverterDefines.Y_PROPERTY);
+				handler.endElement("", "", ConverterDefines.Y_STYLE_PROPERTIES);
 			}
 
 			if (bIsMultimer) {
 				addMultimerStyleProp(handler);
 			}
 
-			handler.endElement("", "", FileUtils.Y_GENERIC_NODE);
+			handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
 			handler.endElement("", "", "data");
 		}
 	}
@@ -1557,19 +1561,19 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(_unitGlyph.getBbox().getY()));
 
 		// Content for <y:NodeLabel>
-		handler.startElement("", "", FileUtils.Y_NODE_LABEL, attr);
+		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		String unitLabel = _unitGlyph.getLabel().getText();
 		handler.characters(unitLabel.toCharArray(), 0, unitLabel.length());
 		addLabelModel(handler);
 		float fValueUnitOfInfo = (float) -0.5;
 		addModelParameter(handler, fValueUnitOfInfo);
-		handler.endElement("", "", FileUtils.Y_NODE_LABEL);
+		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 	}
 
 	private void addModelParameter(TransformerHandler handler, float fNodeRatioY) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		handler.startElement("", "", FileUtils.Y_MODEL_PARAMETER, attr);
+		handler.startElement("", "", ConverterDefines.Y_MODEL_PARAMETER, attr);
 		attr.addAttribute("", "", "labelRatioX", "CDATA", "0.0");
 		attr.addAttribute("", "", "labelRatioY", "CDATA", "0.0");
 		attr.addAttribute("", "", "nodeRatioX", "CDATA", "0.0");
@@ -1578,19 +1582,19 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "offsetY", "CDATA", "0.0");
 		attr.addAttribute("", "", "upX", "CDATA", "0.0");
 		attr.addAttribute("", "", "upY", "CDATA", "-1.0");
-		handler.startElement("", "", FileUtils.Y_SMART_NODE_LABEL_MODEL_PARAMETER, attr);
-		handler.endElement("", "", FileUtils.Y_SMART_NODE_LABEL_MODEL_PARAMETER);
-		handler.endElement("", "", FileUtils.Y_MODEL_PARAMETER);
+		handler.startElement("", "", ConverterDefines.Y_SMART_NODE_LABEL_MODEL_PARAMETER, attr);
+		handler.endElement("", "", ConverterDefines.Y_SMART_NODE_LABEL_MODEL_PARAMETER);
+		handler.endElement("", "", ConverterDefines.Y_MODEL_PARAMETER);
 	}
 
 	private void addLabelModel(TransformerHandler handler) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		handler.startElement("", "", FileUtils.Y_LABEL_MODEL, attr);
+		handler.startElement("", "", ConverterDefines.Y_LABEL_MODEL, attr);
 		attr.addAttribute("", "", "distance", "CDATA", "4.0");
-		handler.startElement("", "", FileUtils.Y_SMART_NODE_LABEL_MODEL, attr);
-		handler.endElement("", "", FileUtils.Y_SMART_NODE_LABEL_MODEL);
-		handler.endElement("", "", FileUtils.Y_LABEL_MODEL);
+		handler.startElement("", "", ConverterDefines.Y_SMART_NODE_LABEL_MODEL, attr);
+		handler.endElement("", "", ConverterDefines.Y_SMART_NODE_LABEL_MODEL);
+		handler.endElement("", "", ConverterDefines.Y_LABEL_MODEL);
 	}
 
 	private void addGeometry(TransformerHandler handler, Glyph glyph) throws SAXException {
@@ -1600,20 +1604,8 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "width", "CDATA", Float.toString(glyph.getBbox().getW()));
 		attr.addAttribute("", "", "x", "CDATA", Float.toString(glyph.getBbox().getX()));
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(glyph.getBbox().getY()));
-		handler.startElement("", "", FileUtils.Y_GEOMETRY, attr);
-		handler.endElement("", "", FileUtils.Y_GEOMETRY);
-	}
-
-	private void addGeometryForStateVariable(TransformerHandler handler, Glyph glyph, float x, float y)
-			throws SAXException {
-		AttributesImpl attr = new AttributesImpl();
-
-		attr.addAttribute("", "", "height", "CDATA", Float.toString(glyph.getBbox().getH()));
-		attr.addAttribute("", "", "width", "CDATA", Float.toString(glyph.getBbox().getW()));
-		attr.addAttribute("", "", "x", "CDATA", Float.toString(x));
-		attr.addAttribute("", "", "y", "CDATA", Float.toString(y));
-		handler.startElement("", "", FileUtils.Y_GEOMETRY, attr);
-		handler.endElement("", "", FileUtils.Y_GEOMETRY);
+		handler.startElement("", "", ConverterDefines.Y_GEOMETRY, attr);
+		handler.endElement("", "", ConverterDefines.Y_GEOMETRY);
 	}
 
 	private void addBorderStyle(TransformerHandler handler, GraphMLStyle style) throws SAXException {
@@ -1622,8 +1614,8 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "color", "CDATA", style.getStrokeColor());
 		attr.addAttribute("", "", "type", "CDATA", "line");
 		attr.addAttribute("", "", "width", "CDATA", style.getStrokeWidth());
-		handler.startElement("", "", FileUtils.Y_BORDER_STYLE, attr);
-		handler.endElement("", "", FileUtils.Y_BORDER_STYLE);
+		handler.startElement("", "", ConverterDefines.Y_BORDER_STYLE, attr);
+		handler.endElement("", "", ConverterDefines.Y_BORDER_STYLE);
 	}
 
 	private void addFillColor(TransformerHandler handler, GraphMLStyle style) throws SAXException {
@@ -1631,8 +1623,8 @@ public class SBGNML2GraphML {
 
 		attr.addAttribute("", "", "color", "CDATA", style.getFillColor());
 		attr.addAttribute("", "", "transparent", "CDATA", "false");
-		handler.startElement("", "", FileUtils.Y_FILL, attr);
-		handler.endElement("", "", FileUtils.Y_FILL);
+		handler.startElement("", "", ConverterDefines.Y_FILL, attr);
+		handler.endElement("", "", ConverterDefines.Y_FILL);
 	}
 
 	private void addOrientation(TransformerHandler handler, String szOrientation) throws SAXException {
@@ -1661,7 +1653,7 @@ public class SBGNML2GraphML {
 			// to show that the glyph has a clone that has to be set, even if the label text
 			// is an empty string. At the decoding step, this additional information must be
 			// removed.
-			String cloneInfo = FileUtils.CloneIsSet;
+			String cloneInfo = CloneHandler.CloneIsSet;
 			if (null != clone.getLabel()) {
 				cloneInfo = clone.getLabel().getText();
 			}
@@ -1709,8 +1701,8 @@ public class SBGNML2GraphML {
 						szRDFDescription = szRDFDescription.concat(eRDFDEscription.getAttribute("rdf:about") + "\n");
 					}
 
-					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQMODEL_IS).getLength(); i++) {
-						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQMODEL_IS).item(i);
+					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQMODEL_IS).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQMODEL_IS).item(i);
 
 						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
 							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
@@ -1720,8 +1712,8 @@ public class SBGNML2GraphML {
 						}
 					}
 
-					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQMODEL_IS_DESCRIBED_BY).getLength(); i++) {
-						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQMODEL_IS_DESCRIBED_BY).item(i);
+					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQMODEL_IS_DESCRIBED_BY).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQMODEL_IS_DESCRIBED_BY).item(i);
 
 						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
 							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
@@ -1732,8 +1724,8 @@ public class SBGNML2GraphML {
 						}
 					}
 
-					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQBIOL_IS).getLength(); i++) {
-						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQBIOL_IS).item(i);
+					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQBIOL_IS).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQBIOL_IS).item(i);
 						if (null != e1) {
 
 							for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
@@ -1745,8 +1737,8 @@ public class SBGNML2GraphML {
 						}
 					}
 
-					for (int i = 0; i < e.getElementsByTagName(FileUtils.BQBIOL_IS_DESCRIBED_BY).getLength(); i++) {
-						Element e1 = (Element) e.getElementsByTagName(FileUtils.BQBIOL_IS_DESCRIBED_BY).item(i);
+					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQBIOL_IS_DESCRIBED_BY).getLength(); i++) {
+						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQBIOL_IS_DESCRIBED_BY).item(i);
 
 						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
 							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);

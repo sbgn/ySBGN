@@ -1,4 +1,4 @@
-package fr.eisbm.GRAPHML2SBGNML;
+package fr.eisbm.GraphMLHandlers;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,9 +6,13 @@ import java.util.Set;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Port;
 
-import fr.eisbm.GRAPHML2SBGNML.FileUtils.PortType;
-
 public class PortArcsRelationship {
+	
+	public enum PortType
+	{
+		SourcePort,
+		TargetPort
+	}
 
 	private Port m_Port;
 	private Set<Arc> m_ConnectedArcs;
