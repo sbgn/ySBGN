@@ -15,14 +15,13 @@ import javax.xml.bind.Unmarshaller;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Sbgn;
 
-public class FileUtils {	
-	public static final String IN_SBGN_FILE = "example_files/test.sbgn";
-	public static final String IN_YED_FILE = "example_files/test.graphml";
-	
+public class FileUtils {
+	public static final String IN_SBGN_FILE = "downloads/new/F100-aspirin-V003B.sbgn";
+	public static final String IN_YED_FILE = "downloads/F008-enos.graphml";
+
 	public static final int DEFAULT_FONT_SIZE = 10;
 	public static final int MAX_PORT_NO = 2;
-	public static final double PORT2GLYPH_DISTANCE = 10.8;
-	
+
 	public static Sbgn readFromFile(String szFileName) throws JAXBException {
 		Sbgn result = null;
 		try {
@@ -58,8 +57,31 @@ public class FileUtils {
 			reader.reset();
 		}
 	}
-	
-	public static Glyph findGlyph(String szId, Glyph g) {
+
+	public static float getPointDistance(float x1, float y1, float x2, float y2) {
+		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+	}
+
+	public static boolean isProcessType(Glyph source) {
+		boolean bIsProcess = false;
+		if (source.getClazz().equals(ConverterDefines.SBGN_PROCESS)
+				|| (source.getClazz().equals(ConverterDefines.SBGN_UNCERTAIN_PROCESS))
+				|| (source.getClazz().equals(ConverterDefines.SBGN_OMITTED_PROCESS))) {
+			bIsProcess = true;
+		}
+		return bIsProcess;
+	}
+
+	public static boolean isOperatorType(Glyph source) {
+		boolean bIsOperator = false;
+		if (source.getClazz().equals(ConverterDefines.SBGN_AND) || (source.getClazz().equals(ConverterDefines.SBGN_OR))
+				|| (source.getClazz().equals(ConverterDefines.SBGN_NOT))) {
+			bIsOperator = true;
+		}
+		return bIsOperator;
+	}
+
+	public static  Glyph findGlyph(String szId, Glyph g) {
 		if (g.getId().equals(szId)) {
 			return g;
 		}
@@ -68,11 +90,7 @@ public class FileUtils {
 		for (int i = 0; res == null && i < innerGlyphs.size(); i++) {
 			res = findGlyph(szId, innerGlyphs.get(i));
 		}
+
 		return res;
 	}
-	
-	public static float getPointDistance(float x1, float y1, float x2, float y2) {
-		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-	}
-
 }

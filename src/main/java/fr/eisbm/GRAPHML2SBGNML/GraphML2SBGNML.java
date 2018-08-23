@@ -24,7 +24,6 @@ import org.w3c.dom.NodeList;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
-import fr.eisbm.GraphMLHandlers.PortArcsRelationship;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
 import fr.eisbm.SBGNHandlers.transformToSBGN02;
@@ -34,7 +33,6 @@ public class GraphML2SBGNML {
 	Sbgn sbgn = new Sbgn();
 	Map map = new Map();
 	java.util.Map<String, String> colorMap = new HashMap<String, String>();
-	java.util.Map<String, PortArcsRelationship> port_arc_map = new HashMap<String, PortArcsRelationship>();
 
 	public static void main(String[] args) {
 		convert(FileUtils.IN_YED_FILE);
@@ -49,6 +47,7 @@ public class GraphML2SBGNML {
 			String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
 			transformToSBGN02.transformToSBGNv02(szOutSBGNFile, szSBGNv02FileName);
 		}
+		System.out.println(szInputFileName +"\t " + bConversion);
 	}
 
 	boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
@@ -64,6 +63,8 @@ public class GraphML2SBGNML {
 
 			map.setLanguage("process description");
 			sbgn.setMap(map);
+			
+			GlyphHandler glyphHandler = new GlyphHandler();
 
 			// read information on the ids of tags for of annotation, color etc
 			ModelAttributes modelAttr = new ModelAttributes();
@@ -83,43 +84,44 @@ public class GraphML2SBGNML {
 					// compartment - mapped by yEd groups with the <y:GroupNode> tag
 					NodeList _nlGroupList = eElement.getElementsByTagName(ConverterDefines.Y_GROUP_NODE);
 					if (_nlGroupList.getLength() > 0)
-						GlyphHandler.parseCompartments(eElement, map);
+						glyphHandler.parseCompartments(eElement, map);
 					else {
 						// checking the node type
 						NodeList _nlConfigList = eElement.getElementsByTagName(ConverterDefines.Y_GENERIC_GROUP_NODE);
-						GlyphHandler.parseComplexes(doc, modelAttr, eElement, _nlConfigList, map);
+						glyphHandler.parseComplexes(doc, modelAttr, eElement, _nlConfigList, map);
 					}
 				}
 			}
 
 			// nodes:
 			NodeList nList = doc.getElementsByTagName(ConverterDefines.NODE_TAG);
-			GlyphHandler.parseNodes(doc, modelAttr, nList, map);
+			glyphHandler.parseNodes(doc, modelAttr, nList, map);
 
 			// for the process glyphs, ports will be created by default
-			GlyphHandler.createPorts(map.getGlyph());
+			glyphHandler.createPorts(map.getGlyph());
 
 			// edges/arcs:
 			NodeList nEdgeList = doc.getElementsByTagName(ConverterDefines.EDGE_TAG);
-			ArcHandler.processArcs(nEdgeList, map, port_arc_map);
-			ArcHandler.assignArcsToPorts(port_arc_map);
+			ArcHandler arcHandler = new ArcHandler();
+			arcHandler.processArcs(nEdgeList, map);
+			arcHandler.setArcsToPorts(map);
 
 			// resources:
 			NodeList nResourceList = doc.getElementsByTagName(ConverterDefines.Y_RESOURCE);
-			GlyphHandler.processResources(nResourceList, map);
+			glyphHandler.processResources(nResourceList, map);
 
 			// add information on doc extension such as annotation, color etc
 			addExtension(doc);
 
 			// move the network elements to start from top/left, i.e. coordinates (0,0)
 			moveNetworkToTopLeft();
-
-			// correct the orientation of the processes and connected arcs following network
-			// move/rotate
-			ArcHandler.correctPortOrientationAndConnectedArcs(map);
+			
+			// correct the orientation of the processes and connected arcs
+			arcHandler.correctPortOrientationAndConnectedArcs(map.getGlyph(), map.getArc());
 
 			// handle clone marker
-			CloneHandler.setClonedGlyphs(map);
+			CloneHandler cloneHandler = new CloneHandler();
+			cloneHandler.setClonedGlyphs(map);
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
@@ -260,6 +262,7 @@ public class GraphML2SBGNML {
 
 	private void moveArcs(List<Arc> arcList, float x_val, float y_val) {
 		for (Arc arc : arcList) {
+			
 			float newX = arc.getStart().getX() + x_val;
 			float newY = arc.getStart().getY() + y_val;
 			arc.getStart().setX(newX);

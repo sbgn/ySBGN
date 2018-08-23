@@ -10,10 +10,10 @@ import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 import org.sbgn.bindings.Map;
 
 public class CloneHandler {
-	
-	public static final String CloneIsSet = "CloneIsSet";
 
-	public static void setClonedGlyphs(Map map) {
+	public final static String CloneIsSet = "CloneIsSet";
+
+	public void setClonedGlyphs(Map map) {
 		for (Glyph g : map.getGlyph()) {
 			if (!(g.getClazz().equals(ConverterDefines.SBGN_COMPLEX)
 					|| g.getClazz().equals(ConverterDefines.SBGN_COMPLEX_MULTIMER))) {
@@ -24,7 +24,7 @@ public class CloneHandler {
 		}
 	}
 
-	private static void findCloneComplexGlyph(Glyph g1, List<Glyph> listOfGlyphs) {
+	private void findCloneComplexGlyph(Glyph g1, List<Glyph> listOfGlyphs) {
 		for (Glyph g2 : listOfGlyphs) {
 			if (!g1.getId().equals(g2.getId()) && (g1.getClazz().equals(g2.getClazz()))) {
 				boolean bClone = findClonedSimilarGlyphs(g1, g2);
@@ -69,7 +69,7 @@ public class CloneHandler {
 
 	}
 
-	private static void setCloneSimpleGlyphs(Glyph g1, List<Glyph> listOfGlyphs) {
+	private void setCloneSimpleGlyphs(Glyph g1, List<Glyph> listOfGlyphs) {
 
 		for (Glyph g2 : listOfGlyphs) {
 			boolean bClone = findClonedSimilarGlyphs(g1, g2);
@@ -87,7 +87,7 @@ public class CloneHandler {
 		}
 	}
 
-	private static boolean findClonedSimilarGlyphs(Glyph g1, Glyph g2) {
+	private boolean findClonedSimilarGlyphs(Glyph g1, Glyph g2) {
 		boolean bClone = false;
 
 		if (!g1.getId().equals(g2.getId()) && (g1.getClazz().equals(g2.getClazz()))) {
@@ -108,7 +108,7 @@ public class CloneHandler {
 		return bClone;
 	}
 
-	private static boolean haveSameStateVariables(Glyph g1, Glyph g2) {
+	private boolean haveSameStateVariables(Glyph g1, Glyph g2) {
 		boolean bSameStateVariable = true;
 
 		for (Glyph g : g1.getGlyph()) {
@@ -129,7 +129,7 @@ public class CloneHandler {
 		return bSameStateVariable;
 	}
 
-	private static boolean haveSameUnitsOfInfo(Glyph g1, Glyph g2) {
+	private boolean haveSameUnitsOfInfo(Glyph g1, Glyph g2) {
 		boolean bSameUOI = true;
 
 		for (Glyph g : g1.getGlyph()) {
@@ -150,7 +150,7 @@ public class CloneHandler {
 		return bSameUOI;
 	}
 
-	private static boolean haveSameCompartment(Glyph g1, Glyph g2) {
+	private boolean haveSameCompartment(Glyph g1, Glyph g2) {
 		boolean bSameCompartment = false;
 
 		if (g1.getCompartmentRef() != null) {
@@ -169,7 +169,7 @@ public class CloneHandler {
 
 	}
 
-	private static boolean haveSameTextLabel(Glyph g1, Glyph g2) {
+	private boolean haveSameTextLabel(Glyph g1, Glyph g2) {
 		boolean bSameTextLabel = false;
 
 		if (g1.getLabel() != null) {

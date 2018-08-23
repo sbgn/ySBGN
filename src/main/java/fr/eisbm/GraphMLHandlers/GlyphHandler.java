@@ -25,13 +25,13 @@ import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
 
 public class GlyphHandler {
 
-	static java.util.Map<String, String> compoundComplexMap = new HashMap<String, String>();
-	static java.util.Map<String, String> compoundCompartmentMap = new HashMap<String, String>();
-	static Set<String> complexSet = new HashSet<String>();
-	static Set<String> compartmentSet = new HashSet<String>();
-	static java.util.Map<Pair<String, String>, ResourceCoordinates> resourceMap = new HashMap<Pair<String, String>, ResourceCoordinates>();
+	java.util.Map<String, String> compoundComplexMap = new HashMap<String, String>();
+	java.util.Map<String, String> compoundCompartmentMap = new HashMap<String, String>();
+	Set<String> complexSet = new HashSet<String>();
+	Set<String> compartmentSet = new HashSet<String>();
+	java.util.Map<Pair<String, String>, ResourceCoordinates> resourceMap = new HashMap<Pair<String, String>, ResourceCoordinates>();
 
-	public static String parseYedNodeType(String szType, boolean bIsMultimer) {
+	public String parseYedNodeType(String szType, boolean bIsMultimer) {
 		String szGlyphClass = "";
 		if (szType.contains(ConverterDefines.COM_YWORKS_SBGN_SIMPLE_CHEMICAL)) {
 			if (bIsMultimer) {
@@ -111,7 +111,7 @@ public class GlyphHandler {
 		return szGlyphClass;
 	}
 
-	public static void parseCompartments(Element eElement, Map map) {
+	public void parseCompartments(Element eElement, Map map) {
 		{
 			String szCompartmentId = eElement.getAttribute(ConverterDefines.ID_ATTR);
 			Glyph _compartmentGlyph = new Glyph();
@@ -160,7 +160,7 @@ public class GlyphHandler {
 		}
 	}
 
-	public static void parseComplexes(Document doc, ModelAttributes modelAttr, Element eElement, NodeList _nlConfigList,
+	public void parseComplexes(Document doc, ModelAttributes modelAttr, Element eElement, NodeList _nlConfigList,
 			Map map) {
 		if (_nlConfigList.getLength() > 0) {
 			if (((Element) _nlConfigList.item(0)).hasAttribute("configuration")) {
@@ -210,6 +210,10 @@ public class GlyphHandler {
 								break;
 							}
 						}
+
+						if (null == _complexGlyph) {
+							System.out.println("parseComplex: complex id = " + szComplexId);
+						}
 					}
 
 					NodeList nCompoundList = eElement.getElementsByTagName(ConverterDefines.NODE_TAG);
@@ -223,12 +227,15 @@ public class GlyphHandler {
 							Element nParentElement = (Element) (nCompoundNode.getParentNode());
 							String szParentID = nParentElement.getAttribute(ConverterDefines.ID_ATTR).substring(0,
 									nParentElement.getAttribute(ConverterDefines.ID_ATTR).length() - 1);
-							if (_complexGlyph.getId().equals(szParentID)) {
 
-								Glyph _glyph = parseGlyphInfo(doc, modelAttr, eCompoundElement, szCompoundId);
+							if (null != _complexGlyph) {
+								if (_complexGlyph.getId().equals(szParentID)) {
 
-								_complexGlyph.getGlyph().add(_glyph);
-								compoundComplexMap.put(szCompoundId, szComplexId);
+									Glyph _glyph = parseGlyphInfo(doc, modelAttr, eCompoundElement, szCompoundId);
+
+									_complexGlyph.getGlyph().add(_glyph);
+									compoundComplexMap.put(szCompoundId, szComplexId);
+								}
 							}
 						}
 					}
@@ -238,7 +245,7 @@ public class GlyphHandler {
 		}
 	}
 
-	public static void parseNodes(Document doc, ModelAttributes modelAttributes, NodeList nList, Map map) {
+	public void parseNodes(Document doc, ModelAttributes modelAttributes, NodeList nList, Map map) {
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);
 
@@ -266,8 +273,7 @@ public class GlyphHandler {
 		}
 	}
 
-	public static Glyph parseGlyphInfo(Document doc, ModelAttributes modelAttributes, Element eElement,
-			String szGlyphId) {
+	public Glyph parseGlyphInfo(Document doc, ModelAttributes modelAttributes, Element eElement, String szGlyphId) {
 		Glyph _glyph = new Glyph();
 		_glyph.setId(szGlyphId);
 
@@ -379,8 +385,7 @@ public class GlyphHandler {
 		return _glyph;
 	}
 
-	private static Element parseAnnotation(Document doc, ModelAttributes modelAttributes, Glyph _glyph,
-			NodeList nlDataList) {
+	private Element parseAnnotation(Document doc, ModelAttributes modelAttributes, Glyph _glyph, NodeList nlDataList) {
 		Element eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
 		// TODO: to read the namespace from the file
 		Element rdfRDF = doc.createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -402,7 +407,7 @@ public class GlyphHandler {
 
 			// setting the orientation value for the SBGN process
 			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
-				if (ArcHandler.isProcessType(_glyph)) {
+				if (FileUtils.isProcessType(_glyph)) {
 					_glyph.setOrientation(_element.getTextContent());
 				}
 			}
@@ -562,7 +567,7 @@ public class GlyphHandler {
 		return eltAnnotation;
 	}
 
-	public static void setCompartmentRefToGlyph(String szParentCompartmentId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
+	public void setCompartmentRefToGlyph(String szParentCompartmentId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
 		for (Glyph _compartment : _listOfGlyphs) {
 			if (_compartment.getId().equals(szParentCompartmentId)) {
 				_glyph.setCompartmentRef(_compartment);
@@ -572,7 +577,7 @@ public class GlyphHandler {
 		}
 	}
 
-	public static void setBbox(Glyph _glyph, NodeList nlGeometry) {
+	public void setBbox(Glyph _glyph, NodeList nlGeometry) {
 		Bbox bbox = new Bbox();
 
 		String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.HEIGHT_ATTR);
@@ -587,7 +592,7 @@ public class GlyphHandler {
 		_glyph.setBbox(bbox);
 	}
 
-	public static void processResources(NodeList nResourceList, Map map) {
+	public void processResources(NodeList nResourceList, Map map) {
 		for (int temp = 0; temp < nResourceList.getLength(); temp++) {
 			Node nResource = nResourceList.item(temp);
 
@@ -668,7 +673,7 @@ public class GlyphHandler {
 		}
 	}
 
-	private static void addGlyphToList(String szParentGlyphId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
+	private void addGlyphToList(String szParentGlyphId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
 		for (Glyph _parentGlyph : _listOfGlyphs) {
 			if (_parentGlyph.getId().equals(szParentGlyphId)) {
 				_parentGlyph.getGlyph().add(_glyph);
@@ -678,7 +683,7 @@ public class GlyphHandler {
 		}
 	}
 
-	public static void setStyle(Element eElement, String szId) {
+	public void setStyle(Element eElement, String szId) {
 		String szFillColorId = ((Element) (eElement.getElementsByTagName(ConverterDefines.Y_FILL).item(0)))
 				.getAttribute(ConverterDefines.COLOR_ATTR);
 		StyleHandler.colorSet.add(szFillColorId);
@@ -708,11 +713,10 @@ public class GlyphHandler {
 		}
 		StyleHandler.styleMap.get(szStyleId).addElementIdToSet(szId);
 	}
-	
-	
-	public static void createPorts(List<Glyph> list) {
+
+	public void createPorts(List<Glyph> list) {
 		for (Glyph glyph : list) {
-			if (ArcHandler.isOperatorType(glyph) || (ArcHandler.isProcessType(glyph))) {
+			if (FileUtils.isOperatorType(glyph) || (FileUtils.isProcessType(glyph))) {
 				if (glyph.getPort() != null) {
 					if (glyph.getPort().size() != FileUtils.MAX_PORT_NO) {
 						for (int i = 0; i < FileUtils.MAX_PORT_NO; i++) {
@@ -727,7 +731,7 @@ public class GlyphHandler {
 		}
 	}
 
-	private static void createPort(Glyph glyph, int i) {
+	private void createPort(Glyph glyph, int i) {
 		Port port = new Port();
 		port.setId(glyph.getId() + "." + i);
 
@@ -737,23 +741,23 @@ public class GlyphHandler {
 		// the glyph (process/ operator) is oriented vertically, so the ports will be
 		// located top/down
 		if (glyph.getOrientation().equals("vertical")) {
-			x = glyph.getBbox().getX();
+			x = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
 
 			if (0 == i) {
-				y = glyph.getBbox().getY() - (float)FileUtils.PORT2GLYPH_DISTANCE;
+				y = (float) (glyph.getBbox().getY() + glyph.getBbox().getH() + glyph.getBbox().getH() * 0.5);
 			} else {
-				y = glyph.getBbox().getY() + glyph.getBbox().getH() + (float) FileUtils.PORT2GLYPH_DISTANCE;
+				y = (float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5);
 			}
 		}
 		// the glyph (process/ operator) is oriented horizontally, so the ports will be
 		// located left-right
 		else {
 			if (0 == i) {
-				x = glyph.getBbox().getX() - (float) FileUtils.PORT2GLYPH_DISTANCE;
+				x = (float) (glyph.getBbox().getX() - glyph.getBbox().getW() * 0.5);
 			} else {
-				x = glyph.getBbox().getX() + glyph.getBbox().getW() + (float)FileUtils.PORT2GLYPH_DISTANCE;
+				x = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() + glyph.getBbox().getW() * 0.5);
 			}
-			y = glyph.getBbox().getY();
+			y = (float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5);
 		}
 
 		port.setX(x);

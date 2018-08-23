@@ -136,4 +136,7 @@ public class ConverterDefines {
 	public static final String RDF_RDF_TAG = "rdf:RDF";
 	public static final String RDF_ABOUT_TAG = "rdf:about";
 	public static final String RDF_DESCRIPTION_TAG = "rdf:Description";
+	public static final String RESOURCE_FONT_SIZE = "10";
+	public static final double RATIO_THIRD = 0.3;
+	public static final double RATIO_HALF = 0.5;
 }

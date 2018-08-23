@@ -40,8 +40,8 @@ public class PortArcsRelationship {
 		this.m_ConnectedArcs = setConnectedArcs;
 	}
 	
-	public void addArcToSet(Arc _arc) {
-		this.m_ConnectedArcs.add(_arc);
+	public void addArcToSet(Arc arc) {
+		this.m_ConnectedArcs.add(arc);
 	}
 
 	public void setType(PortType portType) {
@@ -51,6 +51,10 @@ public class PortArcsRelationship {
 
 	public PortType getPortType() {
 		return m_portType;
+	}
+
+	public void removeArcFromSet(Arc arc) {
+		this.m_ConnectedArcs.remove(arc);
 	}
 
 }

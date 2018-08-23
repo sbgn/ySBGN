@@ -38,7 +38,6 @@ import org.xml.sax.helpers.AttributesImpl;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GraphMLResource;
 import fr.eisbm.SBGNHandlers.GraphMLStyle;
-import fr.eisbm.SBGNHandlers.transformToSBGN02;
 
 public class SBGNML2GraphML {
 	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
@@ -87,17 +86,17 @@ public class SBGNML2GraphML {
 			e.printStackTrace();
 		}
 
-		
 	}
 
 	public static void convert(String szInputFileName) {
 
 		SBGNML2GraphML sg = new SBGNML2GraphML();
-		String szOutFileName = szInputFileName.substring(0, szInputFileName.indexOf(".")).concat(".graphml");
+		String szOutFileName = szInputFileName.substring(0, szInputFileName.indexOf(".")).concat("_generated.graphml");
 		sg.parseSBGNFile(szInputFileName, szOutFileName);
-		
-		String szSBGNv02FileName = szOutFileName.replace(".graphml", "-SBGNv02.sbgn");
-		transformToSBGN02.transformToSBGNv02(szInputFileName, szSBGNv02FileName);
+
+		// String szSBGNv02FileName = szOutFileName.replace(".graphml",
+		// "-SBGNv02.sbgn");
+		// transformToSBGN02.transformToSBGNv02(szInputFileName, szSBGNv02FileName);
 	}
 
 	public void parseSBGNFile(String szInSBGNFileName, String szOutGraphMLFileName) {
@@ -142,7 +141,7 @@ public class SBGNML2GraphML {
 				}
 
 				parseColorsAndStyles();
-				
+
 				try {
 					export(w, graph);
 				} catch (TransformerConfigurationException | SAXException e) {
@@ -468,8 +467,8 @@ public class SBGNML2GraphML {
 		attr.clear();
 		attr.addAttribute("", "", "height", "CDATA", Float.toString(resource.getHeight()));
 		attr.addAttribute("", "", "width", "CDATA", Float.toString(resource.getWidth()));
-		attr.addAttribute("", "", "x", "CDATA", Float.toString(resource.getXCoord()));
-		attr.addAttribute("", "", "y", "CDATA", Float.toString(resource.getYCoord()));
+		attr.addAttribute("", "", "x", "CDATA", "0");
+		attr.addAttribute("", "", "y", "CDATA", "0");
 		handler.startElement("", "", ConverterDefines.Y_GEOMETRY, attr);
 		handler.endElement("", "", ConverterDefines.Y_GEOMETRY);
 
@@ -490,7 +489,7 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "alignment", "CDATA", "right");
 		attr.addAttribute("", "", "autoSizePolicy", "CDATA", "content");
 		attr.addAttribute("", "", "fontFamily", "CDATA", "Dialog");
-		attr.addAttribute("", "", "fontSize", "CDATA", "12");
+		attr.addAttribute("", "", "fontSize", "CDATA", ConverterDefines.RESOURCE_FONT_SIZE);
 		attr.addAttribute("", "", "fontStyle", "CDATA", "plain");
 		attr.addAttribute("", "", "hasBackgroundColor", "CDATA", "false");
 		attr.addAttribute("", "", "hasLineColor", "CDATA", "false");
@@ -504,9 +503,6 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "width", "CDATA", Float.toString(resource.getWidth()));
 		attr.addAttribute("", "", "x", "CDATA", Float.toString(resource.getXCoord()));
 		attr.addAttribute("", "", "y", "CDATA", Float.toString(resource.getYCoord()));
-		
-		System.out.println(resource.getText() +"\t "+resource.getXCoord() +"\t "+ resource.getYCoord());
-
 
 		// Content for <y:NodeLabel>
 		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
@@ -540,7 +536,8 @@ public class SBGNML2GraphML {
 
 		if ((null != source) && (null != target)) {
 
-			if ((source.getClazz().equals(ConverterDefines.SBGN_TAG)) || (target.getClazz().equals(ConverterDefines.SBGN_TAG))) {
+			if ((source.getClazz().equals(ConverterDefines.SBGN_TAG))
+					|| (target.getClazz().equals(ConverterDefines.SBGN_TAG))) {
 				bTag = true;
 			}
 			// <edge>
@@ -583,11 +580,12 @@ public class SBGNML2GraphML {
 				Port p = (Port) a.getSource();
 				float p_x = p.getX();
 				float p_y = p.getY();
-		/*		Glyph g = portToGlyphMap.get(p.getId());
-
-				if (g.getOrientation().equals("horizontal")) {
-					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
-				}*/
+				/*
+				 * Glyph g = portToGlyphMap.get(p.getId());
+				 * 
+				 * if (g.getOrientation().equals("horizontal")) { p_y = (float) (p.getY() +
+				 * g.getBbox().getH() * 0.5); }
+				 */
 
 				attr.clear();
 				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
@@ -611,11 +609,12 @@ public class SBGNML2GraphML {
 				Port p = (Port) a.getTarget();
 				float p_x = p.getX();
 				float p_y = p.getY();
-			/*	Glyph g = portToGlyphMap.get(p.getId());
-
-				if (g.getOrientation().equals("horizontal")) {
-					p_y = (float) (p.getY() + g.getBbox().getH() * 0.5);
-				}*/
+				/*
+				 * Glyph g = portToGlyphMap.get(p.getId());
+				 * 
+				 * if (g.getOrientation().equals("horizontal")) { p_y = (float) (p.getY() +
+				 * g.getBbox().getH() * 0.5); }
+				 */
 
 				attr.clear();
 				attr.addAttribute("", "", "x", "CDATA", Float.toString(p_x));
@@ -719,7 +718,8 @@ public class SBGNML2GraphML {
 		AttributesImpl attr = new AttributesImpl();
 		attr.addAttribute("", "", "id", "CDATA", g.getId());
 
-		if (g.getClazz().equals(ConverterDefines.SBGN_COMPLEX) || (g.getClazz().equals(ConverterDefines.SBGN_COMPARTMENT))) {
+		if (g.getClazz().equals(ConverterDefines.SBGN_COMPLEX)
+				|| (g.getClazz().equals(ConverterDefines.SBGN_COMPARTMENT))) {
 			attr.addAttribute("", "", ConverterDefines.YFILES_FOLDERTYPE, "CDATA", "group");
 		}
 
@@ -746,7 +746,8 @@ public class SBGNML2GraphML {
 			parseSBGNElement(handler, g, ConverterDefines.COM_YWORKS_SBGN_SIMPLE_CHEMICAL, true);
 		}
 		// Process
-		else if ((g.getClazz().equals(ConverterDefines.SBGN_PROCESS)) || (g.getClazz().equals(ConverterDefines.SBGN_ASSOCIATION))
+		else if ((g.getClazz().equals(ConverterDefines.SBGN_PROCESS))
+				|| (g.getClazz().equals(ConverterDefines.SBGN_ASSOCIATION))
 				|| (g.getClazz().equals(ConverterDefines.SBGN_DISSOCIATION))) {
 			parseProcess(handler, g, false, false);
 		} else if (g.getClazz().equals(ConverterDefines.SBGN_UNCERTAIN_PROCESS)) {
@@ -865,8 +866,7 @@ public class SBGNML2GraphML {
 		// Content for <y:NodeLabel>
 		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		addLabelModel(handler);
-		float fValue = 0;
-		addModelParameter(handler, fValue);
+		addModelParameter(handler);
 		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
@@ -945,8 +945,7 @@ public class SBGNML2GraphML {
 		handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 		handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 		addLabelModel(handler);
-		float fValue = 0;
-		addModelParameter(handler, fValue);
+		addModelParameter(handler);
 		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
@@ -988,8 +987,7 @@ public class SBGNML2GraphML {
 			handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 			handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			addLabelModel(handler);
-			float fValue = 0;
-			addModelParameter(handler, fValue);
+			addModelParameter(handler);
 			handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 			if (g.getOrientation().equals("right")) {
@@ -1062,8 +1060,7 @@ public class SBGNML2GraphML {
 			handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 		}
 		addLabelModel(handler);
-		float fValue = 0;
-		addModelParameter(handler, fValue);
+		addModelParameter(handler);
 		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 		handler.endElement("", "", ConverterDefines.Y_GENERIC_NODE);
@@ -1164,8 +1161,7 @@ public class SBGNML2GraphML {
 							// Content for <y:NodeLabel>
 							handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 							addLabelModel(handler);
-							float fValueStateVariable = (float) 0.5;
-							addModelParameter(handler, fValueStateVariable);
+							addModelParameter(handler);
 							handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 							GraphMLResource resource = new GraphMLResource();
@@ -1195,7 +1191,7 @@ public class SBGNML2GraphML {
 							resource.setWidth(childGlyph.getBbox().getW());
 							resource.setXCoord(childGlyph.getBbox().getX());
 							resource.setYCoord(childGlyph.getBbox().getY());
-							
+
 							resourceList.add(resource);
 						}
 					}
@@ -1439,15 +1435,29 @@ public class SBGNML2GraphML {
 			handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 			handler.characters(vertexLabel.toCharArray(), 0, vertexLabel.length());
 			addLabelModel(handler);
-			float fValue = 0;
-			addModelParameter(handler, fValue);
+			addModelParameter(handler);
 			handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 			if (glyph.getGlyph().size() > 0) {
+				int nTotalStateVar = 0;
+				int nTotalUnitOfInfo = 0;
 
 				for (Glyph childGlyph : glyph.getGlyph()) {
 
 					if (childGlyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
+						nTotalStateVar++;
+					}
+					if (childGlyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
+						nTotalUnitOfInfo++;
+					}
+				}
+				int iSVPosition = 0;
+				int iUIPosition = 0;
+
+				for (Glyph childGlyph : glyph.getGlyph()) {
+
+					if (childGlyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
+						iSVPosition++;
 						attr.clear();
 
 						attr.addAttribute("", "", "alignment", "CDATA", "center");
@@ -1480,8 +1490,13 @@ public class SBGNML2GraphML {
 						// Content for <y:NodeLabel>
 						handler.startElement("", "", ConverterDefines.Y_NODE_LABEL, attr);
 						addLabelModel(handler);
-						float fValueStateVariable = (float) 0.5;
-						addModelParameter(handler, fValueStateVariable);
+						double offSetX = getStateVarOffSetX(iSVPosition, nTotalStateVar, nTotalUnitOfInfo,
+								glyph.getBbox().getW());
+						double offSetY = getStateVarOffSetY(iSVPosition, nTotalStateVar, nTotalUnitOfInfo,
+								glyph.getBbox().getH());
+
+						addModelParameterForAdditionalShapes(handler, Double.toString(offSetX),
+								Double.toString(offSetY));
 						handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 
 						GraphMLResource _resource = new GraphMLResource();
@@ -1507,7 +1522,17 @@ public class SBGNML2GraphML {
 
 						resourceList.add(_resource);
 					} else if (childGlyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
-						addUnitOfInformation(handler, style, childGlyph);
+						iUIPosition++;
+
+						double offSetX = getUnitOfInfoOffSetX(iUIPosition, nTotalUnitOfInfo, nTotalStateVar,
+								glyph.getBbox().getW());
+						// unit of information shapes are located on the top of the parent glyph; given
+						// that the bottom - center of the glyph has coordinates x=0,y=0 in yEd, the top
+						// of the glyph is -height of the glyph
+						double offSetY = -glyph.getBbox().getH();
+
+						addUnitOfInformation(handler, style, childGlyph, Double.toString(offSetX),
+								Double.toString(offSetY));
 					}
 				}
 			}
@@ -1533,8 +1558,322 @@ public class SBGNML2GraphML {
 		}
 	}
 
-	private void addUnitOfInformation(TransformerHandler handler, GraphMLStyle style, Glyph _unitGlyph)
-			throws SAXException {
+	private double getUnitOfInfoOffSetX(int iPosition, int nTotalUnitOfInfo, int nTotalStateVariables,
+			float parentWidth) {
+		double offSetX = 0;
+
+		if (nTotalUnitOfInfo == 1) {
+			// if there are more state variables, these will be located on the top of the
+			// shape as well; so, the unit of information shape is shifted to the left top
+			// of the parent shape
+			if (nTotalStateVariables >= 3) {
+				offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+			}
+		} else if (nTotalUnitOfInfo == 2) {
+			if (1 == iPosition) {
+				offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+			} else if (2 == iPosition) {
+				offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+			}
+		}
+		return offSetX;
+	}
+
+	private double getStateVarOffSetY(int iPosition, int nTotalStateVars, int nTotalUnitOfInfo, float parentHeight) {
+		double offSetY = -parentHeight;
+		// if there are more than 6 additional shapes (state variables and unit of
+		// information), they will be displayed one over another at the bottom center of
+		// the parent glyph
+		if (nTotalStateVars <= 2) {
+			offSetY = 0;
+		} else if (nTotalStateVars == 3) {
+			if (nTotalUnitOfInfo <= 1) {
+				if (iPosition == 1) {
+					offSetY = -parentHeight;
+				} else {
+					offSetY = 0;
+				}
+			} else {
+				offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+			}
+		} else if (nTotalStateVars == 4) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (2 == iPosition) {
+					offSetY = 0;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				}
+			}
+		} else if (nTotalStateVars == 5) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (3 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				} else if (5 == iPosition) {
+					offSetY = 0;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				} else if (5 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (2 == iPosition) {
+					offSetY = 0;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				} else if (5 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				}
+			}
+		} else if (nTotalStateVars == 6) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (3 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				} else if (5 == iPosition) {
+					offSetY = 0;
+				} else if (6 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetY = -parentHeight;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				} else if (5 == iPosition) {
+					offSetY = 0;
+				} else if (6 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetY = 0;
+				} else if (2 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetY = 0;
+				} else if (4 == iPosition) {
+					offSetY = 0;
+				} else if (5 == iPosition) {
+					offSetY = 0;
+				} else if (6 == iPosition) {
+					offSetY = -parentHeight * ConverterDefines.RATIO_HALF;
+				}
+			}
+		}
+
+		return offSetY;
+	}
+
+	private double getStateVarOffSetX(int iPosition, int nTotalStateVars, int nTotalUnitOfInfo, float parentWidth) {
+		double offSetX = 0;
+		// if there are more than 6 additional shapes (state variables and unit of
+		// information), they will be displayed one over another at the bottom center of
+		// the parent glyph
+		if (nTotalStateVars == 1) {
+			offSetX = 0;
+		} else if (nTotalStateVars == 2) {
+			if (1 == iPosition) {
+				offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+			} else if (2 == iPosition) {
+				offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+			}
+		} else if (nTotalStateVars == 3) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetX = 0;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				}
+			}
+		} else if (nTotalStateVars == 4) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (4 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (4 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (4 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_HALF;
+				}
+			}
+		} else if (nTotalStateVars == 5) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (4 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (5 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (4 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (5 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_HALF;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = 0;
+				} else if (4 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (5 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_HALF;
+				}
+			}
+		} else if (nTotalStateVars == 6) {
+			if (nTotalUnitOfInfo == 0) {
+				if (1 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (4 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (5 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (6 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_HALF;
+				}
+			} else if (nTotalUnitOfInfo == 1) {
+				if (1 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (4 == iPosition) {
+					offSetX = 0;
+				} else if (5 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (6 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_HALF;
+				}
+			} else if (nTotalUnitOfInfo == 2) {
+				if (1 == iPosition) {
+					offSetX = 0;
+				} else if (2 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_HALF;
+				} else if (3 == iPosition) {
+					offSetX = -parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (4 == iPosition) {
+					offSetX = 0;
+				} else if (5 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_THIRD;
+				} else if (6 == iPosition) {
+					offSetX = parentWidth * ConverterDefines.RATIO_HALF;
+				}
+			}
+		}
+		return offSetX;
+	}
+
+	private void addUnitOfInformation(TransformerHandler handler, GraphMLStyle style, Glyph _unitGlyph,
+			String offSetXValue, String offSetYValue) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
 		attr.addAttribute("", "", "alignment", "CDATA", "center");
@@ -1553,7 +1892,6 @@ public class SBGNML2GraphML {
 		attr.addAttribute("", "", "textColor", "CDATA", "#000000");
 		attr.addAttribute("", "", "verticalTextPosition", "CDATA", "center");
 		attr.addAttribute("", "", "visible", "CDATA", "true");
-
 		attr.addAttribute("", "", "borderDistance", "CDATA", "0.0");
 		attr.addAttribute("", "", "bottomInset", "CDATA", "0");
 		attr.addAttribute("", "", "fontFamily", "CDATA", "Dialog");
@@ -1565,19 +1903,38 @@ public class SBGNML2GraphML {
 		String unitLabel = _unitGlyph.getLabel().getText();
 		handler.characters(unitLabel.toCharArray(), 0, unitLabel.length());
 		addLabelModel(handler);
-		float fValueUnitOfInfo = (float) -0.5;
-		addModelParameter(handler, fValueUnitOfInfo);
+		addModelParameterForAdditionalShapes(handler, offSetXValue, offSetYValue);
+
 		handler.endElement("", "", ConverterDefines.Y_NODE_LABEL);
 	}
 
-	private void addModelParameter(TransformerHandler handler, float fNodeRatioY) throws SAXException {
+	private void addModelParameterForAdditionalShapes(TransformerHandler handler, String offSetXValue,
+			String offSetYValue) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
 		handler.startElement("", "", ConverterDefines.Y_MODEL_PARAMETER, attr);
 		attr.addAttribute("", "", "labelRatioX", "CDATA", "0.0");
 		attr.addAttribute("", "", "labelRatioY", "CDATA", "0.0");
 		attr.addAttribute("", "", "nodeRatioX", "CDATA", "0.0");
-		attr.addAttribute("", "", "nodeRatioY", "CDATA", Float.toString(fNodeRatioY));
+		attr.addAttribute("", "", "nodeRatioY", "CDATA", "0.5");
+		attr.addAttribute("", "", "offsetX", "CDATA", offSetXValue);
+		attr.addAttribute("", "", "offsetY", "CDATA", offSetYValue);
+		attr.addAttribute("", "", "upX", "CDATA", "0.0");
+		attr.addAttribute("", "", "upY", "CDATA", "-1.0");
+		handler.startElement("", "", ConverterDefines.Y_SMART_NODE_LABEL_MODEL_PARAMETER, attr);
+		handler.endElement("", "", ConverterDefines.Y_SMART_NODE_LABEL_MODEL_PARAMETER);
+		handler.endElement("", "", ConverterDefines.Y_MODEL_PARAMETER);
+
+	}
+
+	private void addModelParameter(TransformerHandler handler) throws SAXException {
+		AttributesImpl attr = new AttributesImpl();
+
+		handler.startElement("", "", ConverterDefines.Y_MODEL_PARAMETER, attr);
+		attr.addAttribute("", "", "labelRatioX", "CDATA", "0.0");
+		attr.addAttribute("", "", "labelRatioY", "CDATA", "0.0");
+		attr.addAttribute("", "", "nodeRatioX", "CDATA", "0.0");
+		attr.addAttribute("", "", "nodeRatioY", "CDATA", "0.");
 		attr.addAttribute("", "", "offsetX", "CDATA", "0.0");
 		attr.addAttribute("", "", "offsetY", "CDATA", "0.0");
 		attr.addAttribute("", "", "upX", "CDATA", "0.0");
@@ -1712,7 +2069,8 @@ public class SBGNML2GraphML {
 						}
 					}
 
-					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQMODEL_IS_DESCRIBED_BY).getLength(); i++) {
+					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQMODEL_IS_DESCRIBED_BY)
+							.getLength(); i++) {
 						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQMODEL_IS_DESCRIBED_BY).item(i);
 
 						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
@@ -1737,7 +2095,8 @@ public class SBGNML2GraphML {
 						}
 					}
 
-					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQBIOL_IS_DESCRIBED_BY).getLength(); i++) {
+					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQBIOL_IS_DESCRIBED_BY)
+							.getLength(); i++) {
 						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQBIOL_IS_DESCRIBED_BY).item(i);
 
 						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {

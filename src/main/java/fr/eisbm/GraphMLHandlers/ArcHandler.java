@@ -1,11 +1,15 @@
 package fr.eisbm.GraphMLHandlers;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.sbgn.bindings.Arc;
-import org.sbgn.bindings.Arc.End;
 import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Arc.Start;
+import org.sbgn.bindings.Arc.End;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Label;
@@ -21,10 +25,13 @@ import fr.eisbm.GraphMLHandlers.PortArcsRelationship.PortType;
 
 public class ArcHandler {
 
-	public static void processArcs(NodeList nEdgeList, Map map, java.util.Map<String, PortArcsRelationship> pam) {
+	java.util.Map<String, PortArcsRelationship> port_arc_map = new HashMap<String, PortArcsRelationship>();
+	private Set<String> reversibleSet = new HashSet<String>();
+
+	public void processArcs(NodeList nEdgeList, Map map) {
 		float fPort2PointDistance = 0;
 		for (Glyph process : map.getGlyph()) {
-			if (isProcessType(process)) {
+			if (FileUtils.isProcessType(process)) {
 				fPort2PointDistance = 2 * process.getBbox().getH();
 				break;
 			}
@@ -50,13 +57,7 @@ public class ArcHandler {
 				String szPathCoordinates = processNodeList(eElement.getElementsByTagName(ConverterDefines.Y_PATH));
 				setArcStartEnd(arc, szPathCoordinates);
 
-				// for processes, ports must be set for consumption and production arcs
-				// for logic operators, ports must be set for incoming arcs and for outgoing
-				// regulatory arcs (catalysis, stimulation, inhibition, modulation, necessary
-				// stimulation)
-				setPortToArc(arc, map, pam);
-
-				// set bedn points of the arc
+				// set bend points of the arc
 				String szPointInfo = processNodeList(eElement.getElementsByTagName(ConverterDefines.Y_POINT));
 				setBendPoints(arc, szPointInfo, fPort2PointDistance);
 
@@ -74,257 +75,27 @@ public class ArcHandler {
 		}
 	}
 
-	private static void setPortToArc(Arc arc, Map map, java.util.Map<String, PortArcsRelationship> pam) {
-		// if the port has not been set yet, i.e. the arc source/ target is an instance
-		// of the Glyph class and not of the Port class yet
-		Port currentPort = null;
-		Port alternativePort = null;
-		Glyph glyph = null;
-
-		if (arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
-			if (arc.getSource() instanceof Glyph) {
-				glyph = (Glyph) arc.getSource();
-
-				if (!isReversibleProcess(glyph, map)) {
-					Port port1 = glyph.getPort().get(0);
-					Port port2 = glyph.getPort().get(1);
-
-					float point_x = glyph.getBbox().getX();
-					float point_y = glyph.getBbox().getY();
-
-					if (arc.getNext().size() > 0) {
-						Next bendPoint = getClosestBendPoint(glyph, arc);
-						point_x = bendPoint.getX();
-						point_y = bendPoint.getY();
-					} else {
-						point_x = arc.getEnd().getX();
-						point_y = arc.getEnd().getY();
-					}
-
-					float dist1 = FileUtils.getPointDistance(point_x, point_y, port1.getX(), port1.getY());
-					float dist2 = FileUtils.getPointDistance(point_x, point_y, port2.getX(), port2.getY());
-
-					if (dist1 <= dist2) {
-						currentPort = port1;
-						alternativePort = port2;
-					} else {
-						currentPort = port2;
-						alternativePort = port1;
-					}
-				}
-				// else: reversible processes
-			}
-		} else if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
-			if (arc.getTarget() instanceof Glyph) {
-
-				glyph = (Glyph) arc.getTarget();
-
-				if (glyph.getPort() != null) {
-					if (glyph.getPort().size() == FileUtils.MAX_PORT_NO) {
-						Port port1 = glyph.getPort().get(0);
-						Port port2 = glyph.getPort().get(1);
-
-						float point_x = glyph.getBbox().getX();
-						float point_y = glyph.getBbox().getY();
-
-						if (arc.getNext().size() > 0) {
-							Next bendPoint = getClosestBendPoint(glyph, arc);
-							point_x = bendPoint.getX();
-							point_y = bendPoint.getY();
-						} else {
-							point_x = arc.getStart().getX();
-							point_y = arc.getStart().getY();
-						}
-
-						float dist1 = FileUtils.getPointDistance(point_x, point_y, port1.getX(), port1.getY());
-						float dist2 = FileUtils.getPointDistance(point_x, point_y, port2.getX(), port2.getY());
-
-						if (dist1 <= dist2) {
-							currentPort = port1;
-							alternativePort = port2;
-						} else {
-							currentPort = port2;
-							alternativePort = port1;
-						}
-					}
-				}
+	public String processNodeList(NodeList nodeList) {
+		String szContent = "";
+		for (int temp = 0; temp < nodeList.getLength(); temp++) {
+			Node nNode = nodeList.item(temp);
+			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+				Element eElement = (Element) nNode;
+				szContent = szContent.concat(getElementAttributes(eElement));
 			}
 		}
-
-		else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
-			if (arc.getTarget() instanceof Glyph) {
-				glyph = (Glyph) arc.getTarget();
-				if (ArcHandler.isOperatorType(glyph)) {
-					Port port1 = glyph.getPort().get(0);
-					Port port2 = glyph.getPort().get(1);
-
-					float point_x = glyph.getBbox().getX();
-					float point_y = glyph.getBbox().getY();
-
-					if (arc.getNext().size() > 0) {
-						Next bendPoint = getClosestBendPoint(glyph, arc);
-						point_x = bendPoint.getX();
-						point_y = bendPoint.getY();
-					} else {
-						point_x = arc.getStart().getX();
-						point_y = arc.getStart().getY();
-					}
-
-					float dist1 = FileUtils.getPointDistance(point_x, point_y, port1.getX(), port1.getY());
-					float dist2 = FileUtils.getPointDistance(point_x, point_y, port2.getX(), port2.getY());
-
-					if (dist1 <= dist2) {
-						currentPort = port1;
-						alternativePort = port2;
-					} else {
-						currentPort = port2;
-						alternativePort = port1;
-					}
-				}
-			}
-		} else if (arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
-				|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
-				|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
-				|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
-				|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
-			if (arc.getSource() instanceof Glyph) {
-				glyph = (Glyph) arc.getSource();
-				if (ArcHandler.isOperatorType(glyph)) {
-					Port port1 = glyph.getPort().get(0);
-					Port port2 = glyph.getPort().get(1);
-
-					float point_x = glyph.getBbox().getX();
-					float point_y = glyph.getBbox().getY();
-
-					if (arc.getNext().size() > 0) {
-						Next bendPoint = getClosestBendPoint(glyph, arc);
-						point_x = bendPoint.getX();
-						point_y = bendPoint.getY();
-					} else {
-						point_x = arc.getStart().getX();
-						point_y = arc.getStart().getY();
-					}
-
-					float dist1 = FileUtils.getPointDistance(point_x, point_y, port1.getX(), port1.getY());
-					float dist2 = FileUtils.getPointDistance(point_x, point_y, port2.getX(), port2.getY());
-
-					if (dist1 <= dist2) {
-						currentPort = port1;
-						alternativePort = port2;
-					} else {
-						currentPort = port2;
-						alternativePort = port1;
-					}
-				}
-			}
-		}
-
-		if (currentPort != null) {
-			if (!pam.containsKey(currentPort.getId())) {
-				pam.put(currentPort.getId(), new PortArcsRelationship(currentPort));
-				pam.put(alternativePort.getId(), new PortArcsRelationship(alternativePort));
-				pam.get(currentPort.getId()).addArcToSet(arc);
-
-				if (arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
-					if (!isReversibleProcess(glyph, map)) {
-						pam.get(currentPort.getId()).setType(PortType.SourcePort);
-						pam.get(alternativePort.getId()).setType(PortType.TargetPort);
-					} else {
-						pam.get(currentPort.getId()).setType(PortType.SourcePort);
-						pam.get(alternativePort.getId()).setType(PortType.SourcePort);
-					}
-				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
-					pam.get(currentPort.getId()).setType(PortType.TargetPort);
-					pam.get(alternativePort.getId()).setType(PortType.SourcePort);
-				} else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
-					pam.get(currentPort.getId()).setType(PortType.TargetPort);
-					pam.get(alternativePort.getId()).setType(PortType.SourcePort);
-				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
-					pam.get(currentPort.getId()).setType(PortType.SourcePort);
-					pam.get(alternativePort.getId()).setType(PortType.TargetPort);
-				}
-			}
-			// the port exists already in the map, and it has already some arcs assigned to
-			// it. It must check if the existent arcs have the same clazz; if there are arcs
-			// of different clazz, they must be assigned to the alternative port
-			else {
-
-				if (arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
-					if (pam.get(currentPort.getId()).getPortType() == PortType.SourcePort) {
-						pam.get(currentPort.getId()).addArcToSet(arc);
-					} else {
-						pam.get(alternativePort.getId()).addArcToSet(arc);
-					}
-				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
-					if (pam.get(currentPort.getId()).getPortType() == PortType.TargetPort) {
-						pam.get(currentPort.getId()).addArcToSet(arc);
-					} else {
-						pam.get(alternativePort.getId()).addArcToSet(arc);
-					}
-				} else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
-
-					if (pam.get(currentPort.getId()).getPortType() == PortType.TargetPort) {
-						pam.get(currentPort.getId()).addArcToSet(arc);
-					} else {
-						pam.get(alternativePort.getId()).addArcToSet(arc);
-					}
-				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
-						|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
-
-					if (pam.get(currentPort.getId()).getPortType() == PortType.SourcePort) {
-						pam.get(currentPort.getId()).addArcToSet(arc);
-					} else {
-						pam.get(alternativePort.getId()).addArcToSet(arc);
-					}
-				}
-			}
-		}
+		return szContent;
 	}
 
-	private static boolean isReversibleProcess(Glyph process, Map map) {
-		boolean bReversible = true;
-
-		for (Arc arc : map.getArc()) {
-			if (isArcConnectedToGlyph(arc, process)) {
-				// there is at least one arc connected to the current process glyph that is not
-				// a production arc; thus, the process is not reversible
-				if (!arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
-					bReversible = false;
-					break;
-				}
-			}
+	public String getElementAttributes(Element eElement) {
+		String szAttributeValues = "";
+		for (int i = 0; i < eElement.getAttributes().getLength(); i++) {
+			szAttributeValues = szAttributeValues.concat(eElement.getAttributes().item(i) + "\t");
 		}
-
-		return bReversible;
+		return szAttributeValues;
 	}
 
-	private static boolean isArcConnectedToGlyph(Arc arc, Glyph glyph) {
-
-		boolean bArcAttachedToProcess = false;
-		Port port = null;
-
-		if (arc.getSource() instanceof Port) {
-			port = (Port) arc.getSource();
-		} else if (arc.getTarget() instanceof Port) {
-			port = (Port) arc.getTarget();
-		}
-
-		if (null != port) {
-			if (port.equals(glyph.getPort().get(0)) || (port.equals(glyph.getPort().get(1)))) {
-				bArcAttachedToProcess = true;
-			}
-		}
-		return bArcAttachedToProcess;
-	}
-
-	private static void correctArcClazz(Arc arc) {
+	private void correctArcClazz(Arc arc) {
 		if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
 			if ((arc.getSource() != null) && (arc.getTarget() != null)) {
 
@@ -344,73 +115,62 @@ public class ArcHandler {
 		}
 	}
 
-	private static void setArcStartEnd(Arc arc, String szPathCoordinates) {
+	private void setArcStartEnd(Arc arc, String szPathCoordinates) {
 		float fStartX = 0, fStartY = 0, fStartH = 0, fStartW = 0, fEndX = 0, fEndY = 0, fEndH = 0, fEndW = 0;
 		Glyph source = (Glyph) arc.getSource();
 		Glyph target = (Glyph) arc.getTarget();
 
-		if (null != source.getBbox()) {
-			fStartX = source.getBbox().getX();
-			fStartY = source.getBbox().getY();
-			fStartH = source.getBbox().getH();
-			fStartW = source.getBbox().getW();
+		if (null != source) {
+			if (null != source.getBbox()) {
+				fStartX = source.getBbox().getX();
+				fStartY = source.getBbox().getY();
+				fStartH = source.getBbox().getH();
+				fStartW = source.getBbox().getW();
+			}
 		}
 
-		if (null != target.getBbox())
-
-		{
-			fEndX = target.getBbox().getX();
-			fEndY = target.getBbox().getY();
-			fEndH = target.getBbox().getH();
-			fEndW = target.getBbox().getW();
+		if (null != target) {
+			if (null != target.getBbox()) {
+				fEndX = target.getBbox().getX();
+				fEndY = target.getBbox().getY();
+				fEndH = target.getBbox().getH();
+				fEndW = target.getBbox().getW();
+			}
 		}
 
 		String delimsCoord = "[\t]";
 		szPathCoordinates = szPathCoordinates.replaceAll("\"", "");
 		String[] tokensCoordinates = szPathCoordinates.split(delimsCoord);
 		if (tokensCoordinates.length == 4) {
-			Start _start = new Start();
 			String sx = tokensCoordinates[0].replaceAll("sx=", "");
-			_start.setX(Float.parseFloat(sx) + fStartX + fStartW / 2);
-			// _start.setX(Float.parseFloat(szSX));
+			float valueSX = Float.parseFloat(sx);
+			valueSX = valueSX + fStartX + fStartW / 2;
 
 			String sy = tokensCoordinates[1].replaceAll("sy=", "");
-			_start.setY(Float.parseFloat(sy) + fStartY + fStartH / 2);
-			// _start.setY(Float.parseFloat(szSY));
+			float valueSY = Float.parseFloat(sy);
+			valueSY = valueSY + fStartY + fStartH / 2;
 
-			arc.setStart(_start);
+			Start start = new Start();
+			start.setX(valueSX);
+			start.setY(valueSY);
+			arc.setStart(start);
 
-			End _end = new End();
 			String tx = tokensCoordinates[2].replaceAll("tx=", "");
-			_end.setX(Float.parseFloat(tx) + fEndX + fEndW / 2);
-			// _end.setX(Float.parseFloat(szTX));
+			float valueTX = Float.parseFloat(tx);
+			valueTX = valueTX + fEndX + fEndW / 2;
+
 			String ty = tokensCoordinates[3].replaceAll("ty=", "");
-			_end.setY(Float.parseFloat(ty) + fEndY + fEndH / 2);
-			// _end.setY(Float.parseFloat(szTY));
-			arc.setEnd(_end);
+			float valueTY = Float.parseFloat(ty);
+			valueTY = valueTY + fEndY + fEndH / 2;
+
+			End end = new End();
+			end.setX(valueTX);
+			end.setY(valueTY);
+			arc.setEnd(end);
 		}
 	}
 
-	public static boolean isProcessType(Glyph source) {
-		boolean bIsProcess = false;
-		if (source.getClazz().equals(ConverterDefines.SBGN_PROCESS)
-				|| (source.getClazz().equals(ConverterDefines.SBGN_UNCERTAIN_PROCESS))
-				|| (source.getClazz().equals(ConverterDefines.SBGN_OMITTED_PROCESS))) {
-			bIsProcess = true;
-		}
-		return bIsProcess;
-	}
-
-	public static boolean isOperatorType(Glyph source) {
-		boolean bIsOperator = false;
-		if (source.getClazz().equals(ConverterDefines.SBGN_AND) || (source.getClazz().equals(ConverterDefines.SBGN_OR))
-				|| (source.getClazz().equals(ConverterDefines.SBGN_NOT))) {
-			bIsOperator = true;
-		}
-		return bIsOperator;
-	}
-
-	public static void setArcStyle(Element eElement, NodeList nlLineStyle) {
+	public void setArcStyle(Element eElement, NodeList nlLineStyle) {
 		// getting the border color info
 		String szStrokeColorId = ((Element) (nlLineStyle.item(0))).getAttribute(ConverterDefines.COLOR_ATTR);
 		StyleHandler.colorSet.add(szStrokeColorId);
@@ -427,7 +187,7 @@ public class ArcHandler {
 		StyleHandler.styleMap.get(szStyleId).addElementIdToSet(eElement.getAttribute(ConverterDefines.ID_ATTR));
 	}
 
-	public static void setArcCardinality(Arc arc, NodeList nlCardinalityList) {
+	public void setArcCardinality(Arc arc, NodeList nlCardinalityList) {
 		if (nlCardinalityList.getLength() > 0) {
 			String szCardinality = nlCardinalityList.item(0).getTextContent().trim();
 			if (!szCardinality.equals("")) {
@@ -449,7 +209,7 @@ public class ArcHandler {
 		}
 	}
 
-	public static void setBendPoints(Arc arc, String szPointInfo, float fPort2PointDistance) {
+	public void setBendPoints(Arc arc, String szPointInfo, float fPort2PointDistance) {
 
 		if (!szPointInfo.isEmpty()) {
 			String delims = "[\t]";
@@ -498,7 +258,7 @@ public class ArcHandler {
 		}
 	}
 
-	public static boolean setArcClazz(Arc arc, String szArrowDirection) {
+	public boolean setArcClazz(Arc arc, String szArrowDirection) {
 		String szArcType = ConverterDefines.SBGN_CONSUMPTION;
 		boolean bEdgeToBeCorrected = false;
 
@@ -538,7 +298,7 @@ public class ArcHandler {
 		return bEdgeToBeCorrected;
 	}
 
-	public static void setArcSourceTarget(Arc arc, String szArcAttributes, String szArrowDirection, Map map) {
+	public void setArcSourceTarget(Arc arc, String szArcAttributes, String szArrowDirection, Map map) {
 		boolean bEdgeToBeCorrected = setArcClazz(arc, szArrowDirection);
 
 		String delims = "[\t]";
@@ -561,6 +321,10 @@ public class ArcHandler {
 						break;
 					}
 				}
+
+				if (null == g) {
+					System.out.println("source " + szArcSource);
+				}
 			} else if (tokens[i].contains("target=")) {
 				szArcTarget = tokens[i].replaceAll("target=", "");
 
@@ -571,6 +335,10 @@ public class ArcHandler {
 						arc.setTarget(g);
 						break;
 					}
+				}
+
+				if (null == g) {
+					System.out.println("target " + szArcTarget);
 				}
 			}
 		}
@@ -590,131 +358,172 @@ public class ArcHandler {
 			source = (Glyph) arc.getSource();
 			target = (Glyph) arc.getTarget();
 
-			if ((isProcessType(source)) && (!isProcessType(target))) {
-				arc.setSource(target);
-				arc.setTarget(source);
+			if (source != null && target != null) {
+
+				if ((FileUtils.isProcessType(source)) && (!FileUtils.isProcessType(target))) {
+					arc.setSource(target);
+					arc.setTarget(source);
+				}
 			}
 		}
 	}
 
-	public static void correctPortOrientationAndConnectedArcs(Map map) {
+	public void correctPortOrientationAndConnectedArcs(List<Glyph> listGlyphs, List<Arc> listArcs) {
 
-		for (Glyph glyph : map.getGlyph()) {
+		for (Glyph glyph : listGlyphs) {
 			int horizontal = 0;
 			int vertical = 0;
 
-			if (ArcHandler.isProcessType(glyph)) {
-				if (!isReversibleProcess(glyph, map)) {
-					for (Arc arc : map.getArc()) {
+			if (FileUtils.isProcessType(glyph)) {
+
+				for (Arc arc : listArcs) {
+					boolean bArcAttachedToProcess = isArcConnectedToProcess(arc, glyph);
+					if (bArcAttachedToProcess) {
+
 						if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)
 								|| arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
-							boolean bArcAttachedToProcess = isArcConnectedToGlyph(arc, glyph);
 
-							if (bArcAttachedToProcess) {
-								float point_x = glyph.getBbox().getX();
-								float point_y = glyph.getBbox().getY();
-
-								if (arc.getNext().size() > 0) {
-									Next bendPoint = getClosestBendPoint(glyph, arc);
-									point_x = bendPoint.getX();
-									point_y = bendPoint.getY();
-								} else {
-									if (arc.getTarget() instanceof Port) {
-										point_x = arc.getStart().getX();
-										point_y = arc.getStart().getY();
-
-									} else if (arc.getSource() instanceof Port) {
-										point_x = arc.getEnd().getX();
-										point_y = arc.getEnd().getY();
-									}
-
-								}
-								float y_shape = (float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5);
-								float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
-
-								if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
-									horizontal++;
-								} else {
-									vertical++;
-								}
-							}
-
-						}
-					}
-					rearrangePorts(glyph, horizontal, vertical);
-				}
-			} else if (ArcHandler.isOperatorType(glyph)) {
-				for (Arc arc : map.getArc()) {
-					if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)
-							|| arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
-							|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
-							|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
-							|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
-							|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
-						boolean bArcAttachedToProcess = isArcConnectedToGlyph(arc, glyph);
-
-						if (bArcAttachedToProcess) {
-							float point_x = glyph.getBbox().getX();
-							float point_y = glyph.getBbox().getY();
-
-							if (arc.getNext().size() > 0) {
-								Next bendPoint = getClosestBendPoint(glyph, arc);
-								point_x = bendPoint.getX();
-								point_y = bendPoint.getY();
-							} else {
-								if (arc.getTarget() instanceof Port) {
-									point_x = arc.getStart().getX();
-									point_y = arc.getStart().getY();
-								} else if (arc.getSource() instanceof Port) {
-									point_x = arc.getEnd().getX();
-									point_y = arc.getEnd().getY();
-								}
-							}
-
-							float y_shape = (float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5);
-							float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
-
-							if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
+							if (isHorizontal(glyph, arc)) {
 								horizontal++;
 							} else {
 								vertical++;
 							}
 						}
-
 					}
 				}
 
-				rearrangePorts(glyph, horizontal, vertical);
+				rearrangePorts(glyph, horizontal, vertical, listArcs);
+
+			} else if (FileUtils.isOperatorType(glyph)) {
+				for (Arc arc : listArcs) {
+					boolean bArcAttachedToProcess = isArcConnectedToProcess(arc, glyph);
+
+					if (bArcAttachedToProcess) {
+						if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)
+								|| arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
+								|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
+								|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
+								|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
+								|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
+
+							if (isHorizontal(glyph, arc)) {
+								horizontal++;
+							} else {
+								vertical++;
+							}
+						}
+					}
+				}
+
+				rearrangePorts(glyph, horizontal, vertical, listArcs);
 			}
+			
+			/*//correct start/ end of the arcs
+			else
+			{
+				for (Arc arc : listArcs) {
+						if(arc.getSource() instanceof Glyph)
+						{
+							if(((Glyph) arc.getSource()).getId().equals(glyph.getId()))
+							{
+								arc.getStart().setX(glyph.getBbox().getX() + glyph.getBbox().getW());
+							}
+						}
+						
+						if(arc.getTarget() instanceof Glyph)
+						{
+							if(((Glyph) arc.getTarget()).getId().equals(glyph.getId()))
+							{
+								arc.getEnd().setX(glyph.getBbox().getX());
+							}
+						}
+				}
+			}
+			*/
+			correctPortOrientationAndConnectedArcs(glyph.getGlyph(), listArcs);
 		}
 	}
 
-	public static void rearrangePorts(Glyph glyph, int horizontal, int vertical) {
-		if (horizontal >= vertical) {
-			glyph.getPort().get(0).setX(glyph.getBbox().getX() - (float) FileUtils.PORT2GLYPH_DISTANCE);
-			glyph.getPort().get(1)
-					.setX(glyph.getBbox().getX() + glyph.getBbox().getW() + (float) FileUtils.PORT2GLYPH_DISTANCE);
+	private boolean isHorizontal(Glyph glyph, Arc arc) {
+		boolean bHorizontal = true;
 
-			glyph.getPort().get(0).setY(glyph.getBbox().getY());
-			glyph.getPort().get(1).setY(glyph.getBbox().getY());
+		float point_x = glyph.getBbox().getX();
+		float point_y = glyph.getBbox().getY();
+
+		if (arc.getNext().size() > 0) {
+			Next bendPoint = getClosestBendPoint2Coordinates(arc, glyph.getBbox().getX(), glyph.getBbox().getY());
+			point_x = bendPoint.getX();
+			point_y = bendPoint.getY();
+		} else {
+			if (arc.getTarget() instanceof Port) {
+				point_x = arc.getStart().getX();
+				point_y = arc.getStart().getY();
+			} else if (arc.getSource() instanceof Port) {
+				point_x = arc.getEnd().getX();
+				point_y = arc.getEnd().getY();
+			}
+		}
+
+		float y_shape = (float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5);
+		float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
+
+		if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
+			bHorizontal = true;
+		} else {
+			bHorizontal = false;
+		}
+
+		return bHorizontal;
+	}
+
+	public void rearrangePorts(Glyph glyph, int horizontal, int vertical, List<Arc> listArcs) {
+		if (horizontal >= vertical) {
+			glyph.getPort().get(0).setX((float) (glyph.getBbox().getX() - glyph.getBbox().getW() * 0.5));
+			glyph.getPort().get(1)
+					.setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() + glyph.getBbox().getW() * 0.5));
+
+			glyph.getPort().get(0).setY((float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5));
+			glyph.getPort().get(1).setY((float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5));
 		} else {
 			glyph.getPort().get(0).setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
 			glyph.getPort().get(1).setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
 
-			glyph.getPort().get(0).setY(glyph.getBbox().getY() + (float) FileUtils.PORT2GLYPH_DISTANCE);
-			glyph.getPort().get(1)
-					.setY(glyph.getBbox().getY() + glyph.getBbox().getH() - (float) FileUtils.PORT2GLYPH_DISTANCE);
+			glyph.getPort().get(0)
+					.setY((float) (glyph.getBbox().getY() + glyph.getBbox().getH() + glyph.getBbox().getH() * 0.5));
+			glyph.getPort().get(1).setY((float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5));
+		}
+		for (Arc a : listArcs) {
+			if (isArcConnectedToProcess(a, glyph)) {
+
+				if (a.getSource() instanceof Port) {
+					if (((Port) a.getSource()).equals(glyph.getPort().get(0))) {
+						a.getStart().setX(glyph.getPort().get(0).getX());
+						a.getStart().setY(glyph.getPort().get(0).getY());
+					} else if (((Port) a.getSource()).equals(glyph.getPort().get(1))) {
+						a.getStart().setX(glyph.getPort().get(1).getX());
+						a.getStart().setY(glyph.getPort().get(1).getY());
+					}
+				}
+
+				if (a.getTarget() instanceof Port) {
+					if (((Port) a.getTarget()).equals(glyph.getPort().get(0))) {
+						a.getEnd().setX(glyph.getPort().get(0).getX());
+						a.getEnd().setY(glyph.getPort().get(0).getY());
+					} else if (((Port) a.getTarget()).equals(glyph.getPort().get(1))) {
+						a.getEnd().setX(glyph.getPort().get(1).getX());
+						a.getEnd().setY(glyph.getPort().get(1).getY());
+					}
+				}
+			}
 		}
 	}
 
-	public static Next getClosestBendPoint(Glyph glyph, Arc arc) {
+	public Next getClosestBendPoint2Coordinates(Arc arc, float x_coord, float y_coord) {
 		Next closestBendPoint = arc.getNext().get(0);
-		float min_dist = FileUtils.getPointDistance(closestBendPoint.getX(), closestBendPoint.getY(),
-				glyph.getBbox().getX(), glyph.getBbox().getY());
+		float min_dist = FileUtils.getPointDistance(closestBendPoint.getX(), closestBendPoint.getY(), x_coord, y_coord);
 
 		for (Next next : arc.getNext()) {
-			float dist = FileUtils.getPointDistance(next.getX(), next.getY(), glyph.getBbox().getX(),
-					glyph.getBbox().getY());
+			float dist = FileUtils.getPointDistance(next.getX(), next.getY(), x_coord, y_coord);
 			if (dist < min_dist) {
 				min_dist = dist;
 				closestBendPoint = next;
@@ -724,29 +533,25 @@ public class ArcHandler {
 		return closestBendPoint;
 	}
 
-	public static String processNodeList(NodeList nodeList) {
-		String szContent = "";
-		for (int temp = 0; temp < nodeList.getLength(); temp++) {
-			Node nNode = nodeList.item(temp);
-			if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-				Element eElement = (Element) nNode;
-				szContent = szContent.concat(getElementAttributes(eElement));
-			}
+	public void setArcsToPorts(Map map) {
+
+		// a process is reversible if all connected arcs are of the Production type
+		findReversibleProcesses(map.getGlyph(), map);
+
+		// create relationships in the port_arc_map between arcs and the connected ports
+		for (Arc arc : map.getArc()) {
+			assignPortToArc(arc, map);
 		}
-		return szContent;
-	}
 
-	public static String getElementAttributes(Element eElement) {
-		String szAttributeValues = "";
-		for (int i = 0; i < eElement.getAttributes().getLength(); i++) {
-			szAttributeValues = szAttributeValues.concat(eElement.getAttributes().item(i) + "\t");
-		}
-		return szAttributeValues;
-	}
+		// in case of reversible processes, if all connected nodes were closer to one
+		// port and therefore they all were assigned to that port, resulting in having
+		// the second port not connected, we need to check this and we will assign the
+		// farthest arc from the first port to the second one.
+		checkPortsForReversibleProcesses(map.getGlyph(), map);
 
-	public static void assignArcsToPorts(java.util.Map<String, PortArcsRelationship> pam) {
-
-		for (Entry<String, PortArcsRelationship> entry : pam.entrySet()) {
+		// parse the port_arc_map of relationships between arcs and connected ports and
+		// create physically (draw) the connection (edge)
+		for (Entry<String, PortArcsRelationship> entry : port_arc_map.entrySet()) {
 			if (entry.getValue().getPortType() == PortType.SourcePort) {
 				for (Arc a : entry.getValue().getConnectedArcs()) {
 					a.setSource(entry.getValue().getPort());
@@ -759,4 +564,344 @@ public class ArcHandler {
 		}
 	}
 
+	private void checkPortsForReversibleProcesses(List<Glyph> list, Map map) {
+		for (Glyph glyph : list) {
+			if ((FileUtils.isProcessType(glyph)) && (reversibleSet.contains(glyph.getId()))) {
+
+				Port port1 = glyph.getPort().get(0);
+				Port port2 = glyph.getPort().get(1);
+
+				if (0 != getAllConnectedArcs(port2)) {
+					if (0 == getAllConnectedArcs(port1)) {
+						Arc farthestArc = getFarthestArc(port2);
+
+						if (!port_arc_map.containsKey(port1.getId())) {
+							port_arc_map.put(port1.getId(), new PortArcsRelationship(port1));
+						}
+						port_arc_map.get(port1.getId()).addArcToSet(farthestArc);
+						port_arc_map.get(port2.getId()).removeArcFromSet(farthestArc);
+					}
+				} else {
+					if (0 == getAllConnectedArcs(port2)) {
+						Arc farthestArc = getFarthestArc(port1);
+
+						if (!port_arc_map.containsKey(port2.getId())) {
+							port_arc_map.put(port2.getId(), new PortArcsRelationship(port2));
+						}
+						port_arc_map.get(port2.getId()).addArcToSet(farthestArc);
+						port_arc_map.get(port1.getId()).removeArcFromSet(farthestArc);
+					} else {
+						System.out.println("Error: all ports of the processes should have been already populated");
+					}
+				}
+			}
+
+			checkPortsForReversibleProcesses(glyph.getGlyph(), map);
+		}
+
+	}
+
+	private Arc getFarthestArc(Port port) {
+		Arc farthestArc = null;
+		float greatestDist = 0;
+
+		for (Arc arc : port_arc_map.get(port.getId()).getConnectedArcs()) {
+			float dist = calculateDistance(arc, port);
+			if (greatestDist < dist) {
+				greatestDist = dist;
+				farthestArc = arc;
+			}
+		}
+		return farthestArc;
+	}
+
+	private float calculateDistance(Arc arc, Port port) {
+		float dist = 0;
+		float point_x = 0, point_y = 0;
+
+		if (arc.getNext().size() > 0) {
+			Next bendPoint = getClosestBendPoint2Coordinates(arc, port.getX(), port.getY());
+			point_x = bendPoint.getX();
+			point_y = bendPoint.getY();
+		} else {
+			point_x = arc.getEnd().getX();
+			point_y = arc.getEnd().getY();
+		}
+
+		dist = FileUtils.getPointDistance(port.getX(), port.getY(), point_x, point_y);
+		return dist;
+	}
+
+	private int getAllConnectedArcs(Port port) {
+		int nConnectedArcs = 0;
+
+		if (port_arc_map.containsKey(port.getId())) {
+			nConnectedArcs = port_arc_map.get(port.getId()).getConnectedArcs().size();
+		}
+
+		return nConnectedArcs;
+	}
+
+	private void findReversibleProcesses(List<Glyph> list, Map map) {
+		for (Glyph process : list) {
+			if (FileUtils.isProcessType(process)) {
+				boolean bReversible = true;
+				for (Arc arc : map.getArc()) {
+					if ((isArcConnectedToProcess(arc, process))
+							&& (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION))) {
+						bReversible = false;
+						break;
+					}
+				}
+
+				if (bReversible) {
+					reversibleSet.add(process.getId());
+				}
+			}
+			findReversibleProcesses(process.getGlyph(), map);
+		}
+
+	}
+
+	private void assignPortToArc(Arc arc, Map map) {
+		// if the port has not been set yet, i.e. the arc source/ target is an instance
+		// of the Glyph class and not of the Port class yet
+		Port currentPort = null;
+		Port alternativePort = null;
+		Glyph glyph = null;
+
+		if (arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
+			if (arc.getSource() instanceof Glyph) {
+				glyph = (Glyph) arc.getSource();
+
+				if (FileUtils.isProcessType(glyph)) {
+					currentPort = calculateCurrentPortOutgoingArc(arc, glyph);
+					alternativePort = calculateAlternativePort(currentPort, glyph);
+				}
+			}
+		} else if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
+			if (arc.getTarget() instanceof Glyph) {
+
+				glyph = (Glyph) arc.getTarget();
+
+				if (FileUtils.isProcessType(glyph)) {
+					currentPort = calculateCurrentPortIncomingArc(arc, glyph);
+					alternativePort = calculateAlternativePort(currentPort, glyph);
+				}
+			}
+		}
+
+		else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
+			if (arc.getTarget() instanceof Glyph) {
+
+				glyph = (Glyph) arc.getTarget();
+
+				if (FileUtils.isOperatorType(glyph)) {
+					currentPort = calculateCurrentPortIncomingArc(arc, glyph);
+
+					alternativePort = calculateAlternativePort(currentPort, glyph);
+				}
+			}
+		} else if (arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
+				|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
+				|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
+				|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
+				|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
+			if (arc.getSource() instanceof Glyph) {
+
+				glyph = (Glyph) arc.getSource();
+
+				if (FileUtils.isOperatorType(glyph)) {
+					currentPort = calculateCurrentPortIncomingArc(arc, glyph);
+					alternativePort = calculateAlternativePort(currentPort, glyph);
+				}
+			}
+		}
+
+		if ((currentPort != null) && (alternativePort != null)) {
+			if (!port_arc_map.containsKey(currentPort.getId())) {
+				port_arc_map.put(currentPort.getId(), new PortArcsRelationship(currentPort));
+				port_arc_map.put(alternativePort.getId(), new PortArcsRelationship(alternativePort));
+				port_arc_map.get(currentPort.getId()).addArcToSet(arc);
+
+				if (arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
+					if (!reversibleSet.contains(glyph.getId())) {
+						port_arc_map.get(currentPort.getId()).setType(PortType.SourcePort);
+						port_arc_map.get(alternativePort.getId()).setType(PortType.TargetPort);
+					} else {
+						port_arc_map.get(currentPort.getId()).setType(PortType.SourcePort);
+						port_arc_map.get(alternativePort.getId()).setType(PortType.SourcePort);
+					}
+				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
+					port_arc_map.get(currentPort.getId()).setType(PortType.TargetPort);
+					port_arc_map.get(alternativePort.getId()).setType(PortType.SourcePort);
+				} else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
+					port_arc_map.get(currentPort.getId()).setType(PortType.TargetPort);
+					port_arc_map.get(alternativePort.getId()).setType(PortType.SourcePort);
+				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
+					port_arc_map.get(currentPort.getId()).setType(PortType.SourcePort);
+					port_arc_map.get(alternativePort.getId()).setType(PortType.TargetPort);
+				}
+			}
+			// If the port exists already in the map and it has already some arcs assigned
+			// to
+			// it, it must check if the existent arcs have the same clazz; if there are arcs
+			// of different clazz, they must be assigned to the alternative port. However,
+			// if the glyph is a reversible process, the arcs are assinged to the initial
+			// calculated port, as in this case, both ports can handle outgoing arcs.
+			else {
+
+				if (arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
+					if (!reversibleSet.contains(glyph.getId())) {
+						if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.SourcePort) {
+							port_arc_map.get(currentPort.getId()).addArcToSet(arc);
+						} else {
+							port_arc_map.get(alternativePort.getId()).addArcToSet(arc);
+						}
+					} else {
+						port_arc_map.get(currentPort.getId()).addArcToSet(arc);
+					}
+				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.TargetPort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(arc);
+					}
+				} else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
+
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.TargetPort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(arc);
+					}
+				} else if (arc.getClazz().equals(ConverterDefines.SBGN_CATALYSIS)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_STIMULATION)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_INHIBITION)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
+						|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
+
+					if (port_arc_map.get(currentPort.getId()).getPortType() == PortType.SourcePort) {
+						port_arc_map.get(currentPort.getId()).addArcToSet(arc);
+					} else {
+						port_arc_map.get(alternativePort.getId()).addArcToSet(arc);
+					}
+				}
+			}
+		}
+	}
+
+	private Port calculateAlternativePort(Port currentPort, Glyph glyph) {
+		Port alternativePort = null;
+
+		if (currentPort.equals(glyph.getPort().get(0))) {
+			alternativePort = glyph.getPort().get(1);
+		} else if (currentPort.equals(glyph.getPort().get(1))) {
+			alternativePort = glyph.getPort().get(0);
+		}
+		return alternativePort;
+	}
+
+	private Port calculateCurrentPortIncomingArc(Arc arc, Glyph glyph) {
+		Port currentPort = null;
+		Port port1 = glyph.getPort().get(0);
+		Port port2 = glyph.getPort().get(1);
+
+		float point_x = glyph.getBbox().getX();
+		float point_y = glyph.getBbox().getY();
+
+		if (arc.getNext().size() > 0) {
+			Next bendPoint = getClosestBendPoint2Coordinates(arc, glyph.getBbox().getX(), glyph.getBbox().getY());
+			point_x = bendPoint.getX();
+			point_y = bendPoint.getY();
+		} else {
+			point_x = arc.getStart().getX();
+			point_y = arc.getStart().getY();
+		}
+
+		float dist1 = FileUtils.getPointDistance(point_x, point_y, port1.getX(), port1.getY());
+		float dist2 = FileUtils.getPointDistance(point_x, point_y, port2.getX(), port2.getY());
+
+		if (dist1 <= dist2) {
+			currentPort = port1;
+		} else {
+			currentPort = port2;
+		}
+		return currentPort;
+	}
+
+	private Port calculateCurrentPortOutgoingArc(Arc arc, Glyph glyph) {
+		Port currentPort = null;
+		Port port1 = glyph.getPort().get(0);
+		Port port2 = glyph.getPort().get(1);
+
+		float point_x = glyph.getBbox().getX();
+		float point_y = glyph.getBbox().getY();
+
+		if (arc.getNext().size() > 0) {
+			Next bendPoint = getClosestBendPoint2Coordinates(arc, glyph.getBbox().getX(), glyph.getBbox().getY());
+			point_x = bendPoint.getX();
+			point_y = bendPoint.getY();
+		} else {
+			point_x = arc.getEnd().getX();
+			point_y = arc.getEnd().getY();
+		}
+
+		float dist1 = FileUtils.getPointDistance(point_x, point_y, port1.getX(), port1.getY());
+		float dist2 = FileUtils.getPointDistance(point_x, point_y, port2.getX(), port2.getY());
+
+		if (dist1 <= dist2) {
+			currentPort = port1;
+		} else {
+			currentPort = port2;
+		}
+		return currentPort;
+	}
+
+	private boolean isArcConnectedToProcess(Arc arc, Glyph glyph) {
+
+		boolean bArcAttachedToProcess = false;
+		Glyph currentGlyph = null;
+
+		if (arc.getSource() instanceof Glyph) {
+			currentGlyph = (Glyph) arc.getSource();
+			if (currentGlyph.equals(glyph)) {
+				bArcAttachedToProcess = true;
+			}
+		}
+
+		if (!bArcAttachedToProcess) {
+			if (arc.getTarget() instanceof Glyph) {
+				currentGlyph = (Glyph) arc.getTarget();
+				if (currentGlyph.equals(glyph)) {
+					bArcAttachedToProcess = true;
+				}
+			}
+		}
+
+		Port port = null;
+
+		if (!bArcAttachedToProcess) {
+			if (arc.getSource() instanceof Port) {
+				port = (Port) arc.getSource();
+				if (port.equals(glyph.getPort().get(0)) || (port.equals(glyph.getPort().get(1)))) {
+					bArcAttachedToProcess = true;
+				}
+			}
+		}
+
+		if (!bArcAttachedToProcess) {
+			if (arc.getTarget() instanceof Port) {
+				port = (Port) arc.getTarget();
+				if (port.equals(glyph.getPort().get(0)) || (port.equals(glyph.getPort().get(1)))) {
+					bArcAttachedToProcess = true;
+				}
+			}
+		}
+
+		return bArcAttachedToProcess;
+	}
 }
