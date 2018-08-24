@@ -16,8 +16,8 @@ import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Sbgn;
 
 public class FileUtils {
-	public static final String IN_SBGN_FILE = "downloads/new/F100-aspirin-V003B.sbgn";
-	public static final String IN_YED_FILE = "downloads/F008-enos.graphml";
+	public static final String IN_SBGN_FILE = "example_files/CAMKII_colored_generated.sbgn";
+	public static final String IN_YED_FILE = "downloads/F002-eicosanoids.graphml";
 
 	public static final int DEFAULT_FONT_SIZE = 10;
 	public static final int MAX_PORT_NO = 2;

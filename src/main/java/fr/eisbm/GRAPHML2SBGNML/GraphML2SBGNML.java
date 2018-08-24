@@ -65,6 +65,8 @@ public class GraphML2SBGNML {
 			sbgn.setMap(map);
 			
 			GlyphHandler glyphHandler = new GlyphHandler();
+			ArcHandler arcHandler = new ArcHandler();
+			StyleHandler styleHandler = new StyleHandler();
 
 			// read information on the ids of tags for of annotation, color etc
 			ModelAttributes modelAttr = new ModelAttributes();
@@ -84,26 +86,25 @@ public class GraphML2SBGNML {
 					// compartment - mapped by yEd groups with the <y:GroupNode> tag
 					NodeList _nlGroupList = eElement.getElementsByTagName(ConverterDefines.Y_GROUP_NODE);
 					if (_nlGroupList.getLength() > 0)
-						glyphHandler.parseCompartments(eElement, map);
+						glyphHandler.parseCompartments(eElement, map, styleHandler);
 					else {
 						// checking the node type
 						NodeList _nlConfigList = eElement.getElementsByTagName(ConverterDefines.Y_GENERIC_GROUP_NODE);
-						glyphHandler.parseComplexes(doc, modelAttr, eElement, _nlConfigList, map);
+						glyphHandler.parseComplexes(doc, modelAttr, eElement, _nlConfigList, map, styleHandler);
 					}
 				}
 			}
 
 			// nodes:
 			NodeList nList = doc.getElementsByTagName(ConverterDefines.NODE_TAG);
-			glyphHandler.parseNodes(doc, modelAttr, nList, map);
+			glyphHandler.parseNodes(doc, modelAttr, nList, map, styleHandler);
 
 			// for the process glyphs, ports will be created by default
 			glyphHandler.createPorts(map.getGlyph());
 
 			// edges/arcs:
 			NodeList nEdgeList = doc.getElementsByTagName(ConverterDefines.EDGE_TAG);
-			ArcHandler arcHandler = new ArcHandler();
-			arcHandler.processArcs(nEdgeList, map);
+			arcHandler.processArcs(nEdgeList, map, styleHandler);
 			arcHandler.setArcsToPorts(map);
 
 			// resources:
@@ -111,7 +112,7 @@ public class GraphML2SBGNML {
 			glyphHandler.processResources(nResourceList, map);
 
 			// add information on doc extension such as annotation, color etc
-			addExtension(doc);
+			addExtension(doc, styleHandler);
 
 			// move the network elements to start from top/left, i.e. coordinates (0,0)
 			moveNetworkToTopLeft();
@@ -135,7 +136,7 @@ public class GraphML2SBGNML {
 		return bConversion;
 	}
 
-	private void addExtension(Document doc) {
+	private void addExtension(Document doc, StyleHandler sh) {
 		// add extension data
 		Extension ext = new Extension();
 		// add render information tag
@@ -151,7 +152,7 @@ public class GraphML2SBGNML {
 		eltRenderInfo.appendChild(eltListOfColor);
 
 		int i = 0;
-		for (String _color : StyleHandler.colorSet) {
+		for (String _color : sh.colorSet) {
 			i++;
 			colorMap.put(_color, ConverterDefines.COLOR_PREFIX + i);
 		}
@@ -166,7 +167,7 @@ public class GraphML2SBGNML {
 		// add list of styles
 		Element eltListOfStyles = doc.createElement(ConverterDefines.LIST_OF_STYLES_TAG);
 		eltRenderInfo.appendChild(eltListOfStyles);
-		for (Entry<String, SBGNMLStyle> e : StyleHandler.styleMap.entrySet()) {
+		for (Entry<String, SBGNMLStyle> e : sh.styleMap.entrySet()) {
 			Element eltStyleId = doc.createElement(ConverterDefines.STYLE_TAG);
 			eltStyleId.setAttribute(ConverterDefines.ID_ATTR, e.getKey());
 			eltStyleId.setAttribute(ConverterDefines.ID_LIST_ATTR, e.getValue().getElementSet());

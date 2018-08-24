@@ -28,7 +28,7 @@ public class ArcHandler {
 	java.util.Map<String, PortArcsRelationship> port_arc_map = new HashMap<String, PortArcsRelationship>();
 	private Set<String> reversibleSet = new HashSet<String>();
 
-	public void processArcs(NodeList nEdgeList, Map map) {
+	public void processArcs(NodeList nEdgeList, Map map, StyleHandler sh) {
 		float fPort2PointDistance = 0;
 		for (Glyph process : map.getGlyph()) {
 			if (FileUtils.isProcessType(process)) {
@@ -63,7 +63,7 @@ public class ArcHandler {
 
 				// set arc style (color, line width etc)
 				NodeList nlLineStyle = eElement.getElementsByTagName(ConverterDefines.Y_LINE_STYLE);
-				setArcStyle(eElement, nlLineStyle);
+				setArcStyle(eElement, nlLineStyle, sh);
 
 				// set cardinality of the arc
 				NodeList nlCardinalityList = eElement.getElementsByTagName(ConverterDefines.Y_EDGE_LABEL);
@@ -170,10 +170,10 @@ public class ArcHandler {
 		}
 	}
 
-	public void setArcStyle(Element eElement, NodeList nlLineStyle) {
+	public void setArcStyle(Element eElement, NodeList nlLineStyle, StyleHandler sh) {
 		// getting the border color info
 		String szStrokeColorId = ((Element) (nlLineStyle.item(0))).getAttribute(ConverterDefines.COLOR_ATTR);
-		StyleHandler.colorSet.add(szStrokeColorId);
+		sh.colorSet.add(szStrokeColorId);
 
 		// getting the stroke width info
 		float fStrokeWidth = Float
@@ -181,10 +181,10 @@ public class ArcHandler {
 
 		String szStyleId = ConverterDefines.STYLE_PREFIX + fStrokeWidth + szStrokeColorId.replaceFirst("#", "");
 
-		if (!StyleHandler.styleMap.containsKey(szStyleId)) {
-			StyleHandler.styleMap.put(szStyleId, new SBGNMLStyle(szStyleId, szStrokeColorId, fStrokeWidth));
+		if (!sh.styleMap.containsKey(szStyleId)) {
+			sh.styleMap.put(szStyleId, new SBGNMLStyle(szStyleId, szStrokeColorId, fStrokeWidth));
 		}
-		StyleHandler.styleMap.get(szStyleId).addElementIdToSet(eElement.getAttribute(ConverterDefines.ID_ATTR));
+		sh.styleMap.get(szStyleId).addElementIdToSet(eElement.getAttribute(ConverterDefines.ID_ATTR));
 	}
 
 	public void setArcCardinality(Arc arc, NodeList nlCardinalityList) {

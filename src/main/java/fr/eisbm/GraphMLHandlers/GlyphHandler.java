@@ -14,6 +14,7 @@ import org.sbgn.bindings.Map;
 import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.SBGNBase.Extension;
+import org.sbgn.bindings.SBGNBase.Notes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -111,7 +112,7 @@ public class GlyphHandler {
 		return szGlyphClass;
 	}
 
-	public void parseCompartments(Element eElement, Map map) {
+	public void parseCompartments(Element eElement, Map map, StyleHandler sh) {
 		{
 			String szCompartmentId = eElement.getAttribute(ConverterDefines.ID_ATTR);
 			Glyph _compartmentGlyph = new Glyph();
@@ -134,7 +135,7 @@ public class GlyphHandler {
 			setBbox(_compartmentGlyph, eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
 
 			// setting style info
-			setStyle(eElement, szCompartmentId);
+			setStyle(eElement, szCompartmentId, sh);
 
 			NodeList nCompoundList = eElement.getElementsByTagName(ConverterDefines.NODE_TAG);
 			for (int tempCompound = 0; tempCompound < nCompoundList.getLength(); tempCompound++) {
@@ -161,7 +162,7 @@ public class GlyphHandler {
 	}
 
 	public void parseComplexes(Document doc, ModelAttributes modelAttr, Element eElement, NodeList _nlConfigList,
-			Map map) {
+			Map map, StyleHandler sh) {
 		if (_nlConfigList.getLength() > 0) {
 			if (((Element) _nlConfigList.item(0)).hasAttribute("configuration")) {
 				String szYEDNodeType = ((Element) _nlConfigList.item(0)).getAttribute("configuration");
@@ -189,7 +190,7 @@ public class GlyphHandler {
 						setBbox(_complexGlyph, eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
 
 						// setting style info
-						setStyle(eElement, szComplexId);
+						setStyle(eElement, szComplexId, sh);
 
 						complexSet.add(szComplexId);
 
@@ -231,7 +232,7 @@ public class GlyphHandler {
 							if (null != _complexGlyph) {
 								if (_complexGlyph.getId().equals(szParentID)) {
 
-									Glyph _glyph = parseGlyphInfo(doc, modelAttr, eCompoundElement, szCompoundId);
+									Glyph _glyph = parseGlyphInfo(doc, modelAttr, eCompoundElement, szCompoundId, sh);
 
 									_complexGlyph.getGlyph().add(_glyph);
 									compoundComplexMap.put(szCompoundId, szComplexId);
@@ -245,7 +246,7 @@ public class GlyphHandler {
 		}
 	}
 
-	public void parseNodes(Document doc, ModelAttributes modelAttributes, NodeList nList, Map map) {
+	public void parseNodes(Document doc, ModelAttributes modelAttributes, NodeList nList, Map map, StyleHandler sh) {
 		for (int temp = 0; temp < nList.getLength(); temp++) {
 			Node nNode = nList.item(temp);
 
@@ -257,7 +258,7 @@ public class GlyphHandler {
 
 				if ((!compoundComplexMap.containsKey(szGlyphId)) && (!complexSet.contains(szGlyphId))
 						&& (!compartmentSet.contains(szGlyphId))) {
-					Glyph _glyph = parseGlyphInfo(doc, modelAttributes, eElement, szGlyphId);
+					Glyph _glyph = parseGlyphInfo(doc, modelAttributes, eElement, szGlyphId, sh);
 
 					// if the glyph is part of a compartment, the reference to the compartment is
 					// set
@@ -273,7 +274,8 @@ public class GlyphHandler {
 		}
 	}
 
-	public Glyph parseGlyphInfo(Document doc, ModelAttributes modelAttributes, Element eElement, String szGlyphId) {
+	public Glyph parseGlyphInfo(Document doc, ModelAttributes modelAttributes, Element eElement, String szGlyphId,
+			StyleHandler sh) {
 		Glyph _glyph = new Glyph();
 		_glyph.setId(szGlyphId);
 
@@ -372,43 +374,51 @@ public class GlyphHandler {
 			}
 
 			// setting style info
-			setStyle(eElement, szGlyphId);
+			setStyle(eElement, szGlyphId, sh);
 
 			// parse data information on notes, annotation, orientation, clone etc.
 			NodeList nlDataList = eElement.getElementsByTagName(ConverterDefines.DATA_TAG);
 			Element eltAnnotation = parseAnnotation(doc, modelAttributes, _glyph, nlDataList);
 
-			Extension _extension = new Extension();
-			_extension.getAny().add(eltAnnotation);
-			_glyph.setExtension(_extension);
+			if (null != eltAnnotation) {
+				Extension _extension = new Extension();
+				_extension.getAny().add(eltAnnotation);
+				_glyph.setExtension(_extension);
+			}
 		}
 		return _glyph;
 	}
 
 	private Element parseAnnotation(Document doc, ModelAttributes modelAttributes, Glyph _glyph, NodeList nlDataList) {
-		Element eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
+		Element eltAnnotation = null;
 		// TODO: to read the namespace from the file
 		Element rdfRDF = doc.createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#",
 				ConverterDefines.RDF_RDF_TAG);
-		eltAnnotation.appendChild(rdfRDF);
 		Element rdfDescription = doc.createElement(ConverterDefines.RDF_DESCRIPTION_TAG);
 		rdfRDF.appendChild(rdfDescription);
 		rdfDescription.setAttribute(ConverterDefines.RDF_ABOUT_TAG, "#" + _glyph.getId());
+
+		// check if there is at least one field of the annotation; otherwise, no need to
+		// add an empty annotation
+		boolean bHasAnnotation = false;
 
 		for (int temp2 = 0; temp2 < nlDataList.getLength(); temp2++) {
 			Element _element = ((Element) (nlDataList.item(temp2)));
 
 			// parse notes information
-
-			/*
-			 * if (_element.getAttribute(KEY_TAG).equals(szNotesTagId)) {
-			 * _glyph.setNotes(getSBGNNotes(_element)); }
-			 */
+			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNotesTagId)) {
+				Notes notes = getSBGNNotes(_element);
+				if (null != notes) {
+					_glyph.setNotes(notes);
+					bHasAnnotation = true;
+				}
+			}
 
 			// setting the orientation value for the SBGN process
-			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
+			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
 				if (FileUtils.isProcessType(_glyph)) {
 					_glyph.setOrientation(_element.getTextContent());
+					bHasAnnotation = true;
 				}
 			}
 
@@ -427,6 +437,7 @@ public class GlyphHandler {
 							eltAnnotation.setAttribute(ConverterDefines.XMLNS_NS, value);
 						}
 					}
+					bHasAnnotation = true;
 				}
 			}
 
@@ -458,6 +469,7 @@ public class GlyphHandler {
 							}
 						}
 					}
+					bHasAnnotation = true;
 				}
 			}
 
@@ -480,6 +492,7 @@ public class GlyphHandler {
 					Clone _clone = new Clone();
 					_clone.setLabel(_label);
 					_glyph.setClone(_clone);
+					bHasAnnotation = true;
 				}
 			}
 
@@ -499,6 +512,7 @@ public class GlyphHandler {
 						eltRDFBag.appendChild(eltRDFLi);
 						rdfDescription.appendChild(elBqtModelIs);
 					}
+					bHasAnnotation = true;
 				}
 			}
 
@@ -519,6 +533,7 @@ public class GlyphHandler {
 						eltRDFLi.setAttribute(ConverterDefines.RDF_RESOURCE_TAG, tokens[i]);
 						eltRDFBag.appendChild(eltRDFLi);
 						rdfDescription.appendChild(elBqtModelIsDescribedBy);
+						bHasAnnotation = true;
 					}
 				}
 			}
@@ -540,6 +555,7 @@ public class GlyphHandler {
 						eltRDFBag.appendChild(eltRDFLi);
 					}
 					rdfDescription.appendChild(eltBqbiolIs);
+					bHasAnnotation = true;
 				}
 			}
 
@@ -561,10 +577,26 @@ public class GlyphHandler {
 						eltRDFBag.appendChild(eltRDFLi);
 						rdfDescription.appendChild(elBqbiolIsDescribedBy);
 					}
+					bHasAnnotation = true;
 				}
 			}
 		}
+
+		if (true == bHasAnnotation) {
+			eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
+			eltAnnotation.appendChild(rdfRDF);
+
+		}
 		return eltAnnotation;
+	}
+
+	public Notes getSBGNNotes(Element notes) {
+		Notes newNotes = new Notes();
+		if (notes != null) {
+			newNotes.getAny().add(notes);
+			return newNotes;
+		}
+		return null;
 	}
 
 	public void setCompartmentRefToGlyph(String szParentCompartmentId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
@@ -683,15 +715,15 @@ public class GlyphHandler {
 		}
 	}
 
-	public void setStyle(Element eElement, String szId) {
+	public void setStyle(Element eElement, String szId, StyleHandler sh) {
 		String szFillColorId = ((Element) (eElement.getElementsByTagName(ConverterDefines.Y_FILL).item(0)))
 				.getAttribute(ConverterDefines.COLOR_ATTR);
-		StyleHandler.colorSet.add(szFillColorId);
+		sh.colorSet.add(szFillColorId);
 
 		NodeList nlBorderStyle = eElement.getElementsByTagName(ConverterDefines.Y_BORDER_STYLE);
 		// getting the border color info
 		String szStrokeColorId = ((Element) (nlBorderStyle.item(0))).getAttribute(ConverterDefines.COLOR_ATTR);
-		StyleHandler.colorSet.add(szStrokeColorId);
+		sh.colorSet.add(szStrokeColorId);
 
 		// getting the stroke width color info
 		float fStrokeWidth = Float
@@ -707,11 +739,11 @@ public class GlyphHandler {
 
 		String szStyleId = ConverterDefines.STYLE_PREFIX + fStrokeWidth + szFillColorId.replaceFirst("#", "")
 				+ fFontSize + szStrokeColorId.replaceFirst("#", "");
-		if (!StyleHandler.styleMap.containsKey(szStyleId)) {
-			StyleHandler.styleMap.put(szStyleId,
+		if (!sh.styleMap.containsKey(szStyleId)) {
+			sh.styleMap.put(szStyleId,
 					new SBGNMLStyle(szStyleId, szFillColorId, szStrokeColorId, fStrokeWidth, fFontSize));
 		}
-		StyleHandler.styleMap.get(szStyleId).addElementIdToSet(szId);
+		sh.styleMap.get(szStyleId).addElementIdToSet(szId);
 	}
 
 	public void createPorts(List<Glyph> list) {

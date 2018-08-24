@@ -38,6 +38,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GraphMLResource;
 import fr.eisbm.SBGNHandlers.GraphMLStyle;
+import fr.eisbm.SBGNHandlers.transformToSBGN02;
 
 public class SBGNML2GraphML {
 	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
@@ -94,9 +95,8 @@ public class SBGNML2GraphML {
 		String szOutFileName = szInputFileName.substring(0, szInputFileName.indexOf(".")).concat("_generated.graphml");
 		sg.parseSBGNFile(szInputFileName, szOutFileName);
 
-		// String szSBGNv02FileName = szOutFileName.replace(".graphml",
-		// "-SBGNv02.sbgn");
-		// transformToSBGN02.transformToSBGNv02(szInputFileName, szSBGNv02FileName);
+		String szSBGNv02FileName = szOutFileName.replace(".graphml", "-SBGNv02.sbgn");
+		transformToSBGN02.transformToSBGNv02(szInputFileName, szSBGNv02FileName);
 	}
 
 	public void parseSBGNFile(String szInSBGNFileName, String szOutGraphMLFileName) {
