@@ -1,7 +1,7 @@
 package fr.eisbm.GRAPHML2SBGNML;
 
 public class ConverterDefines {
-	
+
 	public static final String COM_YWORKS_SBGN_SIMPLE_CHEMICAL = "com.yworks.sbgn.SimpleChemical";
 	public static final String COM_YWORKS_SBGN_PROCESS = "com.yworks.sbgn.Process";
 	public static final String COM_YWORKS_SBGN_UNSPECIFIED_ENTITY = "com.yworks.sbgn.UnspecifiedEntity";
@@ -17,7 +17,7 @@ public class ConverterDefines {
 	public static final String COM_YWORKS_SBGN_SUBMAP = "com.yworks.sbgn.Submap";
 	public static final String COM_YWORKS_SBGN_STYLE_MCOUNT = "com.yworks.sbgn.style.mcount";
 	public static final String COM_YWORKS_SBGN_UNIT_OF_INFORMATION = "com.yworks.sbgn.UnitOfInformation";
-	
+
 	public static final String SBGN_OMITTED_PROCESS = "omitted process";
 	public static final String SBGN_UNCERTAIN_PROCESS = "uncertain process";
 	public static final String SBGN_DISSOCIATION = "dissociation";
@@ -54,11 +54,19 @@ public class ConverterDefines {
 	public static final String SBGN_STATE_VARIABLE = "state variable";
 	public static final String SBGN_CARDINALITY = "cardinality";
 	
+	public static final String COM_YWORKS_FLOWCHART_PROCESS = "com.yworks.flowchart.process";
+
+	// AF modulating arcs
+	public static final String SBGN_POSITIVE_INFLUENCE = "positive influence";
+	public static final String SBGN_NEGATIVE_INFLUENCE = "negative influence";
+	public static final String SBGN_UNKNOWN_INFLUENCE = "unknown influence";
+	public static final String SBGN_BIOLOGICAL_ACTIVITY = "biological activity";
+
 	public static final String BQMODEL_IS = "bqmodel:is";
 	public static final String BQMODEL_IS_DESCRIBED_BY = "bqmodel:isDescribedBy";
 	public static final String BQBIOL_IS = "bqbiol:is";
 	public static final String BQBIOL_IS_DESCRIBED_BY = "bqbiol:isDescribedBy";
-	
+
 	public static final String Y_SMART_NODE_LABEL_MODEL_PARAMETER = "y:SmartNodeLabelModelParameter";
 	public static final String Y_MODEL_PARAMETER = "y:ModelParameter";
 	public static final String Y_SMART_NODE_LABEL_MODEL = "y:SmartNodeLabelModel";
@@ -89,7 +97,7 @@ public class ConverterDefines {
 	public static final String Y_PROPERTY = "y:Property";
 	public static final String Y_STYLE_PROPERTIES = "y:StyleProperties";
 	public static final String Y_SHAPE_NODE = "y:ShapeNode";
-	
+
 	public static final String LIST_OF_COLOR_DEFINITIONS_TAG = "listOfColorDefinitions";
 	public static final String VALUE_ATTR = "value";
 	public static final String ID_LIST_ATTR = "idList";

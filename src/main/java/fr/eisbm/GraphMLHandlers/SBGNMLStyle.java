@@ -3,7 +3,7 @@ package fr.eisbm.GraphMLHandlers;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.eisbm.GRAPHML2SBGNML.FileUtils;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 
 public class SBGNMLStyle {
 	String m_szId;
@@ -28,7 +28,7 @@ public class SBGNMLStyle {
 		this.m_szId = szId;
 		this.m_szFillColor = "#000000";
 		this.m_szStrokeColor = szStrokeColor;
-		this.m_fFontSize = FileUtils.DEFAULT_FONT_SIZE;
+		this.m_fFontSize = Utils.DEFAULT_FONT_SIZE;
 		this.m_fStrokeWidth = fStrokeWidth;
 		m_lElementIdSet = new HashSet<String>();
 	}

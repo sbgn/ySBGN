@@ -1,9 +1,6 @@
-package fr.eisbm.GRAPHML2SBGNML;
+package pd;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -24,16 +21,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import af.GraphML2AF;
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
+import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
 import fr.eisbm.SBGNHandlers.transformToSBGN02;
-import pd.GraphML2PD;
 
-public class GraphML2SBGNML {
+public class GraphML2PD {
 
 	Sbgn sbgn = new Sbgn();
 	Map map = new Map();
@@ -45,36 +43,20 @@ public class GraphML2SBGNML {
 	}
 
 	public static void convert(String szInputFileName) {
-
-		try {
-			String xml = new String(Files.readAllBytes(FileSystems.getDefault().getPath(szInputFileName)));
-			String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
-			boolean bConversion = false;
-			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
-				GraphML2PD pdConverter = new GraphML2PD();
-				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			} else {
-				GraphML2AF afConverter = new GraphML2AF();
-				bConversion = afConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			}
-			if (bConversion) {
-				String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
-				transformToSBGN02.transformToSBGNv02(szOutSBGNFile, szSBGNv02FileName);
-			}
-			System.out.println(szInputFileName + "\t " + bConversion);
-
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		GraphML2PD pdConverter = new GraphML2PD();
+		String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
+		boolean bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
+		if (bConversion) {
+			String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
+			transformToSBGN02.transformToSBGNv02(szOutSBGNFile, szSBGNv02FileName);
 		}
-
+		System.out.println(szInputFileName +"\t " + bConversion);
 	}
 
-	boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
+	public boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
 		boolean bConversion = false;
 		try {
 			File inputFile = new File(szInGraphMLFileName);
-
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(inputFile);
@@ -84,7 +66,7 @@ public class GraphML2SBGNML {
 
 			map.setLanguage("process description");
 			sbgn.setMap(map);
-
+			
 			GlyphHandler glyphHandler = new GlyphHandler();
 			ArcHandler arcHandler = new ArcHandler();
 			StyleHandler styleHandler = new StyleHandler();
@@ -137,7 +119,7 @@ public class GraphML2SBGNML {
 
 			// move the network elements to start from top/left, i.e. coordinates (0,0)
 			moveNetworkToTopLeft();
-
+			
 			// correct the orientation of the processes and connected arcs
 			arcHandler.correctPortOrientationAndConnectedArcs(map.getGlyph(), map.getArc());
 
@@ -284,7 +266,7 @@ public class GraphML2SBGNML {
 
 	private void moveArcs(List<Arc> arcList, float x_val, float y_val) {
 		for (Arc arc : arcList) {
-
+			
 			float newX = arc.getStart().getX() + x_val;
 			float newY = arc.getStart().getY() + y_val;
 			arc.getStart().setX(newX);

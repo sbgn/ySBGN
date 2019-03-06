@@ -21,7 +21,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.FileUtils;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
 
 public class GlyphHandler {
@@ -206,7 +206,7 @@ public class GlyphHandler {
 					} else {
 
 						for (Glyph _glyph : map.getGlyph()) {
-							_complexGlyph = FileUtils.findGlyph(szComplexId, _glyph);
+							_complexGlyph = Utils.findGlyph(szComplexId, _glyph);
 							if (null != _complexGlyph) {
 								break;
 							}
@@ -406,19 +406,18 @@ public class GlyphHandler {
 			Element _element = ((Element) (nlDataList.item(temp2)));
 
 			// parse notes information
-			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNotesTagId)) {
+			/*if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNotesTagId)) {
 				Notes notes = getSBGNNotes(_element);
 				if (null != notes) {
 					_glyph.setNotes(notes);
 					bHasAnnotation = true;
 				}
-			}
+			}*/
 
 			// setting the orientation value for the SBGN process
-			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
-				if (FileUtils.isProcessType(_glyph)) {
+			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
+				if (Utils.isProcessType(_glyph)) {
 					_glyph.setOrientation(_element.getTextContent());
-					bHasAnnotation = true;
 				}
 			}
 
@@ -426,6 +425,9 @@ public class GlyphHandler {
 			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szAnnotationTagId)) {
 				String szText = _element.getTextContent();
 				if (!szText.equals("")) {
+					if (null == eltAnnotation) {
+						eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
+					}
 					szText = szText.replaceAll("\"", "");
 					String delims = " ";
 					String[] tokens = szText.split(delims);
@@ -492,7 +494,6 @@ public class GlyphHandler {
 					Clone _clone = new Clone();
 					_clone.setLabel(_label);
 					_glyph.setClone(_clone);
-					bHasAnnotation = true;
 				}
 			}
 
@@ -533,8 +534,8 @@ public class GlyphHandler {
 						eltRDFLi.setAttribute(ConverterDefines.RDF_RESOURCE_TAG, tokens[i]);
 						eltRDFBag.appendChild(eltRDFLi);
 						rdfDescription.appendChild(elBqtModelIsDescribedBy);
-						bHasAnnotation = true;
 					}
+					bHasAnnotation = true;
 				}
 			}
 
@@ -583,7 +584,9 @@ public class GlyphHandler {
 		}
 
 		if (true == bHasAnnotation) {
-			eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
+			if (null == eltAnnotation) {
+				eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
+			}
 			eltAnnotation.appendChild(rdfRDF);
 
 		}
@@ -732,7 +735,7 @@ public class GlyphHandler {
 		// getting the stroke width color info
 		String szStrokeColorWidth = ((Element) (eElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL).item(0)))
 				.getAttribute(ConverterDefines.FONTSIZE_ATTR);
-		float fFontSize = FileUtils.DEFAULT_FONT_SIZE;
+		float fFontSize = Utils.DEFAULT_FONT_SIZE;
 		if (!szStrokeColorWidth.equals("")) {
 			fFontSize = Float.parseFloat(szStrokeColorWidth);
 		}
@@ -748,10 +751,10 @@ public class GlyphHandler {
 
 	public void createPorts(List<Glyph> list) {
 		for (Glyph glyph : list) {
-			if (FileUtils.isOperatorType(glyph) || (FileUtils.isProcessType(glyph))) {
+			if (Utils.isOperatorType(glyph) || (Utils.isProcessType(glyph))) {
 				if (glyph.getPort() != null) {
-					if (glyph.getPort().size() != FileUtils.MAX_PORT_NO) {
-						for (int i = 0; i < FileUtils.MAX_PORT_NO; i++) {
+					if (glyph.getPort().size() != Utils.MAX_PORT_NO) {
+						for (int i = 0; i < Utils.MAX_PORT_NO; i++) {
 							createPort(glyph, i);
 						}
 					}
@@ -765,7 +768,7 @@ public class GlyphHandler {
 
 	private void createPort(Glyph glyph, int i) {
 		Port port = new Port();
-		port.setId(glyph.getId() + "." + i);
+		port.setId(glyph.getId() + "." + (i + 1));
 
 		float x = 0;
 		float y = 0;
@@ -775,7 +778,7 @@ public class GlyphHandler {
 		if (glyph.getOrientation().equals("vertical")) {
 			x = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
 
-			if (0 == i) {
+			if (Utils.FIRST_PORT == i) {
 				y = (float) (glyph.getBbox().getY() + glyph.getBbox().getH() + glyph.getBbox().getH() * 0.5);
 			} else {
 				y = (float) (glyph.getBbox().getY() - glyph.getBbox().getH() * 0.5);
@@ -784,7 +787,7 @@ public class GlyphHandler {
 		// the glyph (process/ operator) is oriented horizontally, so the ports will be
 		// located left-right
 		else {
-			if (0 == i) {
+			if (Utils.FIRST_PORT == i) {
 				x = (float) (glyph.getBbox().getX() - glyph.getBbox().getW() * 0.5);
 			} else {
 				x = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() + glyph.getBbox().getW() * 0.5);

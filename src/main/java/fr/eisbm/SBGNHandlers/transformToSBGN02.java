@@ -15,14 +15,14 @@ import org.sbgn.bindings.Sbgn;
 import org.xml.sax.SAXException;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.FileUtils;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 
 public class transformToSBGN02 {
 	public static void transformToSBGNv02(String szInSBGNFileName, String szOutSBGNv02FileName) {
 		// Now read from "f" and put the result in "sbgn"
 		Sbgn sbgn;
 		try {
-			sbgn = FileUtils.readFromFile(szInSBGNFileName);
+			sbgn = Utils.readFromFile(szInSBGNFileName);
 
 			// map is a container for the glyphs and arcs
 			Map map = (org.sbgn.bindings.Map) sbgn.getMap();

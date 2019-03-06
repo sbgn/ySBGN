@@ -15,12 +15,14 @@ import javax.xml.bind.Unmarshaller;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Sbgn;
 
-public class FileUtils {
-	public static final String IN_SBGN_FILE = "example_files/CAMKII_colored_generated.sbgn";
-	public static final String IN_YED_FILE = "downloads/F002-eicosanoids.graphml";
+public class Utils {
+	public static final String IN_SBGN_FILE = "af/F001-DendriticCell.sbgn";
+	public static final String IN_YED_FILE = "downloads/F007-inos.graphml";
 
 	public static final int DEFAULT_FONT_SIZE = 10;
 	public static final int MAX_PORT_NO = 2;
+	public static final int FIRST_PORT = 0;
+	public static final int SECOND_PORT = 1;
 
 	public static Sbgn readFromFile(String szFileName) throws JAXBException {
 		Sbgn result = null;
@@ -59,7 +61,8 @@ public class FileUtils {
 	}
 
 	public static float getPointDistance(float x1, float y1, float x2, float y2) {
-		return (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+		float dist = (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+		return dist;
 	}
 
 	public static boolean isProcessType(Glyph source) {
