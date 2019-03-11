@@ -17,6 +17,7 @@ public class ConverterDefines {
 	public static final String COM_YWORKS_SBGN_SUBMAP = "com.yworks.sbgn.Submap";
 	public static final String COM_YWORKS_SBGN_STYLE_MCOUNT = "com.yworks.sbgn.style.mcount";
 	public static final String COM_YWORKS_SBGN_UNIT_OF_INFORMATION = "com.yworks.sbgn.UnitOfInformation";
+	public static final String COM_YWORKS_SBGN_TAG_ORIENTATION = "com.yworks.sbgn.style.inverse";
 
 	public static final String SBGN_OMITTED_PROCESS = "omitted process";
 	public static final String SBGN_UNCERTAIN_PROCESS = "uncertain process";
@@ -53,6 +54,7 @@ public class ConverterDefines {
 	public static final String SBGN_UNIT_OF_INFORMATION = "unit of information";
 	public static final String SBGN_STATE_VARIABLE = "state variable";
 	public static final String SBGN_CARDINALITY = "cardinality";
+	public static final String SBGN_OPERATOR = "operator";
 	
 	public static final String COM_YWORKS_FLOWCHART_PROCESS = "com.yworks.flowchart.process";
 
@@ -147,4 +149,6 @@ public class ConverterDefines {
 	public static final String RESOURCE_FONT_SIZE = "10";
 	public static final double RATIO_THIRD = 0.3;
 	public static final double RATIO_HALF = 0.5;
+	public static final String SBGN_LEFT_TAG = "left";
+	public static final String SBGN_RIGHT_TAG = "right";
 }

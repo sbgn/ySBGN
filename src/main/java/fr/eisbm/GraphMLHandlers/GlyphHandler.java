@@ -312,7 +312,7 @@ public class GlyphHandler {
 				szGlyphClass = ConverterDefines.SBGN_OMITTED_PROCESS;
 			}
 
-			if (!szGlyphClass.equals("operator")) {
+			if (!szGlyphClass.equals(ConverterDefines.SBGN_OPERATOR)) {
 
 				_glyph.setClazz(szGlyphClass);
 
@@ -376,6 +376,21 @@ public class GlyphHandler {
 			// setting style info
 			setStyle(eElement, szGlyphId, sh);
 
+			if (szGlyphClass.equals(ConverterDefines.SBGN_TAG)) {
+				_glyph.setOrientation(ConverterDefines.SBGN_LEFT_TAG);
+
+				NodeList _nlPropertyList = eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY);
+				if (_nlPropertyList.getLength() > 0) {
+					Element _tagOrientation = (Element) _nlPropertyList.item(0);
+					if (_tagOrientation.hasAttribute("name")) {
+						if (_tagOrientation.getAttribute("name")
+								.equals(ConverterDefines.COM_YWORKS_SBGN_TAG_ORIENTATION)) {
+							_glyph.setOrientation(ConverterDefines.SBGN_RIGHT_TAG);
+						}
+					}
+				}
+			}
+
 			// parse data information on notes, annotation, orientation, clone etc.
 			NodeList nlDataList = eElement.getElementsByTagName(ConverterDefines.DATA_TAG);
 			Element eltAnnotation = parseAnnotation(doc, modelAttributes, _glyph, nlDataList);
@@ -406,13 +421,11 @@ public class GlyphHandler {
 			Element _element = ((Element) (nlDataList.item(temp2)));
 
 			// parse notes information
-			/*if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNotesTagId)) {
-				Notes notes = getSBGNNotes(_element);
-				if (null != notes) {
-					_glyph.setNotes(notes);
-					bHasAnnotation = true;
-				}
-			}*/
+			/*
+			 * if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.
+			 * szNotesTagId)) { Notes notes = getSBGNNotes(_element); if (null != notes) {
+			 * _glyph.setNotes(notes); bHasAnnotation = true; } }
+			 */
 
 			// setting the orientation value for the SBGN process
 			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
