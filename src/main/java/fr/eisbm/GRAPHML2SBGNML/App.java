@@ -68,7 +68,7 @@ public class App extends Application {
 		Label directionLabel = new Label("Convertion Direction:");
 		grid.add(directionLabel, 0, 0);
 
-		ChoiceBox directionChoice = new ChoiceBox<>(FXCollections.observableArrayList(
+		ChoiceBox<String> directionChoice = new ChoiceBox<>(FXCollections.observableArrayList(
 				ConvertionChoice.GRAPHML2SBGN.toString(), ConvertionChoice.SBGN2GRAPHML.toString()));
 		grid.add(directionChoice, 1, 0);
 		directionChoice.getSelectionModel().selectFirst(); // set first as default
@@ -148,6 +148,22 @@ public class App extends Application {
 				return;
 			}
 
+			if (bSingleFileOption) {
+				if (inputFileText.getText().contains(".graphml")) {
+					directionChoice.setValue(ConvertionChoice.GRAPHML2SBGN.toString());
+				} else {
+					directionChoice.setValue(ConvertionChoice.SBGN2GRAPHML.toString());
+				}
+			} /*else {
+				if(results.size() > 0) {
+					if (results.get(0).contains(".graphml")) {
+						directionChoice.setValue(ConvertionChoice.GRAPHML2SBGN.toString());
+					} else {
+						directionChoice.setValue(ConvertionChoice.SBGN2GRAPHML.toString());
+					}
+				}
+			}*/
+
 			if (directionChoice.getValue().equals(ConvertionChoice.GRAPHML2SBGN.toString())) {
 				System.out.println("Convert button clicked, launch script");
 				Task task = new Task<Void>() {
@@ -157,16 +173,22 @@ public class App extends Application {
 							infoLabel.setText("Running...");
 						});
 
+						boolean bConvertedFile = false;
 						if (bSingleFileOption) {
 							GraphML2SBGNML.convert(inputFileText.getText());
+							bConvertedFile = true;
 						} else {
+							
 							for (String fileName : results) {
 								if (fileName.contains(".graphml")) {
 									GraphML2SBGNML.convert(fileName);
+									bConvertedFile = true;
 								}
 							}
 						}
 
+						if(bConvertedFile)
+						{
 						Platform.runLater(() -> {
 							infoLabel.setText("Done");
 							Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -175,6 +197,17 @@ public class App extends Application {
 							alert.setContentText(szFolderName);
 							alert.show();
 						});
+						}else
+						{
+							Platform.runLater(() -> {
+								infoLabel.setText("Invalid conversion");
+								Alert alert = new Alert(Alert.AlertType.ERROR);
+								alert.setTitle("Conversion FAILED");
+								alert.setHeaderText("The conversion FAILED.");
+								alert.setContentText("You chose the "+directionChoice.getValue() +"direction. No input GraphML file was found. Please check the converison direction and/or the type of the file(s) and try again.");
+								alert.show();
+							});
+						}
 						return null;
 					}
 				};
@@ -189,16 +222,21 @@ public class App extends Application {
 							infoLabel.setText("Running...");
 						});
 
+						boolean bConvertedFile = false;
 						if (bSingleFileOption) {
 							SBGNML2GraphML.convert(inputFileText.getText());
+							bConvertedFile = true;
 						} else {
 							for (String fileName : results) {
 								if ((fileName.contains(".sbgn") || fileName.contains(".xml"))) {
 									SBGNML2GraphML.convert(fileName);
+									bConvertedFile = true;
 								}
 							}
 						}
 
+						if(bConvertedFile)
+						{
 						Platform.runLater(() -> {
 							infoLabel.setText("Done");
 							Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -207,6 +245,17 @@ public class App extends Application {
 							alert.setContentText(szFolderName);
 							alert.show();
 						});
+						}else
+						{
+							Platform.runLater(() -> {
+								infoLabel.setText("Invalid conversion");
+								Alert alert = new Alert(Alert.AlertType.ERROR);
+								alert.setTitle("Conversion FAILED");
+								alert.setHeaderText("The conversion FAILED.");
+								alert.setContentText("You chose the "+directionChoice.getValue() +"direction. No input SBGN file was found. Please check the converison direction and/or the type of the file(s) and try again.");
+								alert.show();
+							});
+						}
 						return null;
 					}
 				};
