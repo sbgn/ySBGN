@@ -65,12 +65,12 @@ public class PD2GraphML {
 
 	// map to hold information on glyphs and corresponding ports
 	private java.util.Map<String, Glyph> portToGlyphMap = new HashMap<String, Glyph>();
-	
+
 	Map<String, String> mColorMap = new HashMap<String, String>();
 	Map<String, GraphMLStyle> mGlyphStyleMap = new HashMap<String, GraphMLStyle>();
 	List<GraphMLResource> resourceList = new ArrayList<GraphMLResource>();
 	Set<String> visitedGlyphSet = new HashSet<String>();
-	
+
 	public PD2GraphML() {
 		super();
 	}
@@ -123,7 +123,7 @@ public class PD2GraphML {
 				} catch (TransformerConfigurationException | SAXException e) {
 					e.printStackTrace();
 				}
-				
+
 				w.close();
 
 			} catch (IOException e1) {
@@ -428,6 +428,7 @@ public class PD2GraphML {
 		handler.endDocument();
 
 		out.flush();
+		out.close();
 	}
 
 	private void parseResource(TransformerHandler handler, GraphMLResource resource) throws SAXException {
@@ -2168,4 +2169,3 @@ public class PD2GraphML {
 		return null;
 	}
 }
-
