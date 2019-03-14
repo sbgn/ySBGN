@@ -6,6 +6,7 @@ import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 
 import org.sbgn.bindings.Map;
 
@@ -15,11 +16,13 @@ public class CloneHandler {
 
 	public void setClonedGlyphs(Map map) {
 		for (Glyph g : map.getGlyph()) {
-			if (!(g.getClazz().equals(ConverterDefines.SBGN_COMPLEX)
-					|| g.getClazz().equals(ConverterDefines.SBGN_COMPLEX_MULTIMER))) {
-				setCloneSimpleGlyphs(g, map.getGlyph());
-			} else {
-				findCloneComplexGlyph(g, map.getGlyph());
+			if (!(Utils.isProcessType(g) || (Utils.isOperatorType(g)) || (g.getClazz().equals(ConverterDefines.SBGN_SOURCE_AND_SINK)))) {
+				if (!(g.getClazz().equals(ConverterDefines.SBGN_COMPLEX)
+						|| g.getClazz().equals(ConverterDefines.SBGN_COMPLEX_MULTIMER))) {
+					setCloneSimpleGlyphs(g, map.getGlyph());
+				} else {
+					findCloneComplexGlyph(g, map.getGlyph());
+				}
 			}
 		}
 	}
@@ -54,19 +57,10 @@ public class CloneHandler {
 				}
 
 				if (bClone) {
-					Clone clone = new Clone();
-
-					if (g1.getClone() != null) {
-						clone = g1.getClone();
-					} else if (g2.getClone() != null) {
-						clone = g2.getClone();
-					}
-					g1.setClone(clone);
-					g2.setClone(clone);
+					setClone(g1, g2);
 				}
 			}
 		}
-
 	}
 
 	private void setCloneSimpleGlyphs(Glyph g1, List<Glyph> listOfGlyphs) {
@@ -74,16 +68,26 @@ public class CloneHandler {
 		for (Glyph g2 : listOfGlyphs) {
 			boolean bClone = findClonedSimilarGlyphs(g1, g2);
 			if (bClone) {
-				Clone clone = new Clone();
-
-				if (g1.getClone() != null) {
-					clone = g1.getClone();
-				} else if (g2.getClone() != null) {
-					clone = g2.getClone();
-				}
-				g1.setClone(clone);
-				g2.setClone(clone);
+				setClone(g1, g2);
 			}
+		}
+	}
+
+	private void setClone(Glyph g1, Glyph g2) {
+		Clone clone = null;
+		boolean bClone = false;
+
+		if (g1.getClone() != null) {
+			clone = g1.getClone();
+			bClone = true;
+
+		} else if (g2.getClone() != null) {
+			clone = g2.getClone();
+			bClone = true;
+		}
+		if (bClone) {
+			g1.setClone(clone);
+			g2.setClone(clone);
 		}
 	}
 
