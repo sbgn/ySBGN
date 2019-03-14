@@ -55,6 +55,7 @@ public class ConverterDefines {
 	public static final String SBGN_STATE_VARIABLE = "state variable";
 	public static final String SBGN_CARDINALITY = "cardinality";
 	public static final String SBGN_OPERATOR = "operator";
+	public static final String SBGN_VERTICAL_PROCESS = "vertical";
 	
 	public static final String COM_YWORKS_FLOWCHART_PROCESS = "com.yworks.flowchart.process";
 

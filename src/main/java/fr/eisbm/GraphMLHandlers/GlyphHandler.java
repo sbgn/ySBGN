@@ -430,7 +430,10 @@ public class GlyphHandler {
 			// setting the orientation value for the SBGN process
 			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
 				if (Utils.isProcessType(_glyph)) {
+					if(_element.getTextContent().equals(ConverterDefines.SBGN_VERTICAL_PROCESS)) //otherwise implicit
+					{
 					_glyph.setOrientation(_element.getTextContent());
+					}
 				}
 			}
 
@@ -464,7 +467,7 @@ public class GlyphHandler {
 					String delims = " ";
 					String[] tokens = szText.split(delims);
 					for (int i = 0; i < tokens.length; i++) {
-						String value = tokens[i].substring(tokens[i].indexOf("=") + 1);
+						String value = tokens[i].substring(tokens[i].indexOf("=") + 1).trim();
 						if (!value.equals("")) {
 
 							if (tokens[i].contains(ConverterDefines.XMLNS_NS + "=")) {
