@@ -123,6 +123,8 @@ public class PD2GraphML {
 				} catch (TransformerConfigurationException | SAXException e) {
 					e.printStackTrace();
 				}
+				
+				w.close();
 
 			} catch (IOException e1) {
 				e1.printStackTrace();
