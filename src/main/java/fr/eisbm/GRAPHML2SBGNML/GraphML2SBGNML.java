@@ -47,20 +47,30 @@ public class GraphML2SBGNML {
 	public static void convert(String szInputFileName) {
 
 		try {
+			long start = System.currentTimeMillis();
 			String xml = new String(Files.readAllBytes(FileSystems.getDefault().getPath(szInputFileName)));
 			String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
+			
+			//if the output file already exists, it will be overwritten during the current conversion step
+			if((new File(szOutSBGNFile)).exists())
+			{
+				System.out.println("The selected output file exists and it will be overwritten during the current conversion step." );
+			}
+			
 			boolean bConversion = false;
 			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
 				GraphML2PD pdConverter = new GraphML2PD();
 				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			} else {
+			} /*else {
 				GraphML2AF afConverter = new GraphML2AF();
 				bConversion = afConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			}
-			if (bConversion) {
-				String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
-				transformToSBGN02.transformToSBGNv02(szOutSBGNFile, szSBGNv02FileName);
-			}
+			}*/
+
+			long end = System.currentTimeMillis();
+			// finding the time difference and converting it into seconds
+			float sec = (end - start) / 1000F;
+			System.out.println(sec + " seconds");
+
 			System.out.println(szInputFileName + "\t " + bConversion);
 
 		} catch (IOException e) {
