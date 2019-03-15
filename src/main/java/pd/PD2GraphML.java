@@ -1985,8 +1985,8 @@ public class PD2GraphML {
 
 		if (null != clone) {
 			// Sometimes, label text within in the clone is not specified, but it is usually
-			// equal to an empty space. Thus, the condition if from below would be false and
-			// the clone would not be set. The FlieUtils.CloneIsSet was introduced in order
+			// equal to an empty space. Thus, the "if" condition from below is false and
+			// the clone is not be set. The FileUtils.CloneIsSet was introduced in order
 			// to show that the glyph has a clone that has to be set, even if the label text
 			// is an empty string. At the decoding step, this additional information must be
 			// removed.

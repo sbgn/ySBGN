@@ -493,22 +493,22 @@ public class GlyphHandler {
 
 			// parse clone information
 			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szCloneTagId)) {
-				if (!_element.getTextContent().equals("")) {
-					Label _label = new Label();
-					String text = "";
+				if (!_element.getTextContent().trim().equals("")) {
+					Clone _clone = new Clone();	
 					// This is in concordance with the SBGN to GraphML translation as sometimes,
 					// label text within in the clone is not specified, but it is usually equal to
 					// empty space. Thus, the condition if from above would be false and the clone
-					// would not be set. The FlieUtils.CloneIsSet was introduced in order to show
+					// would not be set. The FileUtils.CloneIsSet was introduced in order to show
 					// that the glyph has a clone that has to be set, even if the label text is an
 					// empty string. At the decoding step, this additional information must be
 					// removed.
 					if (!_element.getTextContent().equals(CloneHandler.CloneIsSet)) {
-						text = _element.getTextContent();
+						Label _label = new Label();
+						String text = _element.getTextContent();
+						_label.setText(text);
+						_clone.setLabel(_label);
 					}
-					_label.setText(text);
-					Clone _clone = new Clone();
-					_clone.setLabel(_label);
+					
 					_glyph.setClone(_clone);
 				}
 			}
