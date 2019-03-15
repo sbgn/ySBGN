@@ -29,7 +29,6 @@ import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
-import fr.eisbm.SBGNHandlers.transformToSBGN02;
 
 public class GraphML2PD {
 
@@ -46,11 +45,7 @@ public class GraphML2PD {
 		GraphML2PD pdConverter = new GraphML2PD();
 		String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
 		boolean bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-		if (bConversion) {
-			String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
-			transformToSBGN02.transformToSBGNv02(szOutSBGNFile, szSBGNv02FileName);
-		}
-		System.out.println(szInputFileName +"\t " + bConversion);
+		System.out.println(szInputFileName + "\t " + bConversion);
 	}
 
 	public boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
@@ -66,7 +61,7 @@ public class GraphML2PD {
 
 			map.setLanguage("process description");
 			sbgn.setMap(map);
-			
+
 			GlyphHandler glyphHandler = new GlyphHandler();
 			ArcHandler arcHandler = new ArcHandler();
 			StyleHandler styleHandler = new StyleHandler();
@@ -119,7 +114,7 @@ public class GraphML2PD {
 
 			// move the network elements to start from top/left, i.e. coordinates (0,0)
 			moveNetworkToTopLeft();
-			
+
 			// correct the orientation of the processes and connected arcs
 			arcHandler.correctPortOrientationAndConnectedArcs(map.getGlyph(), map.getArc());
 
@@ -187,7 +182,24 @@ public class GraphML2PD {
 		}
 
 		ext.getAny().add(eltRenderInfo);
-		map.setExtension(ext);
+
+		boolean bDefaultColorStyleConfig = false;
+		// The default configuration consists in the existence of two styles (one for
+		// glyphs, another for arcs) and two colors (black and white for stroke and fill
+		// colors respectively).
+		// Information will be added only if the style/color configuration is not the
+		// default one; otherwise, it will generate a difference between the before and
+		// after conversion files.
+		if ((sh.styleMap.size() == 2) && (sh.colorSet.size() == 2)) {
+			if ((sh.colorSet.contains("#FFFFFF") || (sh.colorSet.contains("#ffffff")))
+					&& (sh.colorSet.contains("#000000"))) {
+				bDefaultColorStyleConfig = true;
+			}
+		}
+
+		if (!bDefaultColorStyleConfig) {
+			map.setExtension(ext);
+		}
 	}
 
 	// moving elements section:
@@ -266,7 +278,7 @@ public class GraphML2PD {
 
 	private void moveArcs(List<Arc> arcList, float x_val, float y_val) {
 		for (Arc arc : arcList) {
-			
+
 			float newX = arc.getStart().getX() + x_val;
 			float newY = arc.getStart().getY() + y_val;
 			arc.getStart().setX(newX);
