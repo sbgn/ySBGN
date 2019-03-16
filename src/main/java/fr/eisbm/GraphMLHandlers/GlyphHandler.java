@@ -421,18 +421,20 @@ public class GlyphHandler {
 			Element _element = ((Element) (nlDataList.item(temp2)));
 
 			// parse notes information
-			/*
-			 * if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.
-			 * szNotesTagId)) { Notes notes = getSBGNNotes(_element); if (null != notes) {
-			 * _glyph.setNotes(notes); bHasAnnotation = true; } }
-			 */
+			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNotesTagId)) {
+				Notes notes = getSBGNNotes(_element);
+				if (null != notes) {
+					_glyph.setNotes(notes);
+					bHasAnnotation = true;
+				}
+			}
 
 			// setting the orientation value for the SBGN process
 			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szOrientationTagId)) {
 				if (Utils.isProcessType(_glyph)) {
-					if(_element.getTextContent().equals(ConverterDefines.SBGN_VERTICAL_PROCESS)) //otherwise implicit
+					if (_element.getTextContent().equals(ConverterDefines.SBGN_VERTICAL_PROCESS)) // otherwise implicit
 					{
-					_glyph.setOrientation(_element.getTextContent());
+						_glyph.setOrientation(_element.getTextContent());
 					}
 				}
 			}
@@ -452,6 +454,7 @@ public class GlyphHandler {
 						if (tokens[i].contains(ConverterDefines.XMLNS_N2_NS + "=")) {
 							eltAnnotation.setAttribute(ConverterDefines.XMLNS_N2_NS, value);
 						} else if (tokens[i].contains(ConverterDefines.XMLNS_NS + "=")) {
+
 							eltAnnotation.setAttribute(ConverterDefines.XMLNS_NS, value);
 						}
 					}
@@ -494,7 +497,7 @@ public class GlyphHandler {
 			// parse clone information
 			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szCloneTagId)) {
 				if (!_element.getTextContent().trim().equals("")) {
-					Clone _clone = new Clone();	
+					Clone _clone = new Clone();
 					// This is in concordance with the SBGN to GraphML translation as sometimes,
 					// label text within in the clone is not specified, but it is usually equal to
 					// empty space. Thus, the condition if from above would be false and the clone
@@ -508,7 +511,7 @@ public class GlyphHandler {
 						_label.setText(text);
 						_clone.setLabel(_label);
 					}
-					
+
 					_glyph.setClone(_clone);
 				}
 			}
@@ -610,8 +613,8 @@ public class GlyphHandler {
 	}
 
 	public Notes getSBGNNotes(Element notes) {
-		Notes newNotes = new Notes();
 		if (notes != null) {
+			Notes newNotes = new Notes();
 			newNotes.getAny().add(notes);
 			return newNotes;
 		}
