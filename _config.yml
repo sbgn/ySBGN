@@ -1,0 +1,16 @@
+title: ySBGN
+project_name: ySBGN
+description: >
+  The ySBGN converter
+repository_url: https://github.com/sbgn/ySBGN
+repository_shorthand: sbgn/ySBGN
+
+baseurl: "/ySBGN"
+
+markdown: kramdown
+
+# Plugins
+gems:
+  - jekyll-sitemap
+  - jekyll-redirect-from
+
