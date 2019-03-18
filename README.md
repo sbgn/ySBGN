@@ -46,10 +46,10 @@ Charles Auffray, [EISBM](http://www.eisbm.org/), Lyon, France - strategic advice
 ## Useful links
 
  - [SBGN-ML](https://github.com/sbgn/sbgn/wiki/SBGN_ML)
+  - [yEd Graph Editor](https://www.yworks.com/products/yed)
  - [SBFC](http://sbfc.sourceforge.net/mediawiki/index.php/Main_Page)
- - [yEd Graph Editor](https://www.yworks.com/products/yed)
  - [Newt Editor](http://web.newteditor.org/#)
- - [CD2SBGMML](https://github.com/royludo/cd2sbgnml) - translation between [CellDesigner](http://www.celldesigner.org/) and [SBGN-ML](https://github.com/sbgn/sbgn/wiki/SBGN_ML) in both directions
+ - [CD2SBGMML](https://github.com/sbgn/cd2sbgnml) - translation between [CellDesigner](http://www.celldesigner.org/) and [SBGN-ML](https://github.com/sbgn/sbgn/wiki/SBGN_ML) in both directions
  - [eTRIKS](https://www.etriks.org/) 
  - [Disease Maps Project](http://disease-maps.org/) 
 
