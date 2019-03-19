@@ -6,7 +6,7 @@ Compatible formats:
  - SBGN-ML 0.2 (Process Description)
  - yEd 3.17.1
 
-To find more information, please check the [Wiki](https://github.com/sbgn/ySBGN/wiki). A brief comparison of the tools we used to edit biological diagrams in the SBGN Process Description language is available in the [Features for managing large scale biological diagrams in SBGN PD](https://github.com/sbgn/ySBGN/wiki/Features-editor) page. The translation mapping rules are briefly described in [Translation mapping](https://github.com/sbgn/ySBGN/wiki/Translation-mapping) page. The latest release including executable application and source files can be directly donwloaded from [here](https://github.com/sbgn/ySBGN/releases).
+To find more information, please check the [Wiki](https://github.com/sbgn/ySBGN/wiki). A brief comparison of the tools we used to edit biological diagrams in the SBGN Process Description language is available in the [Editors](https://github.com/sbgn/ySBGN/wiki/Editors) page. The translation mapping rules are briefly described in [Translation](https://github.com/sbgn/ySBGN/wiki/Translation) page. The latest release including executable application and source files can be directly donwloaded from [here](https://github.com/sbgn/ySBGN/releases).
 
 Known issues are shown in the [Issues](https://github.com/sbgn/ySBGN/issues) section and the limitations of the tool are listed on the [Limitations](https://github.com/sbgn/ySBGN/wiki/Limitations) page.
 
