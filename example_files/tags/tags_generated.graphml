@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:java="http://www.yworks.com/xml/yfiles-common/1.0/java" xmlns:sys="http://www.yworks.com/xml/yfiles-common/markup/primitives/2.0" xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:y="http://www.yworks.com/xml/graphml" xmlns:yed="http://www.yworks.com/xml/yed/3" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd">
+<key attr.name="Description" attr.type="string" for="graph" id="d0"/>
+<key for="port" id="d1" yfiles.type="portgraphics"/>
+<key for="port" id="d2" yfiles.type="portgeometry"/>
+<key for="port" id="d3" yfiles.type="portuserdata"/>
+<key attr.name="notes" attr.type="string" for="node" id="d4"/>
+<key attr.name="Annotation" attr.type="string" for="node" id="d5"/>
+<key attr.name="bqmodel:is" attr.type="string" for="node" id="d6"/>
+<key attr.name="bqmodel:isDescribedBy" attr.type="string" for="node" id="d7"/>
+<key attr.name="bqbiol:is" attr.type="string" for="node" id="d8"/>
+<key attr.name="bqbiol:isDescribedBy" attr.type="string" for="node" id="d9"/>
+<key attr.name="Clone" attr.type="string" for="node" id="d10"/>
+<key attr.name="URL" attr.type="string" for="node" id="d11"/>
+<key attr.name="Description" attr.type="string" for="node" id="d12"/>
+<key attr.name="Orientation" attr.type="string" for="node" id="d13"/>
+<key for="node" id="d14" yfiles.type="nodegraphics"/>
+<key for="graphml" id="d15" yfiles.type="resources"/>
+<key attr.name="URL" attr.type="string" for="edge" id="d16"/>
+<key attr.name="Description" attr.type="string" for="edge" id="d17"/>
+<key for="edge" id="d18" yfiles.type="edgegraphics"/>
+<graph edgedefault="directed" id="G">
+<data key="d0"/>
+<node id="glyph1">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d8"/>
+<data key="d9"/>
+<data key="d12"/>
+<data key="d11"/>
+<data key="d10"/>
+<data key="d13">right</data>
+<data key="d14">
+<y:GenericNode configuration="com.yworks.sbgn.Tag">
+<y:Geometry height="60.0" width="108.0" x="156.0" y="120.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel textColor="#000000" verticalTextPosition="center" visible="true" width="108.0" x="156.0" y="120.0">tag right<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0." offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+<y:StyleProperties>
+<y:Property class="java.lang.Boolean" name="com.yworks.sbgn.style.inverse" value="true"/>
+</y:StyleProperties>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph2">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d8"/>
+<data key="d9"/>
+<data key="d12"/>
+<data key="d11"/>
+<data key="d10"/>
+<data key="d13">left</data>
+<data key="d14">
+<y:GenericNode configuration="com.yworks.sbgn.Tag">
+<y:Geometry height="60.0" width="108.0" x="146.0" y="240.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel textColor="#000000" verticalTextPosition="center" visible="true" width="108.0" x="146.0" y="240.0">tag left<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0." offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph3">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d8"/>
+<data key="d9"/>
+<data key="d12"/>
+<data key="d11"/>
+<data key="d10"/>
+<data key="d13">up</data>
+<data key="d14">
+<y:GenericNode configuration="com.yworks.sbgn.Tag">
+<y:Geometry height="108.0" width="60.0" x="170.0" y="446.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="170.0" y="446.0">tag up<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0." offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+<node id="glyph4">
+<data key="d4"/>
+<data key="d5"/>
+<data key="d6"/>
+<data key="d7"/>
+<data key="d8"/>
+<data key="d9"/>
+<data key="d12"/>
+<data key="d11"/>
+<data key="d10"/>
+<data key="d13">down</data>
+<data key="d14">
+<y:GenericNode configuration="com.yworks.sbgn.Tag">
+<y:Geometry height="108.0" width="60.0" x="180.0" y="326.0"/>
+<y:Fill color="#FFFFFF" transparent="false"/>
+<y:BorderStyle color="#000000" type="line" width="1.0"/>
+<y:NodeLabel textColor="#000000" verticalTextPosition="center" visible="true" width="60.0" x="180.0" y="326.0">tag down<y:LabelModel>
+<y:SmartNodeLabelModel distance="4.0"/>
+</y:LabelModel>
+<y:ModelParameter>
+<y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0." offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+</y:ModelParameter>
+</y:NodeLabel>
+</y:GenericNode>
+</data>
+</node>
+</graph>
+<data key="d15">
+<y:Resources/>
+</data>
+</graphml>

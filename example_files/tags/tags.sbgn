@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<sbgn xmlns="http://sbgn.org/libsbgn/0.2">
+    <map language="process description">
+        <glyph id="glyph1" orientation="right" class="tag">
+            <label text="tag right"/>
+            <bbox y="120.0" x="156.0" h="60.0" w="108.0"/>
+        </glyph>
+        <glyph id="glyph2" orientation="left" class="tag">
+            <label text="tag left"/>
+            <bbox y="240.0" x="146.0" h="60.0" w="108.0"/>
+        </glyph>
+        <glyph id="glyph3" orientation="up" class="tag">
+            <label text="tag up"/>
+            <bbox y="446.0" x="170.0" h="108.0" w="60.0"/>
+        </glyph>
+        <glyph id="glyph4" orientation="down" class="tag">
+            <label text="tag down"/>
+            <bbox y="326.0" x="180.0" h="108.0" w="60.0"/>
+        </glyph>
+    </map>
+</sbgn>
