@@ -60,6 +60,8 @@ public class SBGNML2GraphML {
 				AF2GraphML afConverter = new AF2GraphML();
 				afConverter.parseSBGNFile(szInSBGNFileName, szOutGraphMLFileName);
 			}
+			
+			Utils.generateStatistics(sbgn.getMap());
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}

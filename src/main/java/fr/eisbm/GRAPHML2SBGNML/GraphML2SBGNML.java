@@ -161,6 +161,8 @@ public class GraphML2SBGNML {
 			System.out.println(
 					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
 			bConversion = true;
+			
+			Utils.generateStatistics(sbgn.getMap());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
