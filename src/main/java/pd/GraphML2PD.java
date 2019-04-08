@@ -22,13 +22,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
+
 
 public class GraphML2PD {
 
@@ -47,7 +48,7 @@ public class GraphML2PD {
 		boolean bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
 		System.out.println(szInputFileName + "\t " + bConversion);
 	}
-
+	
 	public boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
 		boolean bConversion = false;
 		try {
@@ -71,7 +72,7 @@ public class GraphML2PD {
 			NodeList nKeyList = doc.getElementsByTagName(ConverterDefines.KEY_TAG);
 			modelAttr.populateModelAttributes(nKeyList);
 
-			// handle comlexes and compartments first
+			// handle complexes and compartments first
 			// complexes and compartments are mapped by yEd groups
 			NodeList nCompartComplexList = doc.getElementsByTagName(ConverterDefines.NODE_TAG);
 

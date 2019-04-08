@@ -61,10 +61,15 @@ public class GraphML2SBGNML {
 			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
 				GraphML2PD pdConverter = new GraphML2PD();
 				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			} /*else {
+			} else {
 				GraphML2AF afConverter = new GraphML2AF();
 				bConversion = afConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			}*/
+			}
+			
+			if (bConversion) {
+				String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
+				transformToSBGN02.transformToSBGNv02(szOutSBGNFile, szSBGNv02FileName);
+			}
 
 			long end = System.currentTimeMillis();
 			// finding the time difference and converting it into seconds

@@ -5,4 +5,4 @@
  * @author ibalaur
  *
  */
-package fr.eisbm.GraphMLHandlers;
+package fr.eisbm.GRAPHML2SBGNML;

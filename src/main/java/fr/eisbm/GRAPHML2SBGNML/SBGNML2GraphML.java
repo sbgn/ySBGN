@@ -10,7 +10,6 @@ import org.sbgn.bindings.Sbgn;
 import org.xml.sax.SAXException;
 
 import af.AF2GraphML;
-import fr.eisbm.SBGNHandlers.transformToSBGN02;
 import pd.PD2GraphML;
 
 public class SBGNML2GraphML {
