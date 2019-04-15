@@ -3,26 +3,22 @@ package fr.eisbm.GraphMLHandlers;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import javax.xml.transform.sax.TransformerHandler;
+import java.util.Set;
 
 import org.jgrapht.alg.util.Pair;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
+import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.Label;
 import org.sbgn.bindings.Map;
 import org.sbgn.bindings.Port;
-import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.SBGNBase.Extension;
 import org.sbgn.bindings.SBGNBase.Notes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
@@ -132,11 +128,15 @@ public class GlyphHandler {
 				_compartmentGlyph.setLabel(_label);
 			}
 
-			// setting the bbox info setBbox(_compartmentGlyph,
-			eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
-
 			// setting the bbox info
-			setBbox(_compartmentGlyph, eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
+			NodeList nlGeometryList = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
+			if (nlGeometryList.getLength() > 0) {
+				Node nGeometry = nlGeometryList.item(0);
+
+				if (nGeometry.getNodeType() == Node.ELEMENT_NODE) {
+					setBbox(_compartmentGlyph, (Element) nGeometry);
+				}
+			}
 
 			// setting style info
 			setStyle(eElement, szCompartmentId, sh);
@@ -172,11 +172,11 @@ public class GlyphHandler {
 				String szYEDNodeType = ((Element) _nlConfigList.item(0)).getAttribute("configuration");
 				if (szYEDNodeType.equals(ConverterDefines.COM_YWORKS_SBGN_COMPLEX)) {
 					String szComplexId = eElement.getAttribute(ConverterDefines.ID_ATTR);
-					
+
 					Glyph _complexGlyph = null;
-					
+
 					NodeList nBoundNodeList = eElement.getElementsByTagName(ConverterDefines.Y_PROXY_AUTO_BOUNDS_NODE);
-					if(nBoundNodeList.getLength() >0){
+					if (nBoundNodeList.getLength() > 0) {
 						Node nBoundNode = nBoundNodeList.item(0);
 
 						if (nBoundNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -186,11 +186,12 @@ public class GlyphHandler {
 							// the multimer is represented by a macromolecule having the property
 							// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
 							// value="2"/> in GraphML
-							NodeList _nlNodePropertiesList = (eBoundElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
-						
+							NodeList _nlNodePropertiesList = (eBoundElement
+									.getElementsByTagName(ConverterDefines.Y_PROPERTY));
+
 							for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
 								Element _elem = (Element) _nlNodePropertiesList.item(i);
-								if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
+								if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) && (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
 									bIsMultimer = true;
 									break;
 								}
@@ -202,7 +203,8 @@ public class GlyphHandler {
 								String szGlyphClass = parseYedNodeType(szYEDNodeType, bIsMultimer);
 								_complexGlyph.setClazz(szGlyphClass);
 
-								NodeList _nlNodeLabelList = eBoundElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
+								NodeList _nlNodeLabelList = eBoundElement
+										.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
 								String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
 
 								if (!szTextContent.equals("")) {
@@ -211,11 +213,17 @@ public class GlyphHandler {
 									_label.setText(szTextContent);
 									_complexGlyph.setLabel(_label);
 								}
-								
 
 								// setting the bbox info
-								setBbox(_complexGlyph, eBoundElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
-								
+								NodeList nlGeometryList = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
+								if (nlGeometryList.getLength() > 0) {
+									Node nGeometry = nlGeometryList.item(0);
+
+									if (nGeometry.getNodeType() == Node.ELEMENT_NODE) {
+										setBbox(_complexGlyph, (Element) nGeometry);
+									}
+								}
+
 								// the glyph has resouces (i.e. state variables, multimer states etc.)
 								if (_nlNodeLabelList.getLength() > 1) {
 									for (int i = 1; i < _nlNodeLabelList.getLength(); i++) {
@@ -251,7 +259,7 @@ public class GlyphHandler {
 									System.out.println("parseComplex: complex id = " + szComplexId);
 								}
 							}
-							
+
 						}
 					}
 
@@ -324,7 +332,7 @@ public class GlyphHandler {
 		NodeList _nlNodePropertiesList = (eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
 		for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
 			Element _elem = (Element) _nlNodePropertiesList.item(i);
-			if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
+			if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) && (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
 				bIsMultimer = true;
 				break;
 			}
@@ -365,19 +373,27 @@ public class GlyphHandler {
 			}
 
 			// setting the bbox info
-			setBbox(_glyph, eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
+			NodeList nlGeometryList = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
+			if (nlGeometryList.getLength() > 0) {
+				Node nGeometry = nlGeometryList.item(0);
+
+				if (nGeometry.getNodeType() == Node.ELEMENT_NODE) {
+					setBbox(_glyph, (Element) nGeometry);
+				}
+			}
 
 			// the glyph has resouces (i.e. state variables, multimer states etc.)
 			if (_nlNodeLabelList.getLength() > 1) {
 				for (int i = 1; i < _nlNodeLabelList.getLength(); i++) {
 					Element _element = (Element) _nlNodeLabelList.item(i);
+					String szText = _element.getTextContent().trim();
 
 					if (_element.hasAttribute(ConverterDefines.ICON_DATA_ATTR)) {
 						Pair<String, String> pair = new Pair<String, String>(
 								_element.getAttribute(ConverterDefines.ICON_DATA_ATTR), szGlyphId);
 						if (!resourceMap.containsKey(pair)) {
 							resourceMap.put(pair,
-									new ResourceCoordinates(_glyph.getBbox().getX(), _glyph.getBbox().getY()));
+									new ResourceCoordinates(_glyph.getBbox().getX(), _glyph.getBbox().getY(), szText));
 							if (_element.hasAttribute("x")) {
 								resourceMap.get(pair).updateXCoord(Float.parseFloat(_element.getAttribute("x")));
 							}
@@ -387,7 +403,9 @@ public class GlyphHandler {
 						}
 					}
 
-					addUnitOfInformation(_glyph, i, _element.getTextContent().trim());
+					if (bIsMultimer) {
+						addUnitOfInformation(_glyph, i, szText);
+					}
 				}
 			}
 
@@ -425,12 +443,10 @@ public class GlyphHandler {
 	private void addUnitOfInformation(Glyph _glyph, int i, String szText) {
 		// the glyph is a multimer (the shape from the yEd SBGN palette was used for
 		// drawing) and the child glyph is an unit of information
-		if ((szText.contains("N:"))
-				|| (szText.contains("RNA"))
-				|| (szText.toUpperCase().contains("RECEPTOR"))) {
+		if ((szText.contains("N:")) || (szText.contains("RNA")) || (szText.toUpperCase().contains("RECEPTOR"))) {
 			Glyph _uofGlyph = new Glyph();
 			_uofGlyph.setClazz(ConverterDefines.SBGN_UNIT_OF_INFORMATION);
-			_uofGlyph.setId(_glyph.getId() + "_uof_" + i);
+			_uofGlyph.setId(_glyph.getId() + "_uoi_" + i);
 			Label _label = new Label();
 			_label.setText(szText);
 			_uofGlyph.setLabel(_label);
@@ -677,13 +693,13 @@ public class GlyphHandler {
 		}
 	}
 
-	public void setBbox(Glyph _glyph, NodeList nlGeometry) {
+	public void setBbox(Glyph _glyph, Element nGeometry) {
 		Bbox bbox = new Bbox();
 
-		String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.HEIGHT_ATTR);
-		String szWidth = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.WIDTH_ATTR);
-		String szXPos = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.X_POS_ATTR);
-		String szYPos = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.Y_POS_ATTR);
+		String szHeight = nGeometry.getAttribute(ConverterDefines.HEIGHT_ATTR);
+		String szWidth = nGeometry.getAttribute(ConverterDefines.WIDTH_ATTR);
+		String szXPos = nGeometry.getAttribute(ConverterDefines.X_POS_ATTR);
+		String szYPos = nGeometry.getAttribute(ConverterDefines.Y_POS_ATTR);
 
 		bbox.setH(Float.parseFloat(szHeight));
 		bbox.setW(Float.parseFloat(szWidth));
@@ -715,55 +731,49 @@ public class GlyphHandler {
 					_glyph.setClazz(ConverterDefines.SBGN_UNIT_OF_INFORMATION);
 				}
 
-				NodeList _nlNodeLabelList = eElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
-				if (_nlNodeLabelList.getLength() > 0) {
-					String szNodeText = _nlNodeLabelList.item(0).getTextContent().trim();
+				NodeList nlNodeLabelList = eElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
+				boolean bAuxInfoText =false;
+				
+				if (nlNodeLabelList.getLength() > 0) {
+					Node nNodeLabel = nlNodeLabelList.item(0);
 
-					if (!szNodeText.equals("")) {
-
-						if (_glyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
-							// setting the label of the glyph e.g. P, 2P..
-							Glyph.State _state = new Glyph.State();
-							int iDelimPos = szNodeText.indexOf("@");
-							String szValue = "";
-							String szVariable = "";
-
-							if (iDelimPos < 0) {
-								szValue = szNodeText;
-							} else if (0 == iDelimPos) {
-								szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
-							} else if (iDelimPos > 0) {
-								szValue = szNodeText.substring(0, iDelimPos);
-								szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
-							}
-
-							_state.setValue(szValue);
-							_state.setVariable(szVariable);
-							_glyph.setState(_state);
-						} else if (_glyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
-							Label _label = new Label();
-							_label.setText(szNodeText);
-							_glyph.setLabel(_label);
-						}
+					if (nNodeLabel.getNodeType() == Node.ELEMENT_NODE) {
+						bAuxInfoText = setTextToAuxiliaryInformation(_glyph, nNodeLabel.getTextContent().trim());	
 					}
 				}
 
-				// add the state variable to the corresponding glyph
+				// add the auxiliary information (state variable, unit of information) to the
+				// corresponding glyph
 				for (Entry<Pair<String, String>, ResourceCoordinates> _resource : resourceMap.entrySet()) {
 					if (_resource.getKey().first.equals(szResourceId)) {
-						NodeList nlGeometry = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
-						String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.HEIGHT_ATTR);
-						String szWidth = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.WIDTH_ATTR);
+						NodeList nlGeometryList = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
+						Node nGeometry = nlGeometryList.item(0);
 
-						Bbox bbox = new Bbox();
-						bbox.setH(Float.parseFloat(szHeight));
-						bbox.setW(Float.parseFloat(szWidth));
-						if (_resource.getValue() != null) {
-							bbox.setX(_resource.getValue().getXCoord());
-							bbox.setY(_resource.getValue().getYCoord());
+						if (nGeometry.getNodeType() == Node.ELEMENT_NODE) {
+							Element eGeometryElement = (Element) nGeometry;
+							String szHeight = eGeometryElement.getAttribute(ConverterDefines.HEIGHT_ATTR);
+							String szWidth = eGeometryElement.getAttribute(ConverterDefines.WIDTH_ATTR);
+
+							Bbox bbox = new Bbox();
+							bbox.setH(Float.parseFloat(szHeight));
+							bbox.setW(Float.parseFloat(szWidth));
+							if (_resource.getValue() != null) {
+								bbox.setX(_resource.getValue().getXCoord());
+								bbox.setY(_resource.getValue().getYCoord());
+							}
+							
+							if(!bAuxInfoText)
+							{
+								if (_resource.getValue() != null) {
+									if(_resource.getValue().getText()!=null)
+									{
+										bAuxInfoText = setTextToAuxiliaryInformation(_glyph, _resource.getValue().getText().trim());	
+									}
+								}
+							}
+
+							_glyph.setBbox(bbox);
 						}
-
-						_glyph.setBbox(bbox);
 
 						String szParentGlyphId = _resource.getKey().second;
 						addGlyphToList(szParentGlyphId, _glyph, map.getGlyph());
@@ -771,6 +781,40 @@ public class GlyphHandler {
 				}
 			}
 		}
+	}
+
+	private boolean setTextToAuxiliaryInformation(Glyph _glyph, String szNodeText) {
+		boolean bAuxInfoText = false;
+		
+		if (!szNodeText.equals("")) {
+
+			if (_glyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
+				// setting the label of the glyph e.g. P, 2P..
+				Glyph.State _state = new Glyph.State();
+				int iDelimPos = szNodeText.indexOf("@");
+				String szValue = "";
+				String szVariable = "";
+
+				if (iDelimPos < 0) {
+					szValue = szNodeText;
+				} else if (0 == iDelimPos) {
+					szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
+				} else if (iDelimPos > 0) {
+					szValue = szNodeText.substring(0, iDelimPos);
+					szVariable = szNodeText.substring(iDelimPos + 1, szNodeText.length());
+				}
+
+				_state.setValue(szValue);
+				_state.setVariable(szVariable);
+				_glyph.setState(_state);
+			} else if (_glyph.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
+				Label _label = new Label();
+				_label.setText(szNodeText);
+				_glyph.setLabel(_label);
+			}
+			bAuxInfoText = true;
+		}
+		return bAuxInfoText;
 	}
 
 	private void addGlyphToList(String szParentGlyphId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
