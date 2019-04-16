@@ -191,7 +191,8 @@ public class GlyphHandler {
 
 							for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
 								Element _elem = (Element) _nlNodePropertiesList.item(i);
-								if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) && (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
+								if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT))
+										&& (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
 									bIsMultimer = true;
 									break;
 								}
@@ -332,7 +333,8 @@ public class GlyphHandler {
 		NodeList _nlNodePropertiesList = (eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
 		for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
 			Element _elem = (Element) _nlNodePropertiesList.item(i);
-			if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) && (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
+			if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT))
+					&& (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
 				bIsMultimer = true;
 				break;
 			}
@@ -512,7 +514,6 @@ public class GlyphHandler {
 						if (tokens[i].contains(ConverterDefines.XMLNS_N2_NS + "=")) {
 							eltAnnotation.setAttribute(ConverterDefines.XMLNS_N2_NS, value);
 						} else if (tokens[i].contains(ConverterDefines.XMLNS_NS + "=")) {
-
 							eltAnnotation.setAttribute(ConverterDefines.XMLNS_NS, value);
 						}
 					}
@@ -524,13 +525,14 @@ public class GlyphHandler {
 			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNodeURLTagId)) {
 				String szText = _element.getTextContent();
 				if (!szText.equals("")) {
+					
 					szText = szText.replaceAll("\"", "");
 					String delims = " ";
 					String[] tokens = szText.split(delims);
 					for (int i = 0; i < tokens.length; i++) {
 						String value = tokens[i].substring(tokens[i].indexOf("=") + 1).trim();
 						if (!value.equals("")) {
-
+							
 							if (tokens[i].contains(ConverterDefines.XMLNS_NS + "=")) {
 								rdfRDF.setAttribute(ConverterDefines.XMLNS_NS, value);
 							} else if (tokens[i].contains(ConverterDefines.XMLNS_BQBIOL_NS + "=")) {
@@ -545,10 +547,19 @@ public class GlyphHandler {
 								rdfRDF.setAttribute(ConverterDefines.XMLNS_DC_TERMS_NS, value);
 							} else if (tokens[i].contains(ConverterDefines.XMLNS_VCARD_NS + "=")) {
 								rdfRDF.setAttribute(ConverterDefines.XMLNS_VCARD_NS, value);
+							} else if (tokens[i].toUpperCase().contains(ConverterDefines.UNIPROT) || tokens[i].toUpperCase().contains(ConverterDefines.CHEBI)) {
+								String text = rdfRDF.getTextContent().trim();
+								// if there is some text in the RDF tag description, this is separated through a
+								// space by the newly added url information
+								if (text != "") {
+									text = text.concat(" ");
+								}
+								text = text.concat(value);
+								rdfRDF.setTextContent(text);
 							}
+							bHasAnnotation = true;
 						}
 					}
-					bHasAnnotation = true;
 				}
 			}
 
@@ -732,13 +743,13 @@ public class GlyphHandler {
 				}
 
 				NodeList nlNodeLabelList = eElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
-				boolean bAuxInfoText =false;
-				
+				boolean bAuxInfoText = false;
+
 				if (nlNodeLabelList.getLength() > 0) {
 					Node nNodeLabel = nlNodeLabelList.item(0);
 
 					if (nNodeLabel.getNodeType() == Node.ELEMENT_NODE) {
-						bAuxInfoText = setTextToAuxiliaryInformation(_glyph, nNodeLabel.getTextContent().trim());	
+						bAuxInfoText = setTextToAuxiliaryInformation(_glyph, nNodeLabel.getTextContent().trim());
 					}
 				}
 
@@ -761,13 +772,12 @@ public class GlyphHandler {
 								bbox.setX(_resource.getValue().getXCoord());
 								bbox.setY(_resource.getValue().getYCoord());
 							}
-							
-							if(!bAuxInfoText)
-							{
+
+							if (!bAuxInfoText) {
 								if (_resource.getValue() != null) {
-									if(_resource.getValue().getText()!=null)
-									{
-										bAuxInfoText = setTextToAuxiliaryInformation(_glyph, _resource.getValue().getText().trim());	
+									if (_resource.getValue().getText() != null) {
+										bAuxInfoText = setTextToAuxiliaryInformation(_glyph,
+												_resource.getValue().getText().trim());
 									}
 								}
 							}
@@ -785,7 +795,7 @@ public class GlyphHandler {
 
 	private boolean setTextToAuxiliaryInformation(Glyph _glyph, String szNodeText) {
 		boolean bAuxInfoText = false;
-		
+
 		if (!szNodeText.equals("")) {
 
 			if (_glyph.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
