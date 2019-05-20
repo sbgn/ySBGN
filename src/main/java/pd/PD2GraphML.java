@@ -40,6 +40,7 @@ import fr.eisbm.GraphMLHandlers.GraphMLResource;
 import fr.eisbm.SBGNHandlers.GraphMLStyle;
 
 public class PD2GraphML {
+	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
 	private static final String PORTGRAPHICS_ATTR = "d1";
 	private static final String PORTGEOMETRY_ATTR = "d2";
 	private static final String PORTUSERDATA_ATTR = "d3";
@@ -221,7 +222,7 @@ public class PD2GraphML {
 		attr.addAttribute("", "", "attr.name", "CDATA", "Description");
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "graph");
-		attr.addAttribute("", "", "id", "CDATA", ConverterDefines.GRAPH_DESCRIPTION_ATTR);
+		attr.addAttribute("", "", "id", "CDATA", GRAPH_DESCRIPTION_ATTR);
 		handler.startElement("", "", "key", attr);
 		handler.endElement("", "", "key");
 
@@ -389,7 +390,7 @@ public class PD2GraphML {
 		handler.startElement("", "", "graph", attr);
 
 		attr.clear();
-		attr.addAttribute("", "", "key", "string", ConverterDefines.GRAPH_DESCRIPTION_ATTR);
+		attr.addAttribute("", "", "key", "string", GRAPH_DESCRIPTION_ATTR);
 		handler.startElement("", "", "data", attr);
 		handler.endElement("", "", "data");
 

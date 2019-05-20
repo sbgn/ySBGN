@@ -156,5 +156,4 @@ public class ConverterDefines {
 	public static final double RATIO_HALF = 0.5;
 	public static final String SBGN_LEFT_TAG = "left";
 	public static final String SBGN_RIGHT_TAG = "right";
-	public static final String GRAPH_DESCRIPTION_ATTR = "d0";
 }

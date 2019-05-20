@@ -182,88 +182,103 @@ public class GlyphHandler {
 						if (nBoundNode.getNodeType() == Node.ELEMENT_NODE) {
 							Element eBoundElement = (Element) nBoundNode;
 
-							boolean bIsMultimer = false;
-							// the multimer is represented by a macromolecule having the property
-							// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
-							// value="2"/> in GraphML
-							NodeList _nlNodePropertiesList = (eBoundElement
-									.getElementsByTagName(ConverterDefines.Y_PROPERTY));
+							NodeList nComplexNodeList = eBoundElement
+									.getElementsByTagName(ConverterDefines.Y_GENERIC_GROUP_NODE);
+							if (nComplexNodeList.getLength() > 0) {
+								Node nComplexNode = nComplexNodeList.item(0);
 
-							for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
-								Element _elem = (Element) _nlNodePropertiesList.item(i);
-								if ((_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT))
-										&& (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
-									bIsMultimer = true;
-									break;
+								if (nComplexNode.getNodeType() == Node.ELEMENT_NODE) {
+									Element eComplexElement = (Element) nComplexNode;
+
+									boolean bIsMultimer = false;
+									// the multimer is represented by a macromolecule having the property
+									// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
+									// value="2"/> in GraphML
+									NodeList _nlNodePropertiesList = (eComplexElement
+											.getElementsByTagName(ConverterDefines.Y_PROPERTY));
+
+									for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
+										Element _elem = (Element) _nlNodePropertiesList.item(i);
+										if ((_elem.getAttribute("name")
+												.equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT))
+												&& (Double.parseDouble(_elem.getAttribute("value")) > 1)) {
+											bIsMultimer = true;
+											break;
+										}
+									}
+
+									if (!compoundComplexMap.containsKey(szComplexId)) {
+										_complexGlyph = new Glyph();
+										_complexGlyph.setId(szComplexId);
+										String szGlyphClass = parseYedNodeType(szYEDNodeType, bIsMultimer);
+										_complexGlyph.setClazz(szGlyphClass);
+
+										NodeList _nlNodeLabelList = eComplexElement
+												.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
+
+										String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
+
+										if (!szTextContent.equals("")) {
+											// setting the label of the complex e.g. cytosolic proteasome..
+											Label _label = new Label();
+											_label.setText(szTextContent);
+											_complexGlyph.setLabel(_label);
+										}
+
+										// setting the bbox info
+										NodeList nlGeometryList = eElement
+												.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
+										if (nlGeometryList.getLength() > 0) {
+											Node nGeometry = nlGeometryList.item(0);
+
+											if (nGeometry.getNodeType() == Node.ELEMENT_NODE) {
+												setBbox(_complexGlyph, (Element) nGeometry);
+											}
+										}
+
+										// the glyph has resouces (i.e. state variables, multimer states etc.)
+
+										if (_nlNodeLabelList.getLength() > 1) {
+											for (int i = 1; i < _nlNodeLabelList.getLength(); i++) {
+												Element _element = (Element) _nlNodeLabelList.item(i);
+												addUnitOfInformation(_complexGlyph, i,
+														_element.getTextContent().trim());
+											}
+										}
+
+										// setting style info
+										setStyle(eBoundElement, szComplexId, sh);
+
+										complexSet.add(szComplexId);
+
+										// if the complex is part of a compartment, the reference to the compartment
+										// is
+										// set
+										if (compoundCompartmentMap.containsKey(szComplexId)) {
+											String szCompartmentId = compoundCompartmentMap.get(szComplexId);
+											setCompartmentRefToGlyph(szCompartmentId, _complexGlyph, map.getGlyph());
+										}
+
+										// add the glyph to the map
+										map.getGlyph().add(_complexGlyph);
+									} else {
+
+										for (Glyph _glyph : map.getGlyph()) {
+											_complexGlyph = Utils.findGlyph(szComplexId, _glyph);
+											if (null != _complexGlyph) {
+												break;
+											}
+										}
+
+										if (null == _complexGlyph) {
+											System.out.println("parseComplex: complex id = " + szComplexId);
+										}
+									}
+
 								}
 							}
-
-							if (!compoundComplexMap.containsKey(szComplexId)) {
-								_complexGlyph = new Glyph();
-								_complexGlyph.setId(szComplexId);
-								String szGlyphClass = parseYedNodeType(szYEDNodeType, bIsMultimer);
-								_complexGlyph.setClazz(szGlyphClass);
-
-								NodeList _nlNodeLabelList = eBoundElement
-										.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
-								String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
-
-								if (!szTextContent.equals("")) {
-									// setting the label of the complex e.g. cytosolic proteasome..
-									Label _label = new Label();
-									_label.setText(szTextContent);
-									_complexGlyph.setLabel(_label);
-								}
-
-								// setting the bbox info
-								NodeList nlGeometryList = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
-								if (nlGeometryList.getLength() > 0) {
-									Node nGeometry = nlGeometryList.item(0);
-
-									if (nGeometry.getNodeType() == Node.ELEMENT_NODE) {
-										setBbox(_complexGlyph, (Element) nGeometry);
-									}
-								}
-
-								// the glyph has resouces (i.e. state variables, multimer states etc.)
-								if (_nlNodeLabelList.getLength() > 1) {
-									for (int i = 1; i < _nlNodeLabelList.getLength(); i++) {
-										Element _element = (Element) _nlNodeLabelList.item(i);
-										addUnitOfInformation(_complexGlyph, i, _element.getTextContent().trim());
-									}
-								}
-
-								// setting style info
-								setStyle(eBoundElement, szComplexId, sh);
-
-								complexSet.add(szComplexId);
-
-								// if the complex is part of a compartment, the reference to the compartment is
-								// set
-								if (compoundCompartmentMap.containsKey(szComplexId)) {
-									String szCompartmentId = compoundCompartmentMap.get(szComplexId);
-									setCompartmentRefToGlyph(szCompartmentId, _complexGlyph, map.getGlyph());
-								}
-
-								// add the glyph to the map
-								map.getGlyph().add(_complexGlyph);
-							} else {
-
-								for (Glyph _glyph : map.getGlyph()) {
-									_complexGlyph = Utils.findGlyph(szComplexId, _glyph);
-									if (null != _complexGlyph) {
-										break;
-									}
-								}
-
-								if (null == _complexGlyph) {
-									System.out.println("parseComplex: complex id = " + szComplexId);
-								}
-							}
-
 						}
 					}
-
 					NodeList nCompoundList = eElement.getElementsByTagName(ConverterDefines.NODE_TAG);
 					for (int tempCompound = 0; tempCompound < nCompoundList.getLength(); tempCompound++) {
 						Node nCompoundNode = nCompoundList.item(tempCompound);
@@ -287,7 +302,6 @@ public class GlyphHandler {
 							}
 						}
 					}
-
 				}
 			}
 		}
@@ -501,7 +515,7 @@ public class GlyphHandler {
 
 			// parse annotation information
 			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szAnnotationTagId)) {
-				String szText = _element.getTextContent();
+				String szText = _element.getTextContent().trim();
 				if (!szText.equals("")) {
 					if (null == eltAnnotation) {
 						eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
@@ -525,14 +539,14 @@ public class GlyphHandler {
 			else if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNodeURLTagId)) {
 				String szText = _element.getTextContent();
 				if (!szText.equals("")) {
-					
+
 					szText = szText.replaceAll("\"", "");
 					String delims = " ";
 					String[] tokens = szText.split(delims);
 					for (int i = 0; i < tokens.length; i++) {
 						String value = tokens[i].substring(tokens[i].indexOf("=") + 1).trim();
 						if (!value.equals("")) {
-							
+
 							if (tokens[i].contains(ConverterDefines.XMLNS_NS + "=")) {
 								rdfRDF.setAttribute(ConverterDefines.XMLNS_NS, value);
 							} else if (tokens[i].contains(ConverterDefines.XMLNS_BQBIOL_NS + "=")) {
@@ -547,7 +561,8 @@ public class GlyphHandler {
 								rdfRDF.setAttribute(ConverterDefines.XMLNS_DC_TERMS_NS, value);
 							} else if (tokens[i].contains(ConverterDefines.XMLNS_VCARD_NS + "=")) {
 								rdfRDF.setAttribute(ConverterDefines.XMLNS_VCARD_NS, value);
-							} else if (tokens[i].toUpperCase().contains(ConverterDefines.UNIPROT) || tokens[i].toUpperCase().contains(ConverterDefines.CHEBI)) {
+							} else if (tokens[i].toUpperCase().contains(ConverterDefines.UNIPROT)
+									|| tokens[i].toUpperCase().contains(ConverterDefines.CHEBI)) {
 								String text = rdfRDF.getTextContent().trim();
 								// if there is some text in the RDF tag description, this is separated through a
 								// space by the newly added url information
@@ -676,8 +691,8 @@ public class GlyphHandler {
 				eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
 			}
 			eltAnnotation.appendChild(rdfRDF);
-
 		}
+
 		return eltAnnotation;
 	}
 
