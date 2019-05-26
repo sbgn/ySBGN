@@ -19,9 +19,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.PortArcsRelationship.PortType;
+import utils.ConverterDefines;
+import utils.Utils;
 
 public class ArcHandler {
 
@@ -405,10 +405,10 @@ public class ArcHandler {
 						if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)
 								|| arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
 
-							LINE_POSITION eArcPosition = getLinePosition(glyph, arc);
-							if (eArcPosition.equals(LINE_POSITION.eHorizontal)) {
+							LinePosition eArcPosition = getLinePosition(glyph, arc);
+							if (eArcPosition.equals(LinePosition.eHorizontal)) {
 								horizontal++;
-							} else if (eArcPosition.equals(LINE_POSITION.eVertical)) {
+							} else if (eArcPosition.equals(LinePosition.eVertical)) {
 								vertical++;
 							}
 						}
@@ -429,10 +429,10 @@ public class ArcHandler {
 								|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
 								|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
 
-							LINE_POSITION eArcPosition = getLinePosition(glyph, arc);
-							if (eArcPosition.equals(LINE_POSITION.eHorizontal)) {
+							LinePosition eArcPosition = getLinePosition(glyph, arc);
+							if (eArcPosition.equals(LinePosition.eHorizontal)) {
 								horizontal++;
-							} else if (eArcPosition.equals(LINE_POSITION.eVertical)) {
+							} else if (eArcPosition.equals(LinePosition.eVertical)) {
 								vertical++;
 							}
 						}
@@ -567,8 +567,8 @@ public class ArcHandler {
 		}
 	}
 
-	private LINE_POSITION getLinePosition(Glyph glyph, Arc arc) {
-		LINE_POSITION eLinePosition = LINE_POSITION.eNeutral;
+	private LinePosition getLinePosition(Glyph glyph, Arc arc) {
+		LinePosition eLinePosition = LinePosition.eNeutral;
 
 		float point_x = glyph.getBbox().getX();
 		float point_y = glyph.getBbox().getY();
@@ -591,9 +591,9 @@ public class ArcHandler {
 		float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
 
 		if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
-			eLinePosition = LINE_POSITION.eHorizontal;
+			eLinePosition = LinePosition.eHorizontal;
 		} else if (Math.abs(point_y - y_shape) > Math.abs(point_x - x_shape)) {
-			eLinePosition = LINE_POSITION.eVertical;
+			eLinePosition = LinePosition.eVertical;
 		}
 
 		return eLinePosition;

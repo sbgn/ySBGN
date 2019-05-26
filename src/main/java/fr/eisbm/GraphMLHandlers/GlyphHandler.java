@@ -20,9 +20,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
+import utils.ConverterDefines;
+import utils.Utils;
 
 public class GlyphHandler {
 

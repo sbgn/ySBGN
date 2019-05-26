@@ -1,5 +1,6 @@
 package pd;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -21,6 +22,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
+import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Glyph;
@@ -33,11 +35,11 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GraphMLResource;
 import fr.eisbm.SBGNHandlers.GraphMLStyle;
+import utils.ConverterDefines;
+import utils.Utils;
 
 public class PD2GraphML {
 	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
@@ -82,10 +84,13 @@ public class PD2GraphML {
 		// Now read from "f" and put the result in "sbgn"
 		Sbgn sbgn;
 		try {
-			sbgn = Utils.readFromFile(szInSBGNFileName);
+			File f = new File(szInSBGNFileName);
+
+			// Now read from "f" and put the result in "sbgn"
+			sbgn = SbgnUtil.readFromFile(f);
 
 			// map is a container for the glyphs and arcs
-			map = (org.sbgn.bindings.Map) sbgn.getMap();
+			map = sbgn.getMap().get(0);
 
 			try {
 				w = new FileWriter(szOutGraphMLFileName);

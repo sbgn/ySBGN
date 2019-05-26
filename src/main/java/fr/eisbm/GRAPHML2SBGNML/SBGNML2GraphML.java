@@ -11,22 +11,9 @@ import org.xml.sax.SAXException;
 
 import af.AF2GraphML;
 import pd.PD2GraphML;
+import utils.Utils;
 
 public class SBGNML2GraphML {
-
-	public static void main(String[] args) {
-
-		File inputFile = new File(Utils.IN_SBGN_FILE);
-		try {
-			System.out.println(
-					"SBGN file validation: " + (SbgnUtil.isValid(inputFile) ? "validates" : "does not validate"));
-			convert(Utils.IN_SBGN_FILE);
-			System.out.println("simulation finished");
-		} catch (JAXBException | SAXException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 
 	public static void convert(String szInputFileName) {
 		long start = System.currentTimeMillis();
@@ -50,17 +37,18 @@ public class SBGNML2GraphML {
 		// Now read from "f" and put the result in "sbgn"
 		Sbgn sbgn;
 		try {
-			sbgn = Utils.readFromFile(szInSBGNFileName);
+			File f = new File(szInSBGNFileName);
 
-			if (((org.sbgn.bindings.Map) sbgn.getMap()).getLanguage().equals("process description")) {
+			// Now read from "f" and put the result in "sbgn"
+			sbgn = SbgnUtil.readFromFile(f);
+
+			if ((sbgn.getMap().get(0)).getLanguage().equals("process description")) {
 				PD2GraphML pdConverter = new PD2GraphML();
 				pdConverter.parseSBGNFile(szInSBGNFileName, szOutGraphMLFileName);
-			} else if (((org.sbgn.bindings.Map) sbgn.getMap()).getLanguage().equals("activity flow")) {
+			} else if ((sbgn.getMap().get(0)).getLanguage().equals("activity flow")) {
 				AF2GraphML afConverter = new AF2GraphML();
 				afConverter.parseSBGNFile(szInSBGNFileName, szOutGraphMLFileName);
 			}
-			
-			Utils.generateStatistics(sbgn.getMap());
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}

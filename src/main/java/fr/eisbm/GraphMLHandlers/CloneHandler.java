@@ -5,8 +5,8 @@ import java.util.List;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
+import utils.ConverterDefines;
+import utils.Utils;
 
 import org.sbgn.bindings.Label;
 import org.sbgn.bindings.Map;

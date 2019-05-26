@@ -21,35 +21,22 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
-
+import utils.ConverterDefines;
+import utils.SBGNValidation;
 
 public class GraphML2PD {
 
 	Sbgn sbgn = new Sbgn();
 	Map map = new Map();
 	java.util.Map<String, String> colorMap = new HashMap<String, String>();
-
-	public static void main(String[] args) {
-		convert(Utils.IN_YED_FILE);
-		System.out.println("simulation finished");
-	}
-
-	public static void convert(String szInputFileName) {
-		GraphML2PD pdConverter = new GraphML2PD();
-		String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
-		boolean bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-		System.out.println(szInputFileName + "\t " + bConversion);
-	}
 	
-	public boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
+	public boolean parseGraphMLFile(String szInGraphMLFileName, String szInputFileShortName, String szOutSBGNFile) {
 		boolean bConversion = false;
 		try {
 			File inputFile = new File(szInGraphMLFileName);
@@ -61,7 +48,8 @@ public class GraphML2PD {
 			File outputFile = new File(szOutSBGNFile);
 
 			map.setLanguage("process description");
-			sbgn.setMap(map);
+			map.setId(szInputFileShortName);
+			sbgn.getMap().add(map);
 
 			GlyphHandler glyphHandler = new GlyphHandler();
 			ArcHandler arcHandler = new ArcHandler();
@@ -126,8 +114,6 @@ public class GraphML2PD {
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
 
-			System.out.println(
-					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
 			bConversion = true;
 		} catch (Exception e) {
 			e.printStackTrace();

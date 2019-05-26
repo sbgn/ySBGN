@@ -1,6 +1,6 @@
 package fr.eisbm.SBGNHandlers;
 
-import fr.eisbm.GRAPHML2SBGNML.Utils;
+import utils.Utils;
 
 public class GraphMLStyle {
 	static final String DEFAULT_FILL_COLOR = "#FFFFFF";

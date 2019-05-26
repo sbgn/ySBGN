@@ -1,6 +1,6 @@
 package fr.eisbm.GraphMLHandlers;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import utils.ConverterDefines;
 
 public class GraphMLResource {
 	String m_ID;

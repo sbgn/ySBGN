@@ -3,7 +3,7 @@ package fr.eisbm.GraphMLHandlers;
 import java.util.HashSet;
 import java.util.Set;
 
-import fr.eisbm.GRAPHML2SBGNML.Utils;
+import utils.Utils;
 
 public class SBGNMLStyle {
 	String m_szId;

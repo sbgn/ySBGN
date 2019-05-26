@@ -1,7 +1,6 @@
 package af;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -32,11 +30,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
+import utils.ConverterDefines;
+import utils.Utils;
 
 public class GraphML2AF {
 
@@ -102,25 +99,7 @@ public class GraphML2AF {
 	Set<String> complexSet = new HashSet<String>();
 	Set<String> compartmentSet = new HashSet<String>();
 
-	public static void main(String[] args) {
-
-		convert(Utils.IN_YED_FILE);
-		System.out.println("simulation finished");
-	}
-
-	public static void convert(String szInputFileName) {
-		GraphML2AF gs = new GraphML2AF();
-		String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
-		boolean bConversion = gs.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-
-		if (bConversion) {
-			String szSBGNv02File = szInputFileName.replace(".graphml", "").concat("-SBGNv02.sbgn");
-			// make a SBGN (v02) -valid file
-			gs.createSBGNv02File(szOutSBGNFile, szSBGNv02File);
-		}
-	}
-
-	public boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
+	public boolean parseGraphMLFile(String szInGraphMLFileName, String szInputFileShortName, String szOutSBGNFile) {
 		boolean bConversion = false;
 		try {
 			File inputFile = new File(szInGraphMLFileName);
@@ -132,7 +111,8 @@ public class GraphML2AF {
 			File outputFile = new File(szOutSBGNFile);
 
 			map.setLanguage("activity flow");
-			sbgn.setMap(map);
+			map.setId(szInputFileShortName);
+			sbgn.getMap().add(map);
 
 			String szNotesTagId = "";
 			String szCloneTagId = "";
@@ -229,7 +209,8 @@ public class GraphML2AF {
 									String szGlyphClass = parseYedNodeType(szYEDNodeType);
 									_complexGlyph.setClazz(szGlyphClass);
 
-									NodeList _nlNodeLabelList = eElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
+									NodeList _nlNodeLabelList = eElement
+											.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
 									String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
 
 									if (!szTextContent.equals("")) {
@@ -401,9 +382,9 @@ public class GraphML2AF {
 						if (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("OR")
 								|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("OR")
 								|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("AND")
-								|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("AND"))
+										|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("AND"))
 								|| (((Glyph) _arc.getSource()).getClazz().toUpperCase().equals("NOT")
-								|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("NOT"))) {
+										|| ((Glyph) _arc.getTarget()).getClazz().toUpperCase().equals("NOT"))) {
 							_arc.setClazz(ConverterDefines.SBGN_LOGIC_ARC);
 						}
 					}
@@ -577,9 +558,6 @@ public class GraphML2AF {
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
-
-			System.out.println(
-					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
 
 			bConversion = true;
 		} catch (Exception e) {
@@ -998,51 +976,5 @@ public class GraphML2AF {
 			szAttributeValues = szAttributeValues.concat(eElement.getAttributes().item(i) + "\t");
 		}
 		return szAttributeValues;
-	}
-
-	private void createSBGNv02File(String inSbgnFile, String outSBGNv02File) {
-		// Now read from "f" and put the result in "sbgn"
-		Sbgn sbgn;
-		try {
-			sbgn = Utils.readFromFile(inSbgnFile);
-
-			// map is a container for the glyphs and arcs
-			Map map = (org.sbgn.bindings.Map) sbgn.getMap();
-
-			Map map1 = new org.sbgn.bindings.Map();
-			map1.setLanguage(map.getLanguage());
-
-			// we can get a list of glyphs (nodes) in this map with getGlyph()
-			for (Glyph g : map.getGlyph()) {
-				String newGlyphId = "glyph_" + g.getId();
-				newGlyphId = newGlyphId.replaceAll("::", "_");
-				g.setId(newGlyphId);
-				for (Glyph _glyph : g.getGlyph()) {
-					String newVal = g.getId() + _glyph.getId();
-					newVal = newVal.replaceAll("::", "_");
-					_glyph.setId(newVal);
-				}
-				map1.getGlyph().add(g);
-			}
-
-			for (Arc a : map.getArc()) {
-				String arcId = "arc_" + a.getId();
-				arcId = arcId.replaceAll("::", "_");
-				a.setId(arcId);
-				map1.getArc().add(a);
-			}
-
-			// write everything to disk
-			File outputFile = new File(outSBGNv02File);
-			Sbgn sbgn1 = new Sbgn();
-			sbgn1.setMap(map1);
-			SbgnUtil.writeToFile(sbgn1, outputFile);
-			System.out.println(
-					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
-		} catch (JAXBException | SAXException | IOException e2) {
-			e2.printStackTrace();
-		}
-
-		System.out.println("Finished to generate the SBGN v02 file.");
 	}
 }
