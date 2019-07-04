@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.xml.transform.sax.TransformerHandler;
+
 import org.jgrapht.alg.util.Pair;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
@@ -19,10 +21,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
-import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 
 public class GlyphHandler {
 
@@ -168,52 +172,86 @@ public class GlyphHandler {
 				String szYEDNodeType = ((Element) _nlConfigList.item(0)).getAttribute("configuration");
 				if (szYEDNodeType.equals(ConverterDefines.COM_YWORKS_SBGN_COMPLEX)) {
 					String szComplexId = eElement.getAttribute(ConverterDefines.ID_ATTR);
+					
 					Glyph _complexGlyph = null;
+					
+					NodeList nBoundNodeList = eElement.getElementsByTagName(ConverterDefines.Y_PROXY_AUTO_BOUNDS_NODE);
+					if(nBoundNodeList.getLength() >0){
+						Node nBoundNode = nBoundNodeList.item(0);
 
-					if (!compoundComplexMap.containsKey(szComplexId)) {
-						_complexGlyph = new Glyph();
-						_complexGlyph.setId(szComplexId);
-						String szGlyphClass = parseYedNodeType(szYEDNodeType, false);
-						_complexGlyph.setClazz(szGlyphClass);
+						if (nBoundNode.getNodeType() == Node.ELEMENT_NODE) {
+							Element eBoundElement = (Element) nBoundNode;
 
-						NodeList _nlNodeLabelList = eElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
-						String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
-
-						if (!szTextContent.equals("")) {
-							// setting the label of the complex e.g. cytosolic proteasome..
-							Label _label = new Label();
-							_label.setText(szTextContent);
-							_complexGlyph.setLabel(_label);
-						}
-
-						// setting the bbox info
-						setBbox(_complexGlyph, eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
-
-						// setting style info
-						setStyle(eElement, szComplexId, sh);
-
-						complexSet.add(szComplexId);
-
-						// if the complex is part of a compartment, the reference to the compartment is
-						// set
-						if (compoundCompartmentMap.containsKey(szComplexId)) {
-							String szCompartmentId = compoundCompartmentMap.get(szComplexId);
-							setCompartmentRefToGlyph(szCompartmentId, _complexGlyph, map.getGlyph());
-						}
-
-						// add the glyph to the map
-						map.getGlyph().add(_complexGlyph);
-					} else {
-
-						for (Glyph _glyph : map.getGlyph()) {
-							_complexGlyph = Utils.findGlyph(szComplexId, _glyph);
-							if (null != _complexGlyph) {
-								break;
+							boolean bIsMultimer = false;
+							// the multimer is represented by a macromolecule having the property
+							// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
+							// value="2"/> in GraphML
+							NodeList _nlNodePropertiesList = (eBoundElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
+						
+							for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
+								Element _elem = (Element) _nlNodePropertiesList.item(i);
+								if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
+									bIsMultimer = true;
+									break;
+								}
 							}
-						}
 
-						if (null == _complexGlyph) {
-							System.out.println("parseComplex: complex id = " + szComplexId);
+							if (!compoundComplexMap.containsKey(szComplexId)) {
+								_complexGlyph = new Glyph();
+								_complexGlyph.setId(szComplexId);
+								String szGlyphClass = parseYedNodeType(szYEDNodeType, bIsMultimer);
+								_complexGlyph.setClazz(szGlyphClass);
+
+								NodeList _nlNodeLabelList = eBoundElement.getElementsByTagName(ConverterDefines.Y_NODE_LABEL);
+								String szTextContent = _nlNodeLabelList.item(0).getTextContent().trim();
+
+								if (!szTextContent.equals("")) {
+									// setting the label of the complex e.g. cytosolic proteasome..
+									Label _label = new Label();
+									_label.setText(szTextContent);
+									_complexGlyph.setLabel(_label);
+								}
+								
+
+								// setting the bbox info
+								setBbox(_complexGlyph, eBoundElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY));
+								
+								// the glyph has resouces (i.e. state variables, multimer states etc.)
+								if (_nlNodeLabelList.getLength() > 1) {
+									for (int i = 1; i < _nlNodeLabelList.getLength(); i++) {
+										Element _element = (Element) _nlNodeLabelList.item(i);
+										addUnitOfInformation(_complexGlyph, i, _element.getTextContent().trim());
+									}
+								}
+
+								// setting style info
+								setStyle(eBoundElement, szComplexId, sh);
+
+								complexSet.add(szComplexId);
+
+								// if the complex is part of a compartment, the reference to the compartment is
+								// set
+								if (compoundCompartmentMap.containsKey(szComplexId)) {
+									String szCompartmentId = compoundCompartmentMap.get(szComplexId);
+									setCompartmentRefToGlyph(szCompartmentId, _complexGlyph, map.getGlyph());
+								}
+
+								// add the glyph to the map
+								map.getGlyph().add(_complexGlyph);
+							} else {
+
+								for (Glyph _glyph : map.getGlyph()) {
+									_complexGlyph = Utils.findGlyph(szComplexId, _glyph);
+									if (null != _complexGlyph) {
+										break;
+									}
+								}
+
+								if (null == _complexGlyph) {
+									System.out.println("parseComplex: complex id = " + szComplexId);
+								}
+							}
+							
 						}
 					}
 
@@ -349,27 +387,7 @@ public class GlyphHandler {
 						}
 					}
 
-					// the glyph is a multimer (the shape from the yEd SBGN palette was used for
-					// drawing) and the child glyph is an unit of information
-					if ((_element.getTextContent().trim().contains("N:"))
-							|| (_element.getTextContent().trim().contains("RNA"))
-							|| (_element.getTextContent().trim().toUpperCase().contains("RECEPTOR"))) {
-						Glyph _uofGlyph = new Glyph();
-						_uofGlyph.setClazz(ConverterDefines.SBGN_UNIT_OF_INFORMATION);
-						_uofGlyph.setId(_glyph.getId() + "_uof_" + i);
-						Label _label = new Label();
-						_label.setText(_element.getTextContent().trim());
-						_uofGlyph.setLabel(_label);
-
-						Bbox _uofBbox = new Bbox();
-						_uofBbox.setH(16);
-						_uofBbox.setW(25);
-						_uofBbox.setX(_glyph.getBbox().getX() + 10);
-						_uofBbox.setY(_glyph.getBbox().getY() - 10);
-						_uofGlyph.setBbox(_uofBbox);
-
-						_glyph.getGlyph().add(_uofGlyph);
-					}
+					addUnitOfInformation(_glyph, i, _element.getTextContent().trim());
 				}
 			}
 
@@ -402,6 +420,30 @@ public class GlyphHandler {
 			}
 		}
 		return _glyph;
+	}
+
+	private void addUnitOfInformation(Glyph _glyph, int i, String szText) {
+		// the glyph is a multimer (the shape from the yEd SBGN palette was used for
+		// drawing) and the child glyph is an unit of information
+		if ((szText.contains("N:"))
+				|| (szText.contains("RNA"))
+				|| (szText.toUpperCase().contains("RECEPTOR"))) {
+			Glyph _uofGlyph = new Glyph();
+			_uofGlyph.setClazz(ConverterDefines.SBGN_UNIT_OF_INFORMATION);
+			_uofGlyph.setId(_glyph.getId() + "_uof_" + i);
+			Label _label = new Label();
+			_label.setText(szText);
+			_uofGlyph.setLabel(_label);
+
+			Bbox _uofBbox = new Bbox();
+			_uofBbox.setH(16);
+			_uofBbox.setW(25);
+			_uofBbox.setX(_glyph.getBbox().getX() + 10);
+			_uofBbox.setY(_glyph.getBbox().getY() - 10);
+			_uofGlyph.setBbox(_uofBbox);
+
+			_glyph.getGlyph().add(_uofGlyph);
+		}
 	}
 
 	private Element parseAnnotation(Document doc, ModelAttributes modelAttributes, Glyph _glyph, NodeList nlDataList) {
@@ -614,9 +656,13 @@ public class GlyphHandler {
 
 	public Notes getSBGNNotes(Element notes) {
 		if (notes != null) {
-			Notes newNotes = new Notes();
-			newNotes.getAny().add(notes);
-			return newNotes;
+			if (notes.getTextContent() != null) {
+				if (!notes.getTextContent().trim().isEmpty()) {
+					Notes newNotes = new Notes();
+					newNotes.getAny().add(notes);
+					return newNotes;
+				}
+			}
 		}
 		return null;
 	}

@@ -1,6 +1,7 @@
 package fr.eisbm.GRAPHML2SBGNML;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -12,13 +13,17 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.sbgn.SbgnUtil;
+import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Map;
+import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
+import org.xml.sax.SAXException;
 
 public class Utils {
 	public static final String IN_SBGN_FILE = "af/F001-DendriticCell.sbgn";
-	public static final String IN_YED_FILE = "downloads/F007-inos.graphml";
+	public static final String IN_YED_FILE = "downloads/F003-mevalonate.graphml";
 
 	public static final int DEFAULT_FONT_SIZE = 10;
 	public static final int MAX_PORT_NO = 2;
@@ -78,14 +83,17 @@ public class Utils {
 
 	public static boolean isOperatorType(Glyph source) {
 		boolean bIsOperator = false;
-		if (source.getClazz().equals(ConverterDefines.SBGN_AND) || (source.getClazz().equals(ConverterDefines.SBGN_OR))
-				|| (source.getClazz().equals(ConverterDefines.SBGN_NOT))) {
-			bIsOperator = true;
+		if (source.getClazz() != null) {
+			if (source.getClazz().equals(ConverterDefines.SBGN_AND)
+					|| (source.getClazz().equals(ConverterDefines.SBGN_OR))
+					|| (source.getClazz().equals(ConverterDefines.SBGN_NOT))) {
+				bIsOperator = true;
+			}
 		}
 		return bIsOperator;
 	}
 
-	public static  Glyph findGlyph(String szId, Glyph g) {
+	public static Glyph findGlyph(String szId, Glyph g) {
 		if (g.getId().equals(szId)) {
 			return g;
 		}
@@ -99,8 +107,8 @@ public class Utils {
 	}
 
 	public static void generateStatistics(Map map) {
-		System.out.println("Glyph number "+ map.getGlyph().size());
-		System.out.println("Arc number"+ map.getArc().size());
-		
+		System.out.println("Glyph number " + map.getGlyph().size());
+		System.out.println("Arc number" + map.getArc().size());
+
 	}
 }
