@@ -1,12 +1,10 @@
-package utils;
+package fr.eisbm.SBGNHandlers;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
@@ -16,22 +14,21 @@ import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
 import org.xml.sax.SAXException;
 
-public class SBGNComplianceConversion {
-	public static void makeSBGNCompliant (String szInSBGNFileName, String szOutSBGNv02FileName) {
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
+
+public class transformToSBGN02 {
+	public static void transformToSBGNv02(String szInSBGNFileName, String szOutSBGNv02FileName) {
 		// Now read from "f" and put the result in "sbgn"
 		Sbgn sbgn;
 		try {
-			File f = new File(szInSBGNFileName);
-
-			// Now read from "f" and put the result in "sbgn"
-			sbgn = SbgnUtil.readFromFile(f);
+			sbgn = Utils.readFromFile(szInSBGNFileName);
 
 			// map is a container for the glyphs and arcs
-			Map map = sbgn.getMap().get(0);
+			Map map = (org.sbgn.bindings.Map) sbgn.getMap();
 
 			Map map1 = new org.sbgn.bindings.Map();
 			map1.setLanguage(map.getLanguage());
-			map1.setId(map.getId());
 
 			// we can get a list of glyphs (nodes) in this map with getGlyph()
 			for (Glyph g : map.getGlyph()) {
@@ -77,20 +74,12 @@ public class SBGNComplianceConversion {
 			// write everything to disk
 			File outputFile = new File(szOutSBGNv02FileName);
 			Sbgn sbgn1 = new Sbgn();
-
-			sbgn1.getMap().add(map1);
+			sbgn1.setMap(map1);
 			SbgnUtil.writeToFile(sbgn1, outputFile);
-
-			SBGNValidation.validateSBGN(szOutSBGNv02FileName);
-
+			System.out.println(
+					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
 		} catch (JAXBException | SAXException | IOException e2) {
 			e2.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (TransformerException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
 		System.out.println("simulation finished");
@@ -105,5 +94,6 @@ public class SBGNComplianceConversion {
 				correctInternalGlyphsIds(_glyph.getId(), _glyph.getGlyph());
 			}
 		}
+
 	}
 }

@@ -30,10 +30,8 @@ import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
+import fr.eisbm.SBGNHandlers.transformToSBGN02;
 import pd.GraphML2PD;
-import utils.ConverterDefines;
-import utils.SBGNComplianceConversion;
-import utils.Utils;
 
 public class GraphML2SBGNML {
 
@@ -41,40 +39,39 @@ public class GraphML2SBGNML {
 	Map map = new Map();
 	java.util.Map<String, String> colorMap = new HashMap<String, String>();
 
+	public static void main(String[] args) {
+		convert(Utils.IN_YED_FILE);
+		System.out.println("simulation finished");
+	}
+
 	public static void convert(String szInputFileName) {
+
 		try {
 			long start = System.currentTimeMillis();
 			String xml = new String(Files.readAllBytes(FileSystems.getDefault().getPath(szInputFileName)));
 			String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
 			
-			String szInputFileShortName = FileSystems.getDefault().getPath(szInputFileName).getFileName().toString().replace(".graphml", "");
-
-			// if the output file already exists, it will be overwritten during the current
-			// conversion step
-			if ((new File(szOutSBGNFile)).exists()) {
-				System.out.println(
-						"The selected output file exists and it will be overwritten during the current conversion step.");
+			//if the output file already exists, it will be overwritten during the current conversion step
+			if((new File(szOutSBGNFile)).exists())
+			{
+				System.out.println("The selected output file exists and it will be overwritten during the current conversion step." );
 			}
 			
 			boolean bConversion = false;
 			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
 				GraphML2PD pdConverter = new GraphML2PD();
-				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szInputFileShortName, szOutSBGNFile);
-			} else {
+				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
+			} /*else {
 				GraphML2AF afConverter = new GraphML2AF();
-				bConversion = afConverter.parseGraphMLFile(szInputFileName, szInputFileShortName, szOutSBGNFile);
-			}
-
-			if (bConversion) {
-				String szSBGNv02FileName = szInputFileName.replace(".graphml", "-SBGNv02.sbgn");
-				SBGNComplianceConversion.makeSBGNCompliant(szOutSBGNFile, szSBGNv02FileName);
-			}
+				bConversion = afConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
+			}*/
 
 			long end = System.currentTimeMillis();
 			// finding the time difference and converting it into seconds
 			float sec = (end - start) / 1000F;
 			System.out.println(sec + " seconds");
 
+			System.out.println(szInputFileName + "\t " + bConversion);
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -96,12 +93,7 @@ public class GraphML2SBGNML {
 			File outputFile = new File(szOutSBGNFile);
 
 			map.setLanguage("process description");
-
-			// from libSBGN version 2.0
-			// sbgn.setMap(map);
-
-			// from libSBGN version 3.0
-			sbgn.getMap().add(map);
+			sbgn.setMap(map);
 
 			GlyphHandler glyphHandler = new GlyphHandler();
 			ArcHandler arcHandler = new ArcHandler();
@@ -169,6 +161,8 @@ public class GraphML2SBGNML {
 			System.out.println(
 					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
 			bConversion = true;
+			
+			Utils.generateStatistics(sbgn.getMap());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -1,6 +1,6 @@
 package fr.eisbm.GraphMLHandlers;
 
-import utils.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 
 public class GraphMLResource {
 	String m_ID;
@@ -10,9 +10,8 @@ public class GraphMLResource {
 	float m_XCoord;
 	float m_YCoord;
 	String m_szText;
-
-	public GraphMLResource(String _id, String _class, float _fHeight, float _fWidth, float _xCoord, float _yCoord,
-			String _text) {
+	
+	public GraphMLResource(String _id, String _class, float _fHeight, float _fWidth, float _xCoord, float _yCoord, String _text) {
 		super();
 		this.m_ID = _id;
 		this.m_Class = _class;
@@ -57,10 +56,10 @@ public class GraphMLResource {
 	public float getYCoord() {
 		return m_YCoord;
 	}
-
+	
 	public String getText() {
 		return this.m_szText;
-
+		
 	}
 
 	public void setId(String _id) {
@@ -89,6 +88,9 @@ public class GraphMLResource {
 
 	public void setText(String value) {
 		this.m_szText = value;
-
+		
 	}
+	
+	
+
 }

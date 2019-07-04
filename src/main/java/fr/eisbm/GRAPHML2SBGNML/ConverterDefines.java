@@ -1,4 +1,4 @@
-package utils;
+package fr.eisbm.GRAPHML2SBGNML;
 
 public class ConverterDefines {
 
@@ -95,7 +95,6 @@ public class ConverterDefines {
 	public static final String Y_FILL = "y:Fill";
 	public static final String YED_NODE_REALIZER_ICON = "yed:NodeRealizerIcon";
 	public static final String Y_RESOURCE = "y:Resource";
-	public static final String Y_RESOURCES = "y:Resources";
 	public static final String Y_GEOMETRY = "y:Geometry";
 	public static final String Y_GENERIC_NODE = "y:GenericNode";
 	public static final String Y_PROPERTY = "y:Property";
@@ -124,7 +123,6 @@ public class ConverterDefines {
 	public static final String Y_POS_ATTR = "y";
 	public static final String ICON_DATA_ATTR = "iconData";
 
-	public static final String XMLNS_RDF_NS = "xmlns:rdf";
 	public static final String XMLNS_N2_NS = "xmlns:ns2";
 	public static final String XMLNS_NS = "xmlns";
 	public static final String XMLNS_BQBIOL_NS = "xmlns:bqbiol";
@@ -149,8 +147,6 @@ public class ConverterDefines {
 	public static final String RDF_RDF_TAG = "rdf:RDF";
 	public static final String RDF_ABOUT_TAG = "rdf:about";
 	public static final String RDF_DESCRIPTION_TAG = "rdf:Description";
-	public static final String UNIPROT = "UNIPROT";
-	public static final String CHEBI = "CHEBI";
 	public static final String RESOURCE_FONT_SIZE = "10";
 	public static final double RATIO_THIRD = 0.3;
 	public static final double RATIO_HALF = 0.5;

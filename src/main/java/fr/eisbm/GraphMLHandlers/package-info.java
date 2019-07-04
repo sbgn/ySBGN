@@ -2,7 +2,7 @@
  * 
  */
 /**
- * @author ibalaur
+ * @author iroznovat
  *
  */
 package fr.eisbm.GraphMLHandlers;

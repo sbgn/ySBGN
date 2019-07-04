@@ -19,9 +19,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.PortArcsRelationship.PortType;
-import utils.ConverterDefines;
-import utils.Utils;
 
 public class ArcHandler {
 
@@ -231,7 +231,8 @@ public class ArcHandler {
 						bFoundPort = isPortPoint(fXCoord, fYCoord, g);
 					}
 				}
-
+				
+	
 				if (!bFoundPort) {
 
 					boolean bBendPointFound = false;
@@ -248,7 +249,7 @@ public class ArcHandler {
 						next.setY(fYCoord);
 						arc.getNext().add(next);
 					}
-				} 
+				}
 			}
 		}
 	}
@@ -363,9 +364,6 @@ public class ArcHandler {
 
 		// if the process is a consumption, it is easy to draw from process to entity
 		// and this can not be detected before
-		// given that at this stage the logic arc is drawn using the consumption line,
-		// it is needed to check if the line was correctly drawn between the operator
-		// and the EPN
 		if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)) {
 
 			source = (Glyph) arc.getSource();
@@ -374,10 +372,6 @@ public class ArcHandler {
 			if (source != null && target != null) {
 
 				if ((Utils.isProcessType(source)) && (!Utils.isProcessType(target))) {
-					arc.setSource(target);
-					arc.setTarget(source);
-				}
-				if ((Utils.isOperatorType(source)) && (!Utils.isOperatorType(target))) {
 					arc.setSource(target);
 					arc.setTarget(source);
 				}
@@ -405,10 +399,10 @@ public class ArcHandler {
 						if (arc.getClazz().equals(ConverterDefines.SBGN_CONSUMPTION)
 								|| arc.getClazz().equals(ConverterDefines.SBGN_PRODUCTION)) {
 
-							LinePosition eArcPosition = getLinePosition(glyph, arc);
-							if (eArcPosition.equals(LinePosition.eHorizontal)) {
+							LINE_POSITION eArcPosition = getLinePosition(glyph, arc);
+							if (eArcPosition.equals(LINE_POSITION.eHorizontal)) {
 								horizontal++;
-							} else if (eArcPosition.equals(LinePosition.eVertical)) {
+							} else if (eArcPosition.equals(LINE_POSITION.eVertical)){
 								vertical++;
 							}
 						}
@@ -429,10 +423,10 @@ public class ArcHandler {
 								|| arc.getClazz().equals(ConverterDefines.SBGN_MODULATION)
 								|| arc.getClazz().equals(ConverterDefines.SBGN_NECESSARY_STIMULATION)) {
 
-							LinePosition eArcPosition = getLinePosition(glyph, arc);
-							if (eArcPosition.equals(LinePosition.eHorizontal)) {
+							LINE_POSITION eArcPosition = getLinePosition(glyph, arc);
+							if (eArcPosition.equals(LINE_POSITION.eHorizontal)) {
 								horizontal++;
-							} else if (eArcPosition.equals(LinePosition.eVertical)) {
+							} else if (eArcPosition.equals(LINE_POSITION.eVertical)){
 								vertical++;
 							}
 						}
@@ -448,18 +442,21 @@ public class ArcHandler {
 
 	private void rearrangePorts(Glyph glyph, int horizontal, int vertical) {
 		if (horizontal > vertical) {
-			glyph.getPort().get(Utils.FIRST_PORT).setX((float) (glyph.getBbox().getX() - glyph.getBbox().getW() * 0.5));
+			glyph.getPort().get(Utils.FIRST_PORT)
+					.setX((float) (glyph.getBbox().getX() - glyph.getBbox().getW() * 0.5));
 			glyph.getPort().get(Utils.SECOND_PORT)
 					.setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() + glyph.getBbox().getW() * 0.5));
 
-			glyph.getPort().get(Utils.FIRST_PORT).setY((float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5));
+			glyph.getPort().get(Utils.FIRST_PORT)
+					.setY((float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5));
 			glyph.getPort().get(Utils.SECOND_PORT)
 					.setY((float) (glyph.getBbox().getY() + glyph.getBbox().getH() * 0.5));
 			if (Utils.isProcessType(glyph)) {
 				glyph.setOrientation("horizontal");
 			}
 		} else if (horizontal < vertical) {
-			glyph.getPort().get(Utils.FIRST_PORT).setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
+			glyph.getPort().get(Utils.FIRST_PORT)
+					.setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
 			glyph.getPort().get(Utils.SECOND_PORT)
 					.setX((float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5));
 
@@ -567,8 +564,8 @@ public class ArcHandler {
 		}
 	}
 
-	private LinePosition getLinePosition(Glyph glyph, Arc arc) {
-		LinePosition eLinePosition = LinePosition.eNeutral;
+	private LINE_POSITION getLinePosition(Glyph glyph, Arc arc) {
+		LINE_POSITION eLinePosition = LINE_POSITION.eNeutral;
 
 		float point_x = glyph.getBbox().getX();
 		float point_y = glyph.getBbox().getY();
@@ -591,9 +588,9 @@ public class ArcHandler {
 		float x_shape = (float) (glyph.getBbox().getX() + glyph.getBbox().getW() * 0.5);
 
 		if (Math.abs(point_y - y_shape) < Math.abs(point_x - x_shape)) {
-			eLinePosition = LinePosition.eHorizontal;
-		} else if (Math.abs(point_y - y_shape) > Math.abs(point_x - x_shape)) {
-			eLinePosition = LinePosition.eVertical;
+			eLinePosition = LINE_POSITION.eHorizontal;
+		} else if  (Math.abs(point_y - y_shape) > Math.abs(point_x - x_shape)){
+			eLinePosition = LINE_POSITION.eVertical;
 		}
 
 		return eLinePosition;
@@ -785,10 +782,12 @@ public class ArcHandler {
 
 		else if (arc.getClazz().equals(ConverterDefines.SBGN_LOGIC_ARC)) {
 			if (arc.getTarget() instanceof Glyph) {
+
 				glyph = (Glyph) arc.getTarget();
 
 				if (Utils.isOperatorType(glyph)) {
 					currentPort = calculateCurrentPortIncomingArc(arc, glyph);
+
 					alternativePort = calculateAlternativePort(currentPort, glyph);
 				}
 			}

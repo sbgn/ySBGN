@@ -1,6 +1,6 @@
 package fr.eisbm.GraphMLHandlers;
 
-public enum LinePosition {
+public enum LINE_POSITION {
 	eNeutral,
 	eHorizontal,
 	eVertical

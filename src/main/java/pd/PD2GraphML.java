@@ -1,6 +1,5 @@
 package pd;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,7 +21,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
-import org.sbgn.SbgnUtil;
 import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Arc.Next;
 import org.sbgn.bindings.Glyph;
@@ -35,11 +33,11 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GraphMLResource;
 import fr.eisbm.SBGNHandlers.GraphMLStyle;
-import utils.ConverterDefines;
-import utils.Utils;
 
 public class PD2GraphML {
 	private static final String GRAPH_DESCRIPTION_ATTR = "d0";
@@ -84,13 +82,10 @@ public class PD2GraphML {
 		// Now read from "f" and put the result in "sbgn"
 		Sbgn sbgn;
 		try {
-			File f = new File(szInSBGNFileName);
-
-			// Now read from "f" and put the result in "sbgn"
-			sbgn = SbgnUtil.readFromFile(f);
+			sbgn = Utils.readFromFile(szInSBGNFileName);
 
 			// map is a container for the glyphs and arcs
-			map = sbgn.getMap().get(0);
+			map = (org.sbgn.bindings.Map) sbgn.getMap();
 
 			try {
 				w = new FileWriter(szOutGraphMLFileName);
@@ -311,7 +306,7 @@ public class PD2GraphML {
 
 		// <key> for clone attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.CLONE_TAG);
+		attr.addAttribute("", "", "attr.name", "CDATA", "Clone");
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_CLONE_ATTR);
@@ -338,7 +333,7 @@ public class PD2GraphML {
 
 		// <key> for orientation attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.ORIENTATION_TAG);
+		attr.addAttribute("", "", "attr.name", "CDATA", "Orientation");
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_ORIENTATION_ATTR);
@@ -347,7 +342,7 @@ public class PD2GraphML {
 
 		// <key> for nodegraphics attribute
 		attr.clear();
-		attr.addAttribute("", "", "for", "CDATA", ConverterDefines.NODE_TAG);
+		attr.addAttribute("", "", "for", "CDATA", "node");
 		attr.addAttribute("", "", "id", "CDATA", NODE_GRAPHICS_ATTR);
 		attr.addAttribute("", "", "yfiles.type", "CDATA", "nodegraphics");
 		handler.startElement("", "", "key", attr);
@@ -363,7 +358,7 @@ public class PD2GraphML {
 
 		// <key> for edge url attribute
 		attr.clear();
-		attr.addAttribute("", "", "attr.name", "CDATA", ConverterDefines.URL_TAG);
+		attr.addAttribute("", "", "attr.name", "CDATA", "URL");
 		attr.addAttribute("", "", "attr.type", "CDATA", "string");
 		attr.addAttribute("", "", "for", "CDATA", "edge");
 		attr.addAttribute("", "", "id", "CDATA", EDGE_URL_ATTR);
@@ -381,7 +376,7 @@ public class PD2GraphML {
 
 		// <key> for edge graphics attribute
 		attr.clear();
-		attr.addAttribute("", "", "for", "CDATA", ConverterDefines.EDGE_TAG);
+		attr.addAttribute("", "", "for", "CDATA", "edge");
 		attr.addAttribute("", "", "id", "CDATA", EDGE_GRAPHICS_ATTR);
 		attr.addAttribute("", "", "yfiles.type", "CDATA", "edgegraphics");
 		handler.startElement("", "", "key", attr);
@@ -418,16 +413,16 @@ public class PD2GraphML {
 		// <y:Resources/>
 		attr.clear();
 		attr.addAttribute("", "", "key", "CDATA", RESOURCES);
-		handler.startElement("", "", ConverterDefines.DATA_TAG, attr);
+		handler.startElement("", "", "data", attr);
 		attr.clear();
-		handler.startElement("", "", ConverterDefines.Y_RESOURCES, attr);
+		handler.startElement("", "", "y:Resources", attr);
 
 		for (GraphMLResource resource : resourceList) {
 			parseResource(handler, resource);
 		}
 
-		handler.endElement("", "", ConverterDefines.Y_RESOURCES);
-		handler.endElement("", "", ConverterDefines.DATA_TAG);
+		handler.endElement("", "", "y:Resources");
+		handler.endElement("", "", "data");
 
 		handler.endElement("", "", "graphml");
 		handler.endDocument();
@@ -2007,6 +2002,8 @@ public class PD2GraphML {
 	}
 
 	private void addAnnotation(TransformerHandler handler, Extension extension) throws SAXException {
+		AttributesImpl attr = new AttributesImpl();
+
 		String szAnnotation = "";
 		String szRDFUrl = "";
 		String szRDFDescription = "";
@@ -2019,75 +2016,35 @@ public class PD2GraphML {
 			for (Element e : extension.getAny()) {
 
 				if (null != e) {
-					if (e.hasAttribute(ConverterDefines.XMLNS_N2_NS)) {
-						szAnnotation = szAnnotation
-								.concat("xmlns:ns2=\"" + e.getAttribute(ConverterDefines.XMLNS_N2_NS) + "\"");
+					szAnnotation = szAnnotation.concat("xmlns:ns2=\"" + e.getAttribute("xmlns:ns2") + "\" xmlns=\""
+							+ e.getAttribute("xmlns") + "\"\n");
 
+					for (int i = 0; i < e.getElementsByTagName("rdf:RDF").getLength(); i++) {
+
+						Element eRDFTag = (Element) e.getElementsByTagName("rdf:RDF").item(i);
+						szRDFUrl = szRDFUrl.concat("xmlns:rdf=\"" + eRDFTag.getAttribute("xmlns:rdf") + "\" xmlns=\""
+								+ eRDFTag.getAttribute("xmlns") + "\" xmlns:bqbiol=\""
+								+ eRDFTag.getAttribute("xmlns:bqbiol") + "\" xmlns:bqmodel=\""
+								+ eRDFTag.getAttribute("xmlns:bqmodel") + "\" xmlns:celldesigner=\""
+								+ eRDFTag.getAttribute("xmlns:celldesigner") + "\" xmlns:dc=\""
+								+ eRDFTag.getAttribute("xmlns:dc") + "\" xmlns:dcterms=\""
+								+ eRDFTag.getAttribute("xmlns:dcterms") + "\" xmlns:vCard=\""
+								+ eRDFTag.getAttribute("xmlns:vCard") + "\"");
 					}
 
-					if (e.hasAttribute(ConverterDefines.XMLNS_NS)) {
-						szAnnotation = szAnnotation
-								.concat("xmlns=\"" + e.getAttribute(ConverterDefines.XMLNS_NS) + "\"\n");
+					for (int i = 0; i < e.getElementsByTagName("rdf:Description").getLength(); i++) {
 
-					}
-
-					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.RDF_RDF_TAG).getLength(); i++) {
-
-						Element eRDFTag = (Element) e.getElementsByTagName(ConverterDefines.RDF_RDF_TAG).item(i);
-
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_RDF_NS)) {
-							szRDFUrl = szRDFUrl.concat(
-									"xmlns:rdf=\"" + eRDFTag.getAttribute(ConverterDefines.XMLNS_RDF_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_NS)) {
-							szRDFUrl = szRDFUrl
-									.concat("xmlns=\"" + eRDFTag.getAttribute(ConverterDefines.XMLNS_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_BQBIOL_NS)) {
-							szRDFUrl = szRDFUrl.concat(
-									"xmlns:bqbiol=\"" + eRDFTag.getAttribute(ConverterDefines.XMLNS_BQBIOL_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_BQMODEL_NS)) {
-							szRDFUrl = szRDFUrl.concat("xmlns:bqmodel=\""
-									+ eRDFTag.getAttribute(ConverterDefines.XMLNS_BQMODEL_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_CELL_DESIGNER_NS)) {
-							szRDFUrl = szRDFUrl.concat("xmlns:celldesigner=\""
-									+ eRDFTag.getAttribute(ConverterDefines.XMLNS_CELL_DESIGNER_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_DC_NS)) {
-							szRDFUrl = szRDFUrl
-									.concat("xmlns:dc=\"" + eRDFTag.getAttribute(ConverterDefines.XMLNS_DC_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_DC_TERMS_NS)) {
-							szRDFUrl = szRDFUrl.concat("xmlns:dcterms=\""
-									+ eRDFTag.getAttribute(ConverterDefines.XMLNS_DC_TERMS_NS) + "\" ");
-						}
-						if (eRDFTag.hasAttribute(ConverterDefines.XMLNS_VCARD_NS)) {
-							szRDFUrl = szRDFUrl.concat(
-									"xmlns:vCard=\"" + eRDFTag.getAttribute(ConverterDefines.XMLNS_VCARD_NS) + "\" ");
-						}
-						if (eRDFTag.getTextContent() != null) {
-							szRDFUrl = szRDFUrl.concat(eRDFTag.getTextContent().trim());
-						}
-					}
-
-					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.RDF_DESCRIPTION_TAG).getLength(); i++) {
-
-						Element eRDFDEscription = (Element) e.getElementsByTagName(ConverterDefines.RDF_DESCRIPTION_TAG)
-								.item(i);
-						szRDFDescription = szRDFDescription
-								.concat(eRDFDEscription.getAttribute(ConverterDefines.RDF_ABOUT_TAG) + "\n");
+						Element eRDFDEscription = (Element) e.getElementsByTagName("rdf:Description").item(i);
+						szRDFDescription = szRDFDescription.concat(eRDFDEscription.getAttribute("rdf:about") + "\n");
 					}
 
 					for (int i = 0; i < e.getElementsByTagName(ConverterDefines.BQMODEL_IS).getLength(); i++) {
 						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQMODEL_IS).item(i);
 
-						for (int j = 0; j < e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).getLength(); j++) {
-							Element e2 = (Element) e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).item(j);
+						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
+							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
 							if (null != e2) {
-								szBqmodelIs = szBqmodelIs
-										.concat(e2.getAttribute(ConverterDefines.RDF_RESOURCE_TAG) + "\n");
+								szBqmodelIs = szBqmodelIs.concat(e2.getAttribute("rdf:resource") + "\n");
 							}
 						}
 					}
@@ -2096,11 +2053,11 @@ public class PD2GraphML {
 							.getLength(); i++) {
 						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQMODEL_IS_DESCRIBED_BY).item(i);
 
-						for (int j = 0; j < e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).getLength(); j++) {
-							Element e2 = (Element) e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).item(j);
+						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
+							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
 							if (null != e2) {
 								szBqmodelIsDescribedBy = szBqmodelIsDescribedBy
-										.concat(e2.getAttribute(ConverterDefines.RDF_RESOURCE_TAG) + "\n");
+										.concat(e2.getAttribute("rdf:resource") + "\n");
 							}
 						}
 					}
@@ -2109,11 +2066,10 @@ public class PD2GraphML {
 						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQBIOL_IS).item(i);
 						if (null != e1) {
 
-							for (int j = 0; j < e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).getLength(); j++) {
-								Element e2 = (Element) e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).item(j);
+							for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
+								Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
 								if (null != e2) {
-									szBiolIs = szBiolIs
-											.concat(e2.getAttribute(ConverterDefines.RDF_RESOURCE_TAG) + "\n");
+									szBiolIs = szBiolIs.concat(e2.getAttribute("rdf:resource") + "\n");
 								}
 							}
 						}
@@ -2123,11 +2079,11 @@ public class PD2GraphML {
 							.getLength(); i++) {
 						Element e1 = (Element) e.getElementsByTagName(ConverterDefines.BQBIOL_IS_DESCRIBED_BY).item(i);
 
-						for (int j = 0; j < e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).getLength(); j++) {
-							Element e2 = (Element) e1.getElementsByTagName(ConverterDefines.RDF_LI_TAG).item(j);
+						for (int j = 0; j < e1.getElementsByTagName("rdf:li").getLength(); j++) {
+							Element e2 = (Element) e1.getElementsByTagName("rdf:li").item(j);
 							if (null != e2) {
 								szBqbiolIsDescribedBy = szBqbiolIsDescribedBy
-										.concat(e2.getAttribute(ConverterDefines.RDF_RESOURCE_TAG) + "\n");
+										.concat(e2.getAttribute("rdf:resource") + "\n");
 							}
 						}
 					}
@@ -2135,49 +2091,55 @@ public class PD2GraphML {
 			}
 		}
 
-		if (szAnnotation != "") {
-			addExtensionTagValue(handler, NODE_ANNOTATIONS_ATTR, szAnnotation);
-		}
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_ANNOTATIONS_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szAnnotation.toCharArray(), 0, szAnnotation.length());
+		handler.endElement("", "", "data");
 
-		if (szBqmodelIs != "") {
-			addExtensionTagValue(handler, NODE_BQMODELIS_ATTR, szBqmodelIs);
-		}
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQMODELIS_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szBqmodelIs.toCharArray(), 0, szBqmodelIs.length());
+		handler.endElement("", "", "data");
 
-		if (szBqmodelIsDescribedBy != "") {
-			addExtensionTagValue(handler, NODE_BQMODEL_IS_DESCRIBED_BY_ATTR, szBqmodelIsDescribedBy);
-		}
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQMODEL_IS_DESCRIBED_BY_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szBqmodelIsDescribedBy.toCharArray(), 0, szBqmodelIsDescribedBy.length());
+		handler.endElement("", "", "data");
 
-		if (szBiolIs != "") {
-			addExtensionTagValue(handler, NODE_BQBIOLIS_ATTR, szBiolIs);
-		}
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQBIOLIS_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szBiolIs.toCharArray(), 0, szBiolIs.length());
+		handler.endElement("", "", "data");
 
-		if (szBqbiolIsDescribedBy != "") {
-			addExtensionTagValue(handler, NODE_BQBIOL_IS_DESCRIBED_BY_ATTR, szBqbiolIsDescribedBy);
-		}
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_BQBIOL_IS_DESCRIBED_BY_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szBqbiolIsDescribedBy.toCharArray(), 0, szBqbiolIsDescribedBy.length());
+		handler.endElement("", "", "data");
 
-		if (szRDFDescription != "") {
-			addExtensionTagValue(handler, NODE_DESCRIPT_ATTR, szRDFDescription);
-		}
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_DESCRIPT_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szRDFDescription.toCharArray(), 0, szRDFDescription.length());
+		handler.endElement("", "", "data");
 
-		if (szRDFUrl != "") {
-			addExtensionTagValue(handler, NODE_URL_ATTR, szRDFUrl);
-		}
-	}
-
-	private void addExtensionTagValue(TransformerHandler handler, String tag, String value) throws SAXException {
-		AttributesImpl attr = new AttributesImpl();
-		attr.addAttribute("", "", ConverterDefines.KEY_TAG, "CDATA", tag);
-		handler.startElement("", "", ConverterDefines.DATA_TAG, attr);
-		handler.characters(value.toCharArray(), 0, value.length());
-		handler.endElement("", "", ConverterDefines.DATA_TAG);
+		attr.clear();
+		attr.addAttribute("", "", "key", "CDATA", NODE_URL_ATTR);
+		handler.startElement("", "", "data", attr);
+		handler.characters(szRDFUrl.toCharArray(), 0, szRDFUrl.length());
+		handler.endElement("", "", "data");
 	}
 
 	private void addNotes(TransformerHandler handler, Notes notes) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
 		attr.clear();
-		attr.addAttribute("", "", ConverterDefines.KEY_TAG, "CDATA", NODE_NOTES_ATTR);
-		handler.startElement("", "", ConverterDefines.DATA_TAG, attr);
+		attr.addAttribute("", "", "key", "CDATA", NODE_NOTES_ATTR);
+		handler.startElement("", "", "data", attr);
 
 		if (null != notes) {
 			String notesInfo = "";
@@ -2188,7 +2150,7 @@ public class PD2GraphML {
 
 			handler.characters(notesInfo.toCharArray(), 0, notesInfo.length());
 		}
-		handler.endElement("", "", ConverterDefines.DATA_TAG);
+		handler.endElement("", "", "data");
 	}
 
 	private Glyph findNode(String id) {

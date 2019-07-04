@@ -5,10 +5,9 @@ import java.util.List;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
 
-import utils.ConverterDefines;
-import utils.Utils;
+import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
+import fr.eisbm.GRAPHML2SBGNML.Utils;
 
-import org.sbgn.bindings.Label;
 import org.sbgn.bindings.Map;
 
 public class CloneHandler {
@@ -17,11 +16,10 @@ public class CloneHandler {
 
 	public void setClonedGlyphs(Map map) {
 		for (Glyph g : map.getGlyph()) {
-			if (!(Utils.isProcessType(g) || (Utils.isOperatorType(g))
-					|| (g.getClazz().equals(ConverterDefines.SBGN_SOURCE_AND_SINK)))) {
+			if (!(Utils.isProcessType(g) || (Utils.isOperatorType(g)) || (g.getClazz().equals(ConverterDefines.SBGN_SOURCE_AND_SINK)))) {
 				if (!(g.getClazz().equals(ConverterDefines.SBGN_COMPLEX)
 						|| g.getClazz().equals(ConverterDefines.SBGN_COMPLEX_MULTIMER))) {
-					setCloneSimpleGlyphs(g, map);
+					setCloneSimpleGlyphs(g, map.getGlyph());
 				} else {
 					findCloneComplexGlyph(g, map.getGlyph());
 				}
@@ -44,7 +42,7 @@ public class CloneHandler {
 					for (Glyph g11 : g1.getGlyph()) {
 						// this flag assures that all previous elements have clones; otherwise, if there
 						// is an element from the first map that has not clone in the second map, no
-						// further checking is necessarily as the complexes are not clones
+						// further checking is necessarly as the complexes are not clones
 						if (bClone) {
 							for (Glyph g22 : g2.getGlyph()) {
 								bClone = findClonedSimilarGlyphs(g11, g22);
@@ -65,9 +63,9 @@ public class CloneHandler {
 		}
 	}
 
-	private void setCloneSimpleGlyphs(Glyph g1, Map map) {
+	private void setCloneSimpleGlyphs(Glyph g1, List<Glyph> listOfGlyphs) {
 
-		for (Glyph g2 : map.getGlyph()) {
+		for (Glyph g2 : listOfGlyphs) {
 			boolean bClone = findClonedSimilarGlyphs(g1, g2);
 			if (bClone) {
 				setClone(g1, g2);
@@ -77,17 +75,17 @@ public class CloneHandler {
 
 	private void setClone(Glyph g1, Glyph g2) {
 		Clone clone = null;
+		boolean bClone = false;
 
 		if (g1.getClone() != null) {
 			clone = g1.getClone();
+			bClone = true;
 
 		} else if (g2.getClone() != null) {
 			clone = g2.getClone();
-		} else if ((g1.getClone() == null) && (g2.getClone() == null)) {
-			clone = new Clone();
+			bClone = true;
 		}
-
-		if (clone != null) {
+		if (bClone) {
 			g1.setClone(clone);
 			g2.setClone(clone);
 		}
@@ -98,95 +96,62 @@ public class CloneHandler {
 
 		if (!g1.getId().equals(g2.getId()) && (g1.getClazz().equals(g2.getClazz()))) {
 
-			Label l1 = g1.getLabel();
-			Label l2 = g2.getLabel();
-			boolean bHaveSameLabel = false;
-
-			if ((l1 != null) && (l2 != null)) {
-				if ((l1.getText() != null) && (l2.getText() != null)) {
-					if (l1.getText().equals(l2.getText())) {
-						bHaveSameLabel = true;
-					}
-				}
-			} else if ((l1 == null) && (l2 == null)) {
-				bHaveSameLabel = true;
+			bClone = haveSameCompartment(g1, g2);
+			if (bClone) {
+				bClone = haveSameTextLabel(g1, g2);
 			}
 
-			if (bHaveSameLabel) {
-				bClone = haveSameCompartment(g1, g2);
+			if (bClone) {
+				bClone = haveSameUnitsOfInfo(g1, g2);
+			}
 
-				if (bClone) {
-					bClone = haveSameTextLabel(g1, g2);
-				}
-
-				if (bClone) {
-
-					if (hasInfo(g1, ConverterDefines.SBGN_UNIT_OF_INFORMATION)
-							&& hasInfo(g2, ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
-						bClone = haveSameAuxiliaryInfo(g1, g2, ConverterDefines.SBGN_UNIT_OF_INFORMATION);
-					}
-
-					else if ((hasInfo(g1, ConverterDefines.SBGN_UNIT_OF_INFORMATION)
-							&& (!hasInfo(g2, ConverterDefines.SBGN_UNIT_OF_INFORMATION)))
-							|| ((!hasInfo(g1, ConverterDefines.SBGN_UNIT_OF_INFORMATION))
-									&& hasInfo(g2, ConverterDefines.SBGN_UNIT_OF_INFORMATION))) {
-						bClone = false;
-					}
-
-				}
-
-				if (bClone) {
-					if (hasInfo(g1, ConverterDefines.SBGN_STATE_VARIABLE)
-							&& hasInfo(g2, ConverterDefines.SBGN_STATE_VARIABLE)) {
-						bClone = haveSameAuxiliaryInfo(g1, g2, ConverterDefines.SBGN_STATE_VARIABLE);
-					}
-
-					else if ((hasInfo(g1, ConverterDefines.SBGN_STATE_VARIABLE)
-							&& (!hasInfo(g2, ConverterDefines.SBGN_STATE_VARIABLE)))
-							|| ((!hasInfo(g1, ConverterDefines.SBGN_STATE_VARIABLE))
-									&& hasInfo(g2, ConverterDefines.SBGN_STATE_VARIABLE))) {
-						bClone = false;
-					}
-				}
+			if (bClone) {
+				bClone = haveSameStateVariables(g1, g2);
 			}
 		}
-
 		return bClone;
-
 	}
 
-	private boolean haveSameAuxiliaryInfo(Glyph g1, Glyph g2, String szType) {
-		boolean bFound = true;
+	private boolean haveSameStateVariables(Glyph g1, Glyph g2) {
+		boolean bSameStateVariable = true;
 
 		for (Glyph g : g1.getGlyph()) {
-			if (g.getClazz().equals(szType)) {
+			if (g.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
 				if (!g2.getGlyph().contains(g)) {
-					bFound = false;
+					bSameStateVariable = false;
 				}
 			}
 		}
 
 		for (Glyph g : g2.getGlyph()) {
-			if (g.getClazz().equals(szType)) {
+			if (g.getClazz().equals(ConverterDefines.SBGN_STATE_VARIABLE)) {
 				if (!g1.getGlyph().contains(g)) {
-					bFound = false;
+					bSameStateVariable = false;
 				}
 			}
 		}
-		return bFound;
+		return bSameStateVariable;
 	}
 
-	private boolean hasInfo(Glyph g, String szInfoType) {
-		boolean bFound = false;
-		for (Glyph gi : g.getGlyph()) {
-			if (gi.getClazz().equals(szInfoType)) {
-				{
-					bFound = true;
-					break;
+	private boolean haveSameUnitsOfInfo(Glyph g1, Glyph g2) {
+		boolean bSameUOI = true;
+
+		for (Glyph g : g1.getGlyph()) {
+			if (g.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
+				if (!g2.getGlyph().contains(g)) {
+					bSameUOI = false;
 				}
 			}
 		}
-		return bFound;
+
+		for (Glyph g : g2.getGlyph()) {
+			if (g.getClazz().equals(ConverterDefines.SBGN_UNIT_OF_INFORMATION)) {
+				if (!g1.getGlyph().contains(g)) {
+					bSameUOI = false;
+				}
+			}
+		}
+		return bSameUOI;
 	}
 
 	private boolean haveSameCompartment(Glyph g1, Glyph g2) {
