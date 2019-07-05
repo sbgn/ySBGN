@@ -30,7 +30,6 @@ import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
-import fr.eisbm.SBGNHandlers.transformToSBGN02;
 import pd.GraphML2PD;
 
 public class GraphML2SBGNML {
@@ -38,11 +37,6 @@ public class GraphML2SBGNML {
 	Sbgn sbgn = new Sbgn();
 	Map map = new Map();
 	java.util.Map<String, String> colorMap = new HashMap<String, String>();
-
-	public static void main(String[] args) {
-		convert(Utils.IN_YED_FILE);
-		System.out.println("simulation finished");
-	}
 
 	public static void convert(String szInputFileName) {
 
@@ -61,10 +55,10 @@ public class GraphML2SBGNML {
 			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
 				GraphML2PD pdConverter = new GraphML2PD();
 				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			} /*else {
+			} else {
 				GraphML2AF afConverter = new GraphML2AF();
 				bConversion = afConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
-			}*/
+			}
 
 			long end = System.currentTimeMillis();
 			// finding the time difference and converting it into seconds
@@ -162,7 +156,6 @@ public class GraphML2SBGNML {
 					"SBGN file validation: " + (SbgnUtil.isValid(outputFile) ? "validates" : "does not validate"));
 			bConversion = true;
 			
-			Utils.generateStatistics(sbgn.getMap());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

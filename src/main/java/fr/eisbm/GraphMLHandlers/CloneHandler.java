@@ -189,31 +189,6 @@ public class CloneHandler {
 		return bFound;
 	}
 
-	/*
-	 * private boolean haveSameAuxiliaryInfo(Glyph g1, Glyph g2, String szType) {
-	 * boolean bSameUOI = true;
-	 * 
-	 * for (Glyph gi : g1.getGlyph()) { if (gi.getClazz().equals(szType)) { bSameUOI
-	 * = containsSpecificInfo(g2, gi); if (bSameUOI == false) { break; } } }
-	 * 
-	 * if (bSameUOI) { for (Glyph gi : g2.getGlyph()) { if
-	 * (gi.getClazz().equals(szType)) { bSameUOI = containsSpecificInfo(g1, gi); if
-	 * (bSameUOI == false) { break; } } } } return bSameUOI; }
-	 */
-
-	private boolean containsSpecificInfo(Glyph g, Glyph gi) {
-		boolean bFound = false;
-		for (Glyph gj : g.getGlyph()) {
-			if (gj.getClazz().equals(gi.getClazz())) {
-				bFound = haveSameTextLabel(gj, gi);
-				if (bFound) {
-					break;
-				}
-			}
-		}
-		return bFound;
-	}
-
 	private boolean haveSameCompartment(Glyph g1, Glyph g2) {
 		boolean bSameCompartment = false;
 

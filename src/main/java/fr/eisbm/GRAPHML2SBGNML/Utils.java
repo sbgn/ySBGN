@@ -1,7 +1,6 @@
 package fr.eisbm.GRAPHML2SBGNML;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -13,13 +12,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
-import org.sbgn.SbgnUtil;
-import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Glyph;
-import org.sbgn.bindings.Map;
-import org.sbgn.bindings.Port;
 import org.sbgn.bindings.Sbgn;
-import org.xml.sax.SAXException;
 
 public class Utils {
 	public static final String IN_SBGN_FILE = "af/F001-DendriticCell.sbgn";
@@ -104,11 +98,5 @@ public class Utils {
 		}
 
 		return res;
-	}
-
-	public static void generateStatistics(Map map) {
-		System.out.println("Glyph number " + map.getGlyph().size());
-		System.out.println("Arc number" + map.getArc().size());
-
 	}
 }

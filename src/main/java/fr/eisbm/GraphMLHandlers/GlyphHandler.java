@@ -3,26 +3,22 @@ package fr.eisbm.GraphMLHandlers;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import javax.xml.transform.sax.TransformerHandler;
+import java.util.Set;
 
 import org.jgrapht.alg.util.Pair;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
+import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.Label;
 import org.sbgn.bindings.Map;
 import org.sbgn.bindings.Port;
-import org.sbgn.bindings.Glyph.Clone;
 import org.sbgn.bindings.SBGNBase.Extension;
 import org.sbgn.bindings.SBGNBase.Notes;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 import fr.eisbm.GRAPHML2SBGNML.ModelAttributes;
