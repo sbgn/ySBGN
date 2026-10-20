@@ -4,119 +4,102 @@
 
   <groupId>fr.eisbm</groupId>
   <artifactId>ySBGN</artifactId>
+  <version>1.2.0</version>
 
   <name>ySBGN</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
+    <javafx.version>17.0.13</javafx.version>
   </properties>
+
+  <!-- libSBGN 0.2 (SBGN-ML 0.2) is not on Maven Central; the BioPAX repository serves it over https -->
+  <repositories>
+    <repository>
+      <id>biopax.releases</id>
+      <url>https://www.biopax.org/m2repo/releases/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.jgrapht</groupId>
-    	<artifactId>jgrapht-core</artifactId>
-    	<version>1.0.0</version>
+      <groupId>org.sbgn</groupId>
+      <artifactId>libsbgn</artifactId>
+      <version>0.2</version>
     </dependency>
     <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-simple</artifactId>
-    	<version>1.8.0-beta0</version>
+      <groupId>org.jgrapht</groupId>
+      <artifactId>jgrapht-core</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <!-- JAXB left the JDK in Java 11 -->
+    <dependency>
+      <groupId>javax.xml.bind</groupId>
+      <artifactId>jaxb-api</artifactId>
+      <version>2.3.1</version>
     </dependency>
     <dependency>
-    	<groupId>org.slf4j</groupId>
-    	<artifactId>slf4j-api</artifactId>
-    	<version>1.8.0-beta0</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.9</version>
     </dependency>
+    <!-- JavaFX left the JDK in Java 11; the native part is chosen by javafx.platform (default: the build machine) -->
     <dependency>
-    	<groupId>com.beust</groupId>
-    	<artifactId>jcommander</artifactId>
-    	<version>1.72</version>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
     </dependency>
-    <dependency>
-    	<groupId>com.sun.xml.bind</groupId>
-    	<artifactId>jaxb-impl</artifactId>
-    	<version>2.3.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>com.sun.xml.bind</groupId>
-    	<artifactId>jaxb-core</artifactId>
-    	<version>2.3.0</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.biopax.paxtools</groupId>
-    	<artifactId>sbgn-converter</artifactId>
-    	<version>5.0.1</version>
-    </dependency>
-    <dependency>
-    <groupId>javax.xml.bind</groupId>
-    <artifactId>jaxb-api</artifactId>
-    <version>2.2.11</version>
-</dependency>
-<dependency>
-    <groupId>javax.activation</groupId>
-    <artifactId>activation</artifactId>
-    <version>1.1.1</version>
-</dependency>
-    <dependency>
-    <groupId>org.openjfx</groupId>
-    <artifactId>javafx-controls</artifactId>
-    <version>11</version>
-  </dependency>
   </dependencies>
-  <build>
-  	<plugins>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-assembly-plugin</artifactId>
-  			<version>3.1.0</version>
-  		</plugin>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-install-plugin</artifactId>
-  			<version>2.5.2</version>
-  		</plugin>
 
-        <!-- for jar creation -->
-        <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>single</goal>
-                    </goals>
-                </execution>
-            </executions>
-            <configuration>
-                <descriptorRefs>
-                    <descriptorRef>jar-with-dependencies</descriptorRef>
-                </descriptorRefs>
-                <finalName>${project.artifactId}-${project.version}-app</finalName>
-                <appendAssemblyId>false</appendAssemblyId>
-                <archive>
-                    <manifest>
-                        <mainClass>fr.eisbm.GRAPHML2SBGNML.Launcher</mainClass>
-                    </manifest>
-                </archive>
-            </configuration>
-        </plugin>
-        <plugin>
-        <groupId>org.openjfx</groupId>
-        <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.1</version>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.5.2</version>
+      </plugin>
+
+      <!-- for jar creation -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>3.7.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
-            <mainClass>HelloFX</mainClass>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <finalName>${project.artifactId}-${project.version}-app</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <archive>
+            <manifest>
+              <mainClass>fr.eisbm.GRAPHML2SBGNML.Launcher</mainClass>
+            </manifest>
+          </archive>
         </configuration>
-    </plugin>
-  	</plugins>
+      </plugin>
+    </plugins>
   </build>
-  <version>1.0</version>
 </project>
