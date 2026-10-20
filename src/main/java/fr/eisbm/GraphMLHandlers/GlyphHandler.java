@@ -759,14 +759,35 @@ public class GlyphHandler {
 							bbox.setY(_resource.getValue().getYCoord());
 						}
 
-						_glyph.setBbox(bbox);
+						// yEd shares one resource between nodes with the same label (e.g. N:2), so
+						// each node gets its own glyph, with its own position
+						Glyph _resourceGlyph = copyResourceGlyph(_glyph);
+						_resourceGlyph.setBbox(bbox);
 
 						String szParentGlyphId = _resource.getKey().second;
-						addGlyphToList(szParentGlyphId, _glyph, map.getGlyph());
+						addGlyphToList(szParentGlyphId, _resourceGlyph, map.getGlyph());
 					}
 				}
 			}
 		}
+	}
+
+	private Glyph copyResourceGlyph(Glyph _glyph) {
+		Glyph _copy = new Glyph();
+		_copy.setId(_glyph.getId());
+		_copy.setClazz(_glyph.getClazz());
+		if (_glyph.getLabel() != null) {
+			Label _label = new Label();
+			_label.setText(_glyph.getLabel().getText());
+			_copy.setLabel(_label);
+		}
+		if (_glyph.getState() != null) {
+			Glyph.State _state = new Glyph.State();
+			_state.setValue(_glyph.getState().getValue());
+			_state.setVariable(_glyph.getState().getVariable());
+			_copy.setState(_state);
+		}
+		return _copy;
 	}
 
 	private void addGlyphToList(String szParentGlyphId, Glyph _glyph, List<Glyph> _listOfGlyphs) {
