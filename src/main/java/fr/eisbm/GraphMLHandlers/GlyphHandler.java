@@ -1,5 +1,6 @@
 package fr.eisbm.GraphMLHandlers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,7 +31,9 @@ public class GlyphHandler {
 	java.util.Map<String, String> compoundCompartmentMap = new HashMap<String, String>();
 	Set<String> complexSet = new HashSet<String>();
 	Set<String> compartmentSet = new HashSet<String>();
-	java.util.Map<Pair<String, String>, ResourceCoordinates> resourceMap = new HashMap<Pair<String, String>, ResourceCoordinates>();
+	// a node may show the same resource more than once (e.g. two state variables P), so each
+	// (resource, node) pair keeps the position of every occurrence
+	java.util.Map<Pair<String, String>, List<ResourceCoordinates>> resourceMap = new HashMap<Pair<String, String>, List<ResourceCoordinates>>();
 
 	public String parseYedNodeType(String szType, boolean bIsMultimer) {
 		String szGlyphClass = "";
@@ -372,15 +375,17 @@ public class GlyphHandler {
 						Pair<String, String> pair = new Pair<String, String>(
 								_element.getAttribute(ConverterDefines.ICON_DATA_ATTR), szGlyphId);
 						if (!resourceMap.containsKey(pair)) {
-							resourceMap.put(pair,
-									new ResourceCoordinates(_glyph.getBbox().getX(), _glyph.getBbox().getY()));
-							if (_element.hasAttribute("x")) {
-								resourceMap.get(pair).updateXCoord(Float.parseFloat(_element.getAttribute("x")));
-							}
-							if (_element.hasAttribute("y")) {
-								resourceMap.get(pair).updateYCoord(Float.parseFloat(_element.getAttribute("y")));
-							}
+							resourceMap.put(pair, new ArrayList<ResourceCoordinates>());
 						}
+						ResourceCoordinates coordinates = new ResourceCoordinates(_glyph.getBbox().getX(),
+								_glyph.getBbox().getY());
+						if (_element.hasAttribute("x")) {
+							coordinates.updateXCoord(Float.parseFloat(_element.getAttribute("x")));
+						}
+						if (_element.hasAttribute("y")) {
+							coordinates.updateYCoord(Float.parseFloat(_element.getAttribute("y")));
+						}
+						resourceMap.get(pair).add(coordinates);
 					}
 
 					addUnitOfInformation(_glyph, i, _element.getTextContent().trim());
@@ -745,27 +750,27 @@ public class GlyphHandler {
 				}
 
 				// add the state variable to the corresponding glyph
-				for (Entry<Pair<String, String>, ResourceCoordinates> _resource : resourceMap.entrySet()) {
+				for (Entry<Pair<String, String>, List<ResourceCoordinates>> _resource : resourceMap.entrySet()) {
 					if (_resource.getKey().first.equals(szResourceId)) {
 						NodeList nlGeometry = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
 						String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.HEIGHT_ATTR);
 						String szWidth = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.WIDTH_ATTR);
 
-						Bbox bbox = new Bbox();
-						bbox.setH(Float.parseFloat(szHeight));
-						bbox.setW(Float.parseFloat(szWidth));
-						if (_resource.getValue() != null) {
-							bbox.setX(_resource.getValue().getXCoord());
-							bbox.setY(_resource.getValue().getYCoord());
+						for (ResourceCoordinates coordinates : _resource.getValue()) {
+							Bbox bbox = new Bbox();
+							bbox.setH(Float.parseFloat(szHeight));
+							bbox.setW(Float.parseFloat(szWidth));
+							bbox.setX(coordinates.getXCoord());
+							bbox.setY(coordinates.getYCoord());
+
+							// yEd shares one resource between nodes with the same label (e.g. N:2), so
+							// each node gets its own glyph, with its own position
+							Glyph _resourceGlyph = copyResourceGlyph(_glyph);
+							_resourceGlyph.setBbox(bbox);
+
+							String szParentGlyphId = _resource.getKey().second;
+							addGlyphToList(szParentGlyphId, _resourceGlyph, map.getGlyph());
 						}
-
-						// yEd shares one resource between nodes with the same label (e.g. N:2), so
-						// each node gets its own glyph, with its own position
-						Glyph _resourceGlyph = copyResourceGlyph(_glyph);
-						_resourceGlyph.setBbox(bbox);
-
-						String szParentGlyphId = _resource.getKey().second;
-						addGlyphToList(szParentGlyphId, _resourceGlyph, map.getGlyph());
 					}
 				}
 			}
