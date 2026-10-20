@@ -866,7 +866,7 @@ public class GraphML2AF {
 	public Notes getSBGNNotes(Element notes) {
 		Notes newNotes = new Notes();
 		if (notes != null) {
-			newNotes.getAny().add(notes);
+			newNotes.getAny().add(Utils.toXhtmlNotes(notes));
 			return newNotes;
 		}
 		return null;

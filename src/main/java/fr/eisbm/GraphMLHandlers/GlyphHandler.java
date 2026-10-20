@@ -655,7 +655,7 @@ public class GlyphHandler {
 			if (notes.getTextContent() != null) {
 				if (!notes.getTextContent().trim().isEmpty()) {
 					Notes newNotes = new Notes();
-					newNotes.getAny().add(notes);
+					newNotes.getAny().add(Utils.toXhtmlNotes(notes));
 					return newNotes;
 				}
 			}
