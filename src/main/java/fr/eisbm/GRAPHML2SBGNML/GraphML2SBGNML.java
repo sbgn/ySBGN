@@ -39,19 +39,22 @@ public class GraphML2SBGNML {
 	java.util.Map<String, String> colorMap = new HashMap<String, String>();
 
 	public static void convert(String szInputFileName) {
+		convert(szInputFileName, szInputFileName.replace(".graphml", "").concat(".sbgn"));
+	}
 
+	public static boolean convert(String szInputFileName, String szOutSBGNFile) {
+
+		boolean bConversion = false;
 		try {
 			long start = System.currentTimeMillis();
 			String xml = new String(Files.readAllBytes(FileSystems.getDefault().getPath(szInputFileName)));
-			String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
-			
+
 			//if the output file already exists, it will be overwritten during the current conversion step
 			if((new File(szOutSBGNFile)).exists())
 			{
 				System.out.println("The selected output file exists and it will be overwritten during the current conversion step." );
 			}
 			
-			boolean bConversion = false;
 			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
 				GraphML2PD pdConverter = new GraphML2PD();
 				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
@@ -71,7 +74,7 @@ public class GraphML2SBGNML {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		return bConversion;
 	}
 
 	boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {

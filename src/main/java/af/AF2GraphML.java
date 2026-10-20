@@ -72,7 +72,7 @@ public class AF2GraphML {
 		super();
 	}
 
-	public void parseSBGNFile(String szInSBGNFileName, String szOutGraphMLFileName) {
+	public boolean parseSBGNFile(String szInSBGNFileName, String szOutGraphMLFileName) {
 
 		FileWriter w;
 
@@ -108,6 +108,7 @@ public class AF2GraphML {
 				} catch (TransformerConfigurationException | SAXException e) {
 					e.printStackTrace();
 				}
+				return true;
 
 			} catch (IOException e1) {
 				e1.printStackTrace();
@@ -115,6 +116,7 @@ public class AF2GraphML {
 		} catch (JAXBException e2) {
 			e2.printStackTrace();
 		}
+		return false;
 	}
 
 	private void addGlyphs(DirectedGraph<Glyph, Arc> _graph, List<Glyph> glyphList) {
