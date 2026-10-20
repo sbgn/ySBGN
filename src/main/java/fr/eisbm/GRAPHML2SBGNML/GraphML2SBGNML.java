@@ -28,6 +28,7 @@ import af.GraphML2AF;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
+import fr.eisbm.GraphMLHandlers.IdHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
 import pd.GraphML2PD;
@@ -151,6 +152,9 @@ public class GraphML2SBGNML {
 			// handle clone marker
 			CloneHandler cloneHandler = new CloneHandler();
 			cloneHandler.setClonedGlyphs(map);
+
+			// make the ids valid SBGN-ML ids (NCName, unique)
+			new IdHandler().makeValidIds(map);
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);

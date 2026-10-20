@@ -36,6 +36,7 @@ import org.xml.sax.SAXException;
 
 import fr.eisbm.GRAPHML2SBGNML.ConverterDefines;
 import fr.eisbm.GRAPHML2SBGNML.Utils;
+import fr.eisbm.GraphMLHandlers.IdHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 
 public class GraphML2AF {
@@ -574,6 +575,9 @@ public class GraphML2AF {
 			}
 
 			addExtension(doc);
+
+			// make the ids valid SBGN-ML ids (NCName, unique)
+			new IdHandler().makeValidIds(map);
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
