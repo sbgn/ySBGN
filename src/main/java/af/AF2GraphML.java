@@ -178,7 +178,9 @@ public class AF2GraphML {
 		Transformer serializer = handler.getTransformer();
 		serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 		serializer.setOutputProperty(OutputKeys.STANDALONE, "no");
-		serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+		// no indentation: since Java 9 it also indents the text between elements, so a label's text
+		// (followed by <y:LabelModel>) would get line breaks and spaces, which yEd shows
+		serializer.setOutputProperty(OutputKeys.INDENT, "no");
 		handler.setResult(streamResult);
 		handler.startDocument();
 		AttributesImpl attr = new AttributesImpl();
