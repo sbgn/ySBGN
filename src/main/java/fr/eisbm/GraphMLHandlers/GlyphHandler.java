@@ -185,15 +185,7 @@ public class GlyphHandler {
 							// the multimer is represented by a macromolecule having the property
 							// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
 							// value="2"/> in GraphML
-							NodeList _nlNodePropertiesList = (eBoundElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
-						
-							for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
-								Element _elem = (Element) _nlNodePropertiesList.item(i);
-								if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
-									bIsMultimer = true;
-									break;
-								}
-							}
+							bIsMultimer = isMultimer(eBoundElement);
 
 							if (!compoundComplexMap.containsKey(szComplexId)) {
 								_complexGlyph = new Glyph();
@@ -320,14 +312,7 @@ public class GlyphHandler {
 		// the multimer is represented by a macromolecule having the property
 		// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
 		// value="2"/> in GraphML
-		NodeList _nlNodePropertiesList = (eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
-		for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
-			Element _elem = (Element) _nlNodePropertiesList.item(i);
-			if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
-				bIsMultimer = true;
-				break;
-			}
-		}
+		bIsMultimer = isMultimer(eElement);
 
 		// setting the glyph class
 		NodeList _nlConfigList = eElement.getElementsByTagName(ConverterDefines.Y_GENERIC_GROUP_NODE);
@@ -421,6 +406,36 @@ public class GlyphHandler {
 			}
 		}
 		return _glyph;
+	}
+
+	/**
+	 * A node is a multimer when its own style has mcount above 1 (yEd writes
+	 * mcount 1 for a single entity). The properties of the nodes drawn inside a
+	 * group (the members of a complex) are not the group's.
+	 */
+	private boolean isMultimer(Element eElement) {
+		NodeList _nlNodePropertiesList = eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY);
+		for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
+			Element _elem = (Element) _nlNodePropertiesList.item(i);
+			if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)
+					&& !isInNestedGraph(_elem, eElement)) {
+				try {
+					return Integer.parseInt(_elem.getAttribute("value").trim()) > 1;
+				} catch (NumberFormatException e) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isInNestedGraph(Node node, Element eAncestor) {
+		for (Node n = node.getParentNode(); n != null && n != eAncestor; n = n.getParentNode()) {
+			if ("graph".equals(n.getNodeName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void addUnitOfInformation(Glyph _glyph, int i, String szText) {
