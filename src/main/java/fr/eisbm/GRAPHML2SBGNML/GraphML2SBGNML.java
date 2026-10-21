@@ -28,6 +28,7 @@ import af.GraphML2AF;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
+import fr.eisbm.GraphMLHandlers.IdHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
 import pd.GraphML2PD;
@@ -39,19 +40,22 @@ public class GraphML2SBGNML {
 	java.util.Map<String, String> colorMap = new HashMap<String, String>();
 
 	public static void convert(String szInputFileName) {
+		convert(szInputFileName, szInputFileName.replace(".graphml", "").concat(".sbgn"));
+	}
 
+	public static boolean convert(String szInputFileName, String szOutSBGNFile) {
+
+		boolean bConversion = false;
 		try {
 			long start = System.currentTimeMillis();
 			String xml = new String(Files.readAllBytes(FileSystems.getDefault().getPath(szInputFileName)));
-			String szOutSBGNFile = szInputFileName.replace(".graphml", "").concat(".sbgn");
-			
+
 			//if the output file already exists, it will be overwritten during the current conversion step
 			if((new File(szOutSBGNFile)).exists())
 			{
 				System.out.println("The selected output file exists and it will be overwritten during the current conversion step." );
 			}
 			
-			boolean bConversion = false;
 			if (xml.contains(ConverterDefines.COM_YWORKS_SBGN_PROCESS)) {
 				GraphML2PD pdConverter = new GraphML2PD();
 				bConversion = pdConverter.parseGraphMLFile(szInputFileName, szOutSBGNFile);
@@ -71,7 +75,7 @@ public class GraphML2SBGNML {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		return bConversion;
 	}
 
 	boolean parseGraphMLFile(String szInGraphMLFileName, String szOutSBGNFile) {
@@ -149,6 +153,9 @@ public class GraphML2SBGNML {
 			CloneHandler cloneHandler = new CloneHandler();
 			cloneHandler.setClonedGlyphs(map);
 
+			// make the ids valid SBGN-ML ids (NCName, unique)
+			new IdHandler().makeValidIds(map);
+
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
 
@@ -179,6 +186,10 @@ public class GraphML2SBGNML {
 
 		int i = 0;
 		for (String _color : sh.colorSet) {
+			// a node drawn without fill in yEd (hasColor="false") has no colour: written as "none"
+			if (_color.isEmpty()) {
+				continue;
+			}
 			i++;
 			colorMap.put(_color, ConverterDefines.COLOR_PREFIX + i);
 		}
@@ -200,9 +211,9 @@ public class GraphML2SBGNML {
 
 			// add graphics of the style
 			Element graphics = doc.createElement(ConverterDefines.GRAPHICS_TAG);
-			graphics.setAttribute(ConverterDefines.FILL_ATTR, colorMap.get(e.getValue().getFillColor()));
+			graphics.setAttribute(ConverterDefines.FILL_ATTR, colorMap.getOrDefault(e.getValue().getFillColor(), "none"));
 			graphics.setAttribute(ConverterDefines.FONTSIZE_ATTR, Float.toString(e.getValue().getFontSize()));
-			graphics.setAttribute(ConverterDefines.STROKE_ATTR, colorMap.get(e.getValue().getStrokeColor()));
+			graphics.setAttribute(ConverterDefines.STROKE_ATTR, colorMap.getOrDefault(e.getValue().getStrokeColor(), "none"));
 			graphics.setAttribute(ConverterDefines.STROKE_WIDTH_ATTR, Float.toString(e.getValue().getStrokeWidth()));
 			eltStyleId.appendChild(graphics);
 

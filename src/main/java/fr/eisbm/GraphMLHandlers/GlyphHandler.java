@@ -1,5 +1,6 @@
 package fr.eisbm.GraphMLHandlers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jgrapht.alg.util.Pair;
+import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
@@ -30,7 +32,9 @@ public class GlyphHandler {
 	java.util.Map<String, String> compoundCompartmentMap = new HashMap<String, String>();
 	Set<String> complexSet = new HashSet<String>();
 	Set<String> compartmentSet = new HashSet<String>();
-	java.util.Map<Pair<String, String>, ResourceCoordinates> resourceMap = new HashMap<Pair<String, String>, ResourceCoordinates>();
+	// a node may show the same resource more than once (e.g. two state variables P), so each
+	// (resource, node) pair keeps the position of every occurrence
+	java.util.Map<Pair<String, String>, List<ResourceCoordinates>> resourceMap = new HashMap<Pair<String, String>, List<ResourceCoordinates>>();
 
 	public String parseYedNodeType(String szType, boolean bIsMultimer) {
 		String szGlyphClass = "";
@@ -182,15 +186,7 @@ public class GlyphHandler {
 							// the multimer is represented by a macromolecule having the property
 							// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
 							// value="2"/> in GraphML
-							NodeList _nlNodePropertiesList = (eBoundElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
-						
-							for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
-								Element _elem = (Element) _nlNodePropertiesList.item(i);
-								if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
-									bIsMultimer = true;
-									break;
-								}
-							}
+							bIsMultimer = isMultimer(eBoundElement);
 
 							if (!compoundComplexMap.containsKey(szComplexId)) {
 								_complexGlyph = new Glyph();
@@ -317,14 +313,7 @@ public class GlyphHandler {
 		// the multimer is represented by a macromolecule having the property
 		// <y:Property class="java.lang.Integer" name="com.yworks.sbgn.style.mcount"
 		// value="2"/> in GraphML
-		NodeList _nlNodePropertiesList = (eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY));
-		for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
-			Element _elem = (Element) _nlNodePropertiesList.item(i);
-			if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)) {
-				bIsMultimer = true;
-				break;
-			}
-		}
+		bIsMultimer = isMultimer(eElement);
 
 		// setting the glyph class
 		NodeList _nlConfigList = eElement.getElementsByTagName(ConverterDefines.Y_GENERIC_GROUP_NODE);
@@ -372,15 +361,17 @@ public class GlyphHandler {
 						Pair<String, String> pair = new Pair<String, String>(
 								_element.getAttribute(ConverterDefines.ICON_DATA_ATTR), szGlyphId);
 						if (!resourceMap.containsKey(pair)) {
-							resourceMap.put(pair,
-									new ResourceCoordinates(_glyph.getBbox().getX(), _glyph.getBbox().getY()));
-							if (_element.hasAttribute("x")) {
-								resourceMap.get(pair).updateXCoord(Float.parseFloat(_element.getAttribute("x")));
-							}
-							if (_element.hasAttribute("y")) {
-								resourceMap.get(pair).updateYCoord(Float.parseFloat(_element.getAttribute("y")));
-							}
+							resourceMap.put(pair, new ArrayList<ResourceCoordinates>());
 						}
+						ResourceCoordinates coordinates = new ResourceCoordinates(_glyph.getBbox().getX(),
+								_glyph.getBbox().getY());
+						if (_element.hasAttribute("x")) {
+							coordinates.updateXCoord(Float.parseFloat(_element.getAttribute("x")));
+						}
+						if (_element.hasAttribute("y")) {
+							coordinates.updateYCoord(Float.parseFloat(_element.getAttribute("y")));
+						}
+						resourceMap.get(pair).add(coordinates);
 					}
 
 					addUnitOfInformation(_glyph, i, _element.getTextContent().trim());
@@ -407,7 +398,7 @@ public class GlyphHandler {
 
 			// parse data information on notes, annotation, orientation, clone etc.
 			NodeList nlDataList = eElement.getElementsByTagName(ConverterDefines.DATA_TAG);
-			Element eltAnnotation = parseAnnotation(doc, modelAttributes, _glyph, nlDataList);
+			Element eltAnnotation = parseAnnotation(doc, modelAttributes, _glyph, nlDataList, eElement);
 
 			if (null != eltAnnotation) {
 				Extension _extension = new Extension();
@@ -416,6 +407,93 @@ public class GlyphHandler {
 			}
 		}
 		return _glyph;
+	}
+
+	/**
+	 * A process or logic gate drawn outside every compartment is given the
+	 * smallest compartment its centre lies in, else the compartment of its first
+	 * neighbour, as Newt places it.
+	 */
+	public void setProcessCompartments(Map map) {
+		List<Glyph> compartments = new ArrayList<Glyph>();
+		for (Glyph g : map.getGlyph()) {
+			if (ConverterDefines.SBGN_COMPARTMENT.equals(g.getClazz())) {
+				compartments.add(g);
+			}
+		}
+		if (compartments.isEmpty()) {
+			return;
+		}
+		for (Glyph g : map.getGlyph()) {
+			if ((Utils.isProcessType(g) || Utils.isOperatorType(g)) && g.getCompartmentRef() == null) {
+				float x = g.getBbox().getX() + g.getBbox().getW() / 2;
+				float y = g.getBbox().getY() + g.getBbox().getH() / 2;
+				Glyph smallest = null;
+				for (Glyph c : compartments) {
+					Bbox b = c.getBbox();
+					if (b.getX() <= x && x <= b.getX() + b.getW() && b.getY() <= y && y <= b.getY() + b.getH()
+							&& (smallest == null || b.getW() * b.getH() < smallest.getBbox().getW()
+									* smallest.getBbox().getH())) {
+						smallest = c;
+					}
+				}
+				if (smallest == null) {
+					smallest = neighbourCompartment(g, map);
+				}
+				if (smallest != null) {
+					g.setCompartmentRef(smallest);
+				}
+			}
+		}
+	}
+
+	private Glyph neighbourCompartment(Glyph g, Map map) {
+		for (Arc arc : map.getArc()) {
+			Object other = null;
+			if (owner(arc.getSource(), g)) {
+				other = arc.getTarget();
+			} else if (owner(arc.getTarget(), g)) {
+				other = arc.getSource();
+			}
+			if (other instanceof Glyph && ((Glyph) other).getCompartmentRef() instanceof Glyph) {
+				return (Glyph) ((Glyph) other).getCompartmentRef();
+			}
+		}
+		return null;
+	}
+
+	private boolean owner(Object end, Glyph g) {
+		return end == g || (end instanceof Port && g.getPort().contains(end));
+	}
+
+	/**
+	 * A node is a multimer when its own style has mcount above 1 (yEd writes
+	 * mcount 1 for a single entity). The properties of the nodes drawn inside a
+	 * group (the members of a complex) are not the group's.
+	 */
+	private boolean isMultimer(Element eElement) {
+		NodeList _nlNodePropertiesList = eElement.getElementsByTagName(ConverterDefines.Y_PROPERTY);
+		for (int i = 0; i < _nlNodePropertiesList.getLength(); i++) {
+			Element _elem = (Element) _nlNodePropertiesList.item(i);
+			if (_elem.getAttribute("name").equals(ConverterDefines.COM_YWORKS_SBGN_STYLE_MCOUNT)
+					&& !isInNestedGraph(_elem, eElement)) {
+				try {
+					return Integer.parseInt(_elem.getAttribute("value").trim()) > 1;
+				} catch (NumberFormatException e) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private boolean isInNestedGraph(Node node, Element eAncestor) {
+		for (Node n = node.getParentNode(); n != null && n != eAncestor; n = n.getParentNode()) {
+			if ("graph".equals(n.getNodeName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private void addUnitOfInformation(Glyph _glyph, int i, String szText) {
@@ -442,7 +520,67 @@ public class GlyphHandler {
 		}
 	}
 
-	private Element parseAnnotation(Document doc, ModelAttributes modelAttributes, Glyph _glyph, NodeList nlDataList) {
+	/**
+	 * Writes the identifiers kept as node properties as identifiers.org links, as
+	 * Newt reads them: bqbiol:is for one entity (a metabolite by its ChEBI ID, a
+	 * protein by HGNC symbol, HGNC and UniProt), bqbiol:hasVersion with the
+	 * members' links for a family (Member annotation).
+	 */
+	private boolean addIdentifiers(Document doc, Element rdfDescription, java.util.Map<String, String> identifiers) {
+		List<String> uris = new ArrayList<String>();
+		String szQualifier = "bqbiol:is";
+		if (identifiers.containsKey("Member annotation")) {
+			szQualifier = "bqbiol:hasVersion";
+			// [{"symbol": "MAP2K1", "props": [["HGNC", "HGNC:6840"], ["HGNC symbol", "MAP2K1"], ...]}, ...]
+			java.util.regex.Matcher member = java.util.regex.Pattern.compile("\\{[^{}]*\\}")
+					.matcher(identifiers.get("Member annotation"));
+			while (member.find()) {
+				java.util.Map<String, String> props = new HashMap<String, String>();
+				java.util.regex.Matcher prop = java.util.regex.Pattern
+						.compile("\\[\\s*\"([^\"]+)\"\\s*,\\s*\"([^\"]*)\"\\s*\\]").matcher(member.group());
+				while (prop.find()) {
+					props.put(prop.group(1), prop.group(2));
+				}
+				uris.addAll(identifierUris(props));
+			}
+		} else if (identifiers.containsKey("ChEBI") || identifiers.containsKey("HGNC symbol")) {
+			uris.addAll(identifierUris(identifiers));
+		}
+		if (uris.isEmpty()) {
+			return false;
+		}
+		Element eltQualifier = doc.createElementNS("http://biomodels.net/biology-qualifiers/", szQualifier);
+		Element eltRDFBag = doc.createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", ConverterDefines.RDF_BAG_TAG);
+		eltQualifier.appendChild(eltRDFBag);
+		for (String uri : uris) {
+			Element eltRDFLi = doc.createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", ConverterDefines.RDF_LI_TAG);
+			eltRDFLi.setAttributeNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#", ConverterDefines.RDF_RESOURCE_TAG, uri);
+			eltRDFBag.appendChild(eltRDFLi);
+		}
+		rdfDescription.appendChild(eltQualifier);
+		return true;
+	}
+
+	private List<String> identifierUris(java.util.Map<String, String> props) {
+		List<String> uris = new ArrayList<String>();
+		if (props.containsKey("ChEBI")) {
+			uris.add("http://identifiers.org/CHEBI:" + props.get("ChEBI").replace("CHEBI:", ""));
+			return uris;
+		}
+		if (props.containsKey("HGNC symbol")) {
+			uris.add("http://identifiers.org/hgnc.symbol:" + props.get("HGNC symbol"));
+		}
+		if (props.containsKey("HGNC")) {
+			uris.add("http://identifiers.org/hgnc:" + props.get("HGNC").replace("HGNC:", ""));
+		}
+		if (props.containsKey("UniProt")) {
+			uris.add("http://identifiers.org/uniprot:" + props.get("UniProt"));
+		}
+		return uris;
+	}
+
+	private Element parseAnnotation(Document doc, ModelAttributes modelAttributes, Glyph _glyph, NodeList nlDataList,
+			Element eNode) {
 		Element eltAnnotation = null;
 		// TODO: to read the namespace from the file
 		Element rdfRDF = doc.createElementNS("http://www.w3.org/1999/02/22-rdf-syntax-ns#",
@@ -454,9 +592,30 @@ public class GlyphHandler {
 		// check if there is at least one field of the annotation; otherwise, no need to
 		// add an empty annotation
 		boolean bHasAnnotation = false;
+		java.util.Map<String, String> identifiers = new HashMap<String, String>();
 
 		for (int temp2 = 0; temp2 < nlDataList.getLength(); temp2++) {
 			Element _element = ((Element) (nlDataList.item(temp2)));
+			// the data of the nodes drawn inside a group (members of a complex) are theirs
+			if (isInNestedGraph(_element, eNode)) {
+				continue;
+			}
+
+			// identifiers kept as node properties: HGNC, HGNC symbol, UniProt, ChEBI, Member annotation
+			String szKey = _element.getAttribute(ConverterDefines.KEY_TAG);
+			if (!szKey.isEmpty() && !_element.getTextContent().trim().isEmpty()) {
+				if (szKey.equals(modelAttributes.szHgncTagId)) {
+					identifiers.put("HGNC", _element.getTextContent().trim());
+				} else if (szKey.equals(modelAttributes.szHgncSymbolTagId)) {
+					identifiers.put("HGNC symbol", _element.getTextContent().trim());
+				} else if (szKey.equals(modelAttributes.szUniProtTagId)) {
+					identifiers.put("UniProt", _element.getTextContent().trim());
+				} else if (szKey.equals(modelAttributes.szChebiTagId)) {
+					identifiers.put("ChEBI", _element.getTextContent().trim());
+				} else if (szKey.equals(modelAttributes.szMemberAnnotationTagId)) {
+					identifiers.put("Member annotation", _element.getTextContent().trim());
+				}
+			}
 
 			// parse notes information
 			if (_element.getAttribute(ConverterDefines.KEY_TAG).equals(modelAttributes.szNotesTagId)) {
@@ -640,6 +799,10 @@ public class GlyphHandler {
 			}
 		}
 
+		if (!Utils.isProcessType(_glyph) && addIdentifiers(doc, rdfDescription, identifiers)) {
+			bHasAnnotation = true;
+		}
+
 		if (true == bHasAnnotation) {
 			if (null == eltAnnotation) {
 				eltAnnotation = doc.createElement(ConverterDefines.ANNOTATION_TAG);
@@ -655,7 +818,7 @@ public class GlyphHandler {
 			if (notes.getTextContent() != null) {
 				if (!notes.getTextContent().trim().isEmpty()) {
 					Notes newNotes = new Notes();
-					newNotes.getAny().add(notes);
+					newNotes.getAny().add(Utils.toXhtmlNotes(notes));
 					return newNotes;
 				}
 			}
@@ -745,28 +908,49 @@ public class GlyphHandler {
 				}
 
 				// add the state variable to the corresponding glyph
-				for (Entry<Pair<String, String>, ResourceCoordinates> _resource : resourceMap.entrySet()) {
+				for (Entry<Pair<String, String>, List<ResourceCoordinates>> _resource : resourceMap.entrySet()) {
 					if (_resource.getKey().first.equals(szResourceId)) {
 						NodeList nlGeometry = eElement.getElementsByTagName(ConverterDefines.Y_GEOMETRY);
 						String szHeight = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.HEIGHT_ATTR);
 						String szWidth = ((Element) (nlGeometry.item(0))).getAttribute(ConverterDefines.WIDTH_ATTR);
 
-						Bbox bbox = new Bbox();
-						bbox.setH(Float.parseFloat(szHeight));
-						bbox.setW(Float.parseFloat(szWidth));
-						if (_resource.getValue() != null) {
-							bbox.setX(_resource.getValue().getXCoord());
-							bbox.setY(_resource.getValue().getYCoord());
+						for (ResourceCoordinates coordinates : _resource.getValue()) {
+							Bbox bbox = new Bbox();
+							bbox.setH(Float.parseFloat(szHeight));
+							bbox.setW(Float.parseFloat(szWidth));
+							bbox.setX(coordinates.getXCoord());
+							bbox.setY(coordinates.getYCoord());
+
+							// yEd shares one resource between nodes with the same label (e.g. N:2), so
+							// each node gets its own glyph, with its own position
+							Glyph _resourceGlyph = copyResourceGlyph(_glyph);
+							_resourceGlyph.setBbox(bbox);
+
+							String szParentGlyphId = _resource.getKey().second;
+							addGlyphToList(szParentGlyphId, _resourceGlyph, map.getGlyph());
 						}
-
-						_glyph.setBbox(bbox);
-
-						String szParentGlyphId = _resource.getKey().second;
-						addGlyphToList(szParentGlyphId, _glyph, map.getGlyph());
 					}
 				}
 			}
 		}
+	}
+
+	private Glyph copyResourceGlyph(Glyph _glyph) {
+		Glyph _copy = new Glyph();
+		_copy.setId(_glyph.getId());
+		_copy.setClazz(_glyph.getClazz());
+		if (_glyph.getLabel() != null) {
+			Label _label = new Label();
+			_label.setText(_glyph.getLabel().getText());
+			_copy.setLabel(_label);
+		}
+		if (_glyph.getState() != null) {
+			Glyph.State _state = new Glyph.State();
+			_state.setValue(_glyph.getState().getValue());
+			_state.setVariable(_glyph.getState().getVariable());
+			_copy.setState(_state);
+		}
+		return _copy;
 	}
 
 	private void addGlyphToList(String szParentGlyphId, Glyph _glyph, List<Glyph> _listOfGlyphs) {

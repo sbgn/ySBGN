@@ -2,6 +2,7 @@ package fr.eisbm.GraphMLHandlers;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,7 +27,7 @@ import fr.eisbm.GraphMLHandlers.PortArcsRelationship.PortType;
 public class ArcHandler {
 
 	java.util.Map<String, PortArcsRelationship> port_arc_map = new HashMap<String, PortArcsRelationship>();
-	java.util.Map<String, HashSet<Arc>> glyph_arc_map = new HashMap<String, HashSet<Arc>>();
+	java.util.Map<String, Set<Arc>> glyph_arc_map = new HashMap<String, Set<Arc>>();
 	private Set<String> reversibleSet = new HashSet<String>();
 
 	public void processArcs(NodeList nEdgeList, Map map, StyleHandler sh) {
@@ -480,7 +481,7 @@ public class ArcHandler {
 
 					if (isArcConnectedToGlyph(arc, glyph)) {
 						if (!glyph_arc_map.containsKey(glyph.getId())) {
-							glyph_arc_map.put(glyph.getId(), new HashSet<Arc>());
+							glyph_arc_map.put(glyph.getId(), new LinkedHashSet<Arc>());
 						}
 						glyph_arc_map.get(glyph.getId()).add(arc);
 					}

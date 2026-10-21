@@ -27,6 +27,7 @@ import fr.eisbm.GRAPHML2SBGNML.Utils;
 import fr.eisbm.GraphMLHandlers.ArcHandler;
 import fr.eisbm.GraphMLHandlers.CloneHandler;
 import fr.eisbm.GraphMLHandlers.GlyphHandler;
+import fr.eisbm.GraphMLHandlers.IdHandler;
 import fr.eisbm.GraphMLHandlers.SBGNMLStyle;
 import fr.eisbm.GraphMLHandlers.StyleHandler;
 
@@ -106,6 +107,9 @@ public class GraphML2PD {
 			arcHandler.processArcs(nEdgeList, map, styleHandler);
 			arcHandler.setArcsToPorts(map);
 
+			// processes and logic gates outside every compartment
+			glyphHandler.setProcessCompartments(map);
+
 			// resources:
 			NodeList nResourceList = doc.getElementsByTagName(ConverterDefines.Y_RESOURCE);
 			glyphHandler.processResources(nResourceList, map);
@@ -122,6 +126,9 @@ public class GraphML2PD {
 			// handle clone marker
 			CloneHandler cloneHandler = new CloneHandler();
 			cloneHandler.setClonedGlyphs(map);
+
+			// make the ids valid SBGN-ML ids (NCName, unique)
+			new IdHandler().makeValidIds(map);
 
 			// write everything to disk
 			SbgnUtil.writeToFile(sbgn, outputFile);
@@ -152,6 +159,10 @@ public class GraphML2PD {
 
 		int i = 0;
 		for (String _color : sh.colorSet) {
+			// a node drawn without fill in yEd (hasColor="false") has no colour: written as "none"
+			if (_color.isEmpty()) {
+				continue;
+			}
 			i++;
 			colorMap.put(_color, ConverterDefines.COLOR_PREFIX + i);
 		}
@@ -173,9 +184,9 @@ public class GraphML2PD {
 
 			// add graphics of the style
 			Element graphics = doc.createElement(ConverterDefines.GRAPHICS_TAG);
-			graphics.setAttribute(ConverterDefines.FILL_ATTR, colorMap.get(e.getValue().getFillColor()));
+			graphics.setAttribute(ConverterDefines.FILL_ATTR, colorMap.getOrDefault(e.getValue().getFillColor(), "none"));
 			graphics.setAttribute(ConverterDefines.FONTSIZE_ATTR, Float.toString(e.getValue().getFontSize()));
-			graphics.setAttribute(ConverterDefines.STROKE_ATTR, colorMap.get(e.getValue().getStrokeColor()));
+			graphics.setAttribute(ConverterDefines.STROKE_ATTR, colorMap.getOrDefault(e.getValue().getStrokeColor(), "none"));
 			graphics.setAttribute(ConverterDefines.STROKE_WIDTH_ATTR, Float.toString(e.getValue().getStrokeWidth()));
 			eltStyleId.appendChild(graphics);
 
