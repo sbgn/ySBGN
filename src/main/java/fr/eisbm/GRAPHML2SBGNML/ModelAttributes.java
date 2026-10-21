@@ -15,6 +15,12 @@ public class ModelAttributes {
 	public String szAnnotationTagId;
 	public String szNodeURLTagId;
 	public String szOrientationTagId;
+	// identifiers as node properties (metabolismregulation.github.io maps)
+	public String szHgncTagId;
+	public String szHgncSymbolTagId;
+	public String szUniProtTagId;
+	public String szChebiTagId;
+	public String szMemberAnnotationTagId;
 	
 	public ModelAttributes() {
 		super();
@@ -27,6 +33,11 @@ public class ModelAttributes {
 		szAnnotationTagId ="";
 		szNodeURLTagId ="";
 		szOrientationTagId ="";
+		szHgncTagId = "";
+		szHgncSymbolTagId = "";
+		szUniProtTagId = "";
+		szChebiTagId = "";
+		szMemberAnnotationTagId = "";
 	}
 	
 	public void populateModelAttributes(NodeList nKeyList) {
@@ -52,6 +63,16 @@ public class ModelAttributes {
 				} else if (eElement.getAttribute("attr.name").toLowerCase()
 						.equals(ConverterDefines.ORIENTATION_TAG)) {
 					szOrientationTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
+				} else if (eElement.getAttribute("attr.name").equals("HGNC")) {
+					szHgncTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
+				} else if (eElement.getAttribute("attr.name").equals("HGNC symbol")) {
+					szHgncSymbolTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
+				} else if (eElement.getAttribute("attr.name").equals("UniProt")) {
+					szUniProtTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
+				} else if (eElement.getAttribute("attr.name").equals("ChEBI")) {
+					szChebiTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
+				} else if (eElement.getAttribute("attr.name").equals("Member annotation")) {
+					szMemberAnnotationTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
 				} else if ((eElement.getAttribute("attr.name").toLowerCase().equals(ConverterDefines.URL_TAG))
 						&& (eElement.getAttribute("for").toLowerCase().equals(ConverterDefines.NODE_TAG))) {
 					szNodeURLTagId = eElement.getAttribute(ConverterDefines.ID_ATTR);
