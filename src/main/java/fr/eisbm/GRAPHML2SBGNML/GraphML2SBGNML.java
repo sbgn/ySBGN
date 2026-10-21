@@ -186,6 +186,10 @@ public class GraphML2SBGNML {
 
 		int i = 0;
 		for (String _color : sh.colorSet) {
+			// a node drawn without fill in yEd (hasColor="false") has no colour: written as "none"
+			if (_color.isEmpty()) {
+				continue;
+			}
 			i++;
 			colorMap.put(_color, ConverterDefines.COLOR_PREFIX + i);
 		}
@@ -207,9 +211,9 @@ public class GraphML2SBGNML {
 
 			// add graphics of the style
 			Element graphics = doc.createElement(ConverterDefines.GRAPHICS_TAG);
-			graphics.setAttribute(ConverterDefines.FILL_ATTR, colorMap.get(e.getValue().getFillColor()));
+			graphics.setAttribute(ConverterDefines.FILL_ATTR, colorMap.getOrDefault(e.getValue().getFillColor(), "none"));
 			graphics.setAttribute(ConverterDefines.FONTSIZE_ATTR, Float.toString(e.getValue().getFontSize()));
-			graphics.setAttribute(ConverterDefines.STROKE_ATTR, colorMap.get(e.getValue().getStrokeColor()));
+			graphics.setAttribute(ConverterDefines.STROKE_ATTR, colorMap.getOrDefault(e.getValue().getStrokeColor(), "none"));
 			graphics.setAttribute(ConverterDefines.STROKE_WIDTH_ATTR, Float.toString(e.getValue().getStrokeWidth()));
 			eltStyleId.appendChild(graphics);
 

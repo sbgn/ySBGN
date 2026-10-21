@@ -889,6 +889,10 @@ public class GraphML2AF {
 
 		int i = 0;
 		for (String _color : colorSet) {
+			// a node drawn without fill in yEd (hasColor="false") has no colour: written as "none"
+			if (_color.isEmpty()) {
+				continue;
+			}
 			i++;
 			colorMap.put(_color, COLOR_PREFIX + i);
 		}
@@ -910,9 +914,9 @@ public class GraphML2AF {
 
 			// add graphics of the style
 			Element graphics = doc.createElement(GRAPHICS_TAG);
-			graphics.setAttribute(FILL_ATTR, colorMap.get(e.getValue().getFillColor()));
+			graphics.setAttribute(FILL_ATTR, colorMap.getOrDefault(e.getValue().getFillColor(), "none"));
 			graphics.setAttribute(FONTSIZE_ATTR, Float.toString(e.getValue().getFontSize()));
-			graphics.setAttribute(STROKE_ATTR, colorMap.get(e.getValue().getStrokeColor()));
+			graphics.setAttribute(STROKE_ATTR, colorMap.getOrDefault(e.getValue().getStrokeColor(), "none"));
 			graphics.setAttribute(STROKE_WIDTH_ATTR, Float.toString(e.getValue().getStrokeWidth()));
 			eltStyleId.appendChild(graphics);
 
