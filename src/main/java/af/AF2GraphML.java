@@ -1787,7 +1787,12 @@ public class AF2GraphML {
 	private void addBorderStyle(TransformerHandler handler, GraphMLStyle style) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		attr.addAttribute("", "", "color", "CDATA", style.getStrokeColor());
+		// no colour (SBGN-ML render "none"): yEd's hasColor="false"
+		if (style.getStrokeColor() != null) {
+			attr.addAttribute("", "", "color", "CDATA", style.getStrokeColor());
+		} else {
+			attr.addAttribute("", "", "hasColor", "CDATA", "false");
+		}
 		attr.addAttribute("", "", "type", "CDATA", "line");
 		attr.addAttribute("", "", "width", "CDATA", style.getStrokeWidth());
 		handler.startElement("", "", ConverterDefines.Y_BORDER_STYLE, attr);
@@ -1797,7 +1802,11 @@ public class AF2GraphML {
 	private void addFillColor(TransformerHandler handler, GraphMLStyle style) throws SAXException {
 		AttributesImpl attr = new AttributesImpl();
 
-		attr.addAttribute("", "", "color", "CDATA", style.getFillColor());
+		if (style.getFillColor() != null) {
+			attr.addAttribute("", "", "color", "CDATA", style.getFillColor());
+		} else {
+			attr.addAttribute("", "", "hasColor", "CDATA", "false");
+		}
 		attr.addAttribute("", "", "transparent", "CDATA", "false");
 		handler.startElement("", "", ConverterDefines.Y_FILL, attr);
 		handler.endElement("", "", ConverterDefines.Y_FILL);

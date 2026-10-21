@@ -45,7 +45,9 @@ public class ConversionTest {
 				{ "example_files/process_port_diagrams/ProcessPorts.graphml" },
 				{ "example_files/tags/tags_generated.graphml" }, { "acsn_diagrams/cellcycle_v1.graphml" },
 				// metabolismregulation.github.io ACLY map: two state variables P on one node
-				{ "src/test/resources/F006-acly.graphml" } });
+				{ "src/test/resources/F006-acly.graphml" },
+				// metabolismregulation.github.io aspirin map: nodes drawn without fill
+				{ "src/test/resources/F100-aspirin.graphml" } });
 	}
 
 	@Rule
