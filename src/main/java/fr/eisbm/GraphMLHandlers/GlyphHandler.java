@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jgrapht.alg.util.Pair;
+import org.sbgn.bindings.Arc;
 import org.sbgn.bindings.Bbox;
 import org.sbgn.bindings.Glyph;
 import org.sbgn.bindings.Glyph.Clone;
@@ -406,6 +407,63 @@ public class GlyphHandler {
 			}
 		}
 		return _glyph;
+	}
+
+	/**
+	 * A process or logic gate drawn outside every compartment is given the
+	 * smallest compartment its centre lies in, else the compartment of its first
+	 * neighbour, as Newt places it.
+	 */
+	public void setProcessCompartments(Map map) {
+		List<Glyph> compartments = new ArrayList<Glyph>();
+		for (Glyph g : map.getGlyph()) {
+			if (ConverterDefines.SBGN_COMPARTMENT.equals(g.getClazz())) {
+				compartments.add(g);
+			}
+		}
+		if (compartments.isEmpty()) {
+			return;
+		}
+		for (Glyph g : map.getGlyph()) {
+			if ((Utils.isProcessType(g) || Utils.isOperatorType(g)) && g.getCompartmentRef() == null) {
+				float x = g.getBbox().getX() + g.getBbox().getW() / 2;
+				float y = g.getBbox().getY() + g.getBbox().getH() / 2;
+				Glyph smallest = null;
+				for (Glyph c : compartments) {
+					Bbox b = c.getBbox();
+					if (b.getX() <= x && x <= b.getX() + b.getW() && b.getY() <= y && y <= b.getY() + b.getH()
+							&& (smallest == null || b.getW() * b.getH() < smallest.getBbox().getW()
+									* smallest.getBbox().getH())) {
+						smallest = c;
+					}
+				}
+				if (smallest == null) {
+					smallest = neighbourCompartment(g, map);
+				}
+				if (smallest != null) {
+					g.setCompartmentRef(smallest);
+				}
+			}
+		}
+	}
+
+	private Glyph neighbourCompartment(Glyph g, Map map) {
+		for (Arc arc : map.getArc()) {
+			Object other = null;
+			if (owner(arc.getSource(), g)) {
+				other = arc.getTarget();
+			} else if (owner(arc.getTarget(), g)) {
+				other = arc.getSource();
+			}
+			if (other instanceof Glyph && ((Glyph) other).getCompartmentRef() instanceof Glyph) {
+				return (Glyph) ((Glyph) other).getCompartmentRef();
+			}
+		}
+		return null;
+	}
+
+	private boolean owner(Object end, Glyph g) {
+		return end == g || (end instanceof Port && g.getPort().contains(end));
 	}
 
 	/**

@@ -107,6 +107,9 @@ public class GraphML2PD {
 			arcHandler.processArcs(nEdgeList, map, styleHandler);
 			arcHandler.setArcsToPorts(map);
 
+			// processes and logic gates outside every compartment
+			glyphHandler.setProcessCompartments(map);
+
 			// resources:
 			NodeList nResourceList = doc.getElementsByTagName(ConverterDefines.Y_RESOURCE);
 			glyphHandler.processResources(nResourceList, map);
