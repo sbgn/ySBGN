@@ -60,6 +60,16 @@ public class Utils {
 		}
 	}
 
+	/**
+	 * SBGN-ML notes hold XHTML: the text of a yEd description is written as an
+	 * XHTML body, not as the GraphML data element itself.
+	 */
+	public static org.w3c.dom.Element toXhtmlNotes(org.w3c.dom.Element data) {
+		org.w3c.dom.Element body = data.getOwnerDocument().createElementNS("http://www.w3.org/1999/xhtml", "body");
+		body.setTextContent(data.getTextContent());
+		return body;
+	}
+
 	public static float getPointDistance(float x1, float y1, float x2, float y2) {
 		float dist = (float) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 		return dist;

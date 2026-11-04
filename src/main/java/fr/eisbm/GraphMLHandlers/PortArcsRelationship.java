@@ -1,6 +1,6 @@
 package fr.eisbm.GraphMLHandlers;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.sbgn.bindings.Arc;
@@ -20,7 +20,7 @@ public class PortArcsRelationship {
 
 	public PortArcsRelationship(Port currentPort) {
 		super();
-		this.m_ConnectedArcs = new HashSet<Arc>();;
+		this.m_ConnectedArcs = new LinkedHashSet<Arc>();
 		this.m_Port = currentPort;
 	}
 

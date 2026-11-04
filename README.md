@@ -12,20 +12,35 @@ Known issues are shown in the [Issues](https://github.com/sbgn/ySBGN/issues) sec
 
 ## Requirements
 
- - Java 8 (with JavaFX if you want to use the GUI)
- - Maven (tested with Maven 3.5)
+ - Java 11 or newer (e.g. https://adoptium.net). JavaFX for the GUI is included in the jars.
+ - To build from source: Maven 3.6 or newer.
 
-## Install
+## Download and run
+
+The executable jars can be downloaded from the [Release page](https://github.com/sbgn/ySBGN/releases), one per system, as the GUI needs the JavaFX of that system:
+
+| Your computer | File |
+|---|---|
+| Mac with Apple chip (M1 and later) | `ySBGN-<version>-mac-arm.jar` |
+| Mac with Intel chip | `ySBGN-<version>-mac-intel.jar` |
+| Windows | `ySBGN-<version>-windows.jar` |
+| Linux | `ySBGN-<version>-linux.jar` |
+
+Double-click the jar to open the GUI, or convert on the command line (any of the jars works there):
+
+`java -jar ySBGN-<version>-linux.jar map.graphml [map.sbgn]`
+
+`java -jar ySBGN-<version>-linux.jar map.sbgn [map.graphml]`
+
+The command line exits with 1 when a conversion fails.
+
+## Build
 
 After cloning the repository and getting into its directory:
 
-`mvn clean`
+`mvn clean package`
 
-`mvn install`
-
-A small GUI is also provided as the main class of the package. It can be launched by double clicking on the jar or by directly calling the package with `java -jar`. Be sure to have JavaFX working in your Java distribution.
-
-The executable jar can be directly downloaded from the [Release page](https://github.com/sbgn/ySBGN/releases).
+This runs the tests and writes `target/ySBGN-<version>-app.jar` for the system it is built on. For another system add `-Djavafx.platform=mac`, `mac-aarch64`, `win` or `linux`.
 
 ## How to contribute
 
